@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+def volunteerHome(request):
+    return render(request,'volunteerHome.html')
+
