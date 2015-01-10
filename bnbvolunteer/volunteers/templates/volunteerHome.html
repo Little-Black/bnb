@@ -2,18 +2,21 @@ Hi this is the volunteer home page
 
 Here you can enter a new volunteer work log.
 
-<form action="{% url 'volunteers:submitNewLog' %}" method="post">
+<form action="{% url 'submitNewLog' %}" method="post">
 
-Date:<br>
+Date:
 <input type="text" name="date">
 <br>
-Task:<br>
+Task:
 <input type="text" name="task">
-Hours:<br>
+<br>
+Hours:
 <input type="text" name="hours">
-Rate:<br>
+<br>
+Rate:
 <input type="text" name="rate">
-Voucher pts earned:<br>
+<br>
+Voucher pts earned:
 <input type="text" name="earned">
 
 <input type="submit" value="Submit" />

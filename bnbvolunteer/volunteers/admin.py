@@ -1,3 +1,5 @@
 from django.contrib import admin
+from volunteers.models import *
+from django.http import HttpResponse
 
-# Register your models here.
+admin.site.register(Userlog)
