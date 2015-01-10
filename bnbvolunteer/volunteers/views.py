@@ -9,7 +9,7 @@ from volunteers.models import *
 def volunteerHome(request):
     csrfContext = RequestContext(request)
     print "um"
-    return render(request,'volunteerHome.html')
+    return render(request,'volunteers/volunteerHome.html')
 
 def volunteerSubmit(request):
     print "hey"
@@ -21,14 +21,19 @@ def volunteerSubmit(request):
     task = request.POST['task']
     hours = request.POST['hours']
     rate = request.POST['rate']
-    earned = request.POST['earned']
-    userlog = Userlog(user=user,date=date,task=task,hours=hours,rate=rate,voucherearned=earned) #request.user
+    print request.POST.getlist('myInputs')
+    earned = request.POST.getlist('myInputs')
+    totalearned = 0
+    for input in earned:
+        totalearned += int(input)
+        print totalearned
+    userlog = Userlog(user=user,date=date,task=task,hours=hours,rate=rate,voucherearned=totalearned) #request.user
     try: 
         userlog.save()
     except:
         print "ERROR"
     # return render(RequestContext(request),'volunteerHome.html')
     csrfContext = RequestContext(request)
-    return render(request,'volunteerHome.html')
+    return render(request,'volunteers/volunteerHome.html')
 
 
