@@ -3,7 +3,9 @@ from volunteers.models import *
 from django.http.response import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from userManagement import *
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -14,6 +16,7 @@ def volunteerHome(request):
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerHome.html',context)
 
+@login_required
 def volunteerSubmit(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -43,18 +46,25 @@ def userLogin(request):
     if request.method == "POST":
         (loginSuccessful, context) = loginByForm(request, LoginForm(request.POST))
         if loginSuccessful:
-            return HttpResponseRedirect(reverse('volunteerHome'))
+            redirect = request.GET["next"] if "next" in request.GET else reverse("volunteerHome")
+            return HttpResponseRedirect(redirect)
         else:
             return render(request, "volunteers/login.html", context)
     else:
-        return render(request, "volunteers/login.html", {"form": LoginForm()})
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse("volunteerHome"))
+        else:
+            return render(request, "volunteers/login.html", {"form": LoginForm()})
 
 def userRegistration(request):
     if request.method == "POST":
         (registrationSuccessful, context) = registerByForm(request, RegistrationForm(request.POST))
         if registrationSuccessful:
-            return HttpResponseRedirect(reverse('volunteerHome'))
+            return HttpResponseRedirect(reverse('userLogin'))
         else:
             return render(request, "volunteers/register.html", context)
     else:
-        return render(request, "volunteers/register.html", {"form": RegistrationForm})
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse("volunteerHome"))
+        else:
+            return render(request, "volunteers/register.html", {"form": RegistrationForm})
