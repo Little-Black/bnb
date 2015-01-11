@@ -5,7 +5,12 @@ from django.core.urlresolvers import reverse
 from userManagement import *
 
 def volunteerHome(request):
-    query_results = Userlog.objects.all()
+    try:
+        user = request.user #authenticate(username='admin', password='adMIN')
+        query_results = Userlog.objects.filter(user=user)
+    except:
+        print "Not logged in"
+        query_results = []
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerHome.html',context)
 
@@ -30,7 +35,7 @@ def volunteerSubmit(request):
     except:
         print "ERROR"
     # return render(RequestContext(request),'volunteerHome.html')
-    query_results = Userlog.objects.all()
+    query_results = Userlog.objects.filter(user=user)
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerHome.html',context)
 
