@@ -11,5 +11,5 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^volunteer/home/$', views.volunteerHome, name="volunteerHome"),
-    url(r'^volunteer/home/submit/$', views.volunteerSubmit, name="submitNewLog"),
+    url(r'^volunteer/home/submit$', views.volunteerSubmit, name="submitNewLog"),
 )
