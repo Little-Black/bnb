@@ -7,11 +7,13 @@
     {% if message %}
         <p> {{ message }} </p>
     {% endif %}
-    <form method="post" action="{% url 'userLogin' %}">
+    <form method="post">
         {% csrf_token %}
-        <p> Username: <input type='text' name='username'> </p>
-        <p> Password: <input type='password' name='password'> </p>
-        <p> <input type="submit" value="Login"> </p>
+        {% for field in form %}
+            <p> {{ field.label_tag }} {{ field }} </p>
+        {% endfor %}
+        <input type="submit" value="Login">
     </form>
+    <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
 </body>
 </html>

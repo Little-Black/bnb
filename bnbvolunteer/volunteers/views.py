@@ -1,12 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.contrib.auth import authenticate, login
 from volunteers.models import *
 from django.http.response import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-
+from userManagement import *
 
 def volunteerHome(request):
     query_results = Userlog.objects.all()
@@ -38,18 +34,22 @@ def volunteerSubmit(request):
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerHome.html',context)
 
-def showLoginPage(request):
-    return render(request, "volunteers/login.html", {})
-
 def userLogin(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            login(request, user)
+    if request.method == "POST":
+        (loginSuccessful, context) = loginByForm(request, LoginForm(request.POST))
+        if loginSuccessful:
             return HttpResponseRedirect(reverse('volunteerHome'))
         else:
-            return render(request, "volunteers/login.html", {"message": "Account has been disabled. Please contact admin."})
+            return render(request, "volunteers/login.html", context)
     else:
-        return render(request, "volunteers/login.html", {"message": "Invalid username or password."})
+        return render(request, "volunteers/login.html", {"form": LoginForm()})
+
+def userRegistration(request):
+    if request.method == "POST":
+        (registrationSuccessful, context) = registerByForm(request, RegistrationForm(request.POST))
+        if registrationSuccessful:
+            return HttpResponseRedirect(reverse('volunteerHome'))
+        else:
+            return render(request, "volunteers/register.html", context)
+    else:
+        return render(request, "volunteers/register.html", {"form": RegistrationForm})
