@@ -11,7 +11,7 @@ def volunteerHome(request):
 
 def volunteerSubmit(request):
     try:
-        user = authenticate(username='admin', password='adMIN')
+        user = request.user #authenticate(username='admin', password='adMIN')
     except:
         print "ERROR UGHHH"
     date = request.POST['date']

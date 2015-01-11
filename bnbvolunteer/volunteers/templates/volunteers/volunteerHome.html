@@ -1,5 +1,6 @@
-Hi this is the volunteer home page
-
+Welcome to the volunteer home page, {{user.first_name}}!
+<br>
+<a href="{% url 'logout' %}">Logout</a>
 <br>
 
 Here you can enter a new volunteer work log.
@@ -20,19 +21,12 @@ Rate:
 <br>
 Voucher pts earned:
 <br>
-
-<!-- a href="#" onclick="
-           suit.fieldChange('~okcode','insert_hrs');
-           suit.fieldChange('g_insert_after','1'); 
-           document.timesheet.submit(); return false">
-            <img src="../../static/volunteers/plus.jpeg" width="20" height="20" border="0" /></a> -->
 <div id="dynamicInput">
           Entry 1<input type="text" name="myInputs">
 </div>
 <input type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
 
-<!-- <input type="text" name="earned"> -->
-            <br>
+<br>
 
 <input type="submit" value="Submit" />
 </form>
