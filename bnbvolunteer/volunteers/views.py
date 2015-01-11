@@ -7,12 +7,11 @@ from volunteers.models import *
 
 
 def volunteerHome(request):
-    csrfContext = RequestContext(request)
-    print "um"
-    return render(request,'volunteers/volunteerHome.html')
+    query_results = Userlog.objects.all()
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerHome.html',context)
 
 def volunteerSubmit(request):
-    print "hey"
     try:
         user = authenticate(username='admin', password='adMIN')
     except:
@@ -33,7 +32,8 @@ def volunteerSubmit(request):
     except:
         print "ERROR"
     # return render(RequestContext(request),'volunteerHome.html')
-    csrfContext = RequestContext(request)
-    return render(request,'volunteers/volunteerHome.html')
+    query_results = Userlog.objects.all()
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerHome.html',context)
 
 
