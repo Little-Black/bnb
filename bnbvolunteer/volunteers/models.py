@@ -8,3 +8,8 @@ class Userlog(models.Model):
     hours = models.PositiveSmallIntegerField(default=0)
     rate = models.PositiveSmallIntegerField(default=2)
     voucherearned = models.PositiveSmallIntegerField(default=0)
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    address = models.CharField(blank=True, max_length=100)
+    phone = models.CharField(blank=True, max_length=30)
