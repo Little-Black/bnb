@@ -9,12 +9,11 @@ from django.core.urlresolvers import reverse
 
 
 def volunteerHome(request):
-    csrfContext = RequestContext(request)
-    print "um"
-    return render(request,'volunteerHome.html')
+    query_results = Userlog.objects.all()
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerHome.html',context)
 
 def volunteerSubmit(request):
-    print "hey"
     try:
         user = authenticate(username='admin', password='adMIN')
     except:
@@ -23,15 +22,21 @@ def volunteerSubmit(request):
     task = request.POST['task']
     hours = request.POST['hours']
     rate = request.POST['rate']
-    earned = request.POST['earned']
-    userlog = Userlog(user=user,date=date,task=task,hours=hours,rate=rate,voucherearned=earned) #request.user
+    print request.POST.getlist('myInputs')
+    earned = request.POST.getlist('myInputs')
+    totalearned = 0
+    for input in earned:
+        totalearned += int(input)
+        print totalearned
+    userlog = Userlog(user=user,date=date,task=task,hours=hours,rate=rate,voucherearned=totalearned) #request.user
     try: 
         userlog.save()
     except:
         print "ERROR"
     # return render(RequestContext(request),'volunteerHome.html')
-    csrfContext = RequestContext(request)
-    return render(request,'volunteerHome.html')
+    query_results = Userlog.objects.all()
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerHome.html',context)
 
 def showLoginPage(request):
     return render(request, "volunteers/login.html", {})

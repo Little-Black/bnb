@@ -1,0 +1,84 @@
+Hi this is the volunteer home page
+
+<br>
+
+Here you can enter a new volunteer work log.
+
+<form action="{% url 'submitNewLog' %}" method="post">{% csrf_token %}
+
+Date:
+<input type="text" name="date">
+<br>
+Task:
+<input type="text" name="task">
+<br>
+Hours:
+<input type="text" name="hours">
+<br>
+Rate:
+<input type="text" name="rate">
+<br>
+Voucher pts earned:
+<br>
+
+<!-- a href="#" onclick="
+           suit.fieldChange('~okcode','insert_hrs');
+           suit.fieldChange('g_insert_after','1'); 
+           document.timesheet.submit(); return false">
+            <img src="../../static/volunteers/plus.jpeg" width="20" height="20" border="0" /></a> -->
+<div id="dynamicInput">
+          Entry 1<input type="text" name="myInputs">
+</div>
+<input type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
+
+<!-- <input type="text" name="earned"> -->
+            <br>
+
+<input type="submit" value="Submit" />
+</form>
+
+
+<br>
+
+<table>
+    <tr>
+        <th>User</th>
+        <th>Date</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Rate</th>
+        <th>Points Earned</th>
+    </tr>
+    {% for item in query_results %}
+    <tr> 
+        <td>{{ item.user }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.task }}</td>
+        <td>{{ item.hours }}</td>
+        <td>{{ item.rate }}</td>
+        <td>{{ item.voucherearned }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+
+
+
+
+
+<script>
+var counter = 1;
+var limit = 15;
+function addInput(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var newdiv = document.createElement('div');
+          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+     }
+}
+</script>
