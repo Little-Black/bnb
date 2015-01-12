@@ -78,3 +78,13 @@ def editProfile(request):
     else:
         form = EditProfileForm(createUserContext(request.user))
     return render(request, "volunteers/profile.html", {"form": form})
+
+@login_required
+def search(request):
+    context = {}
+    return render(request,'volunteers/search.html',context)
+
+@login_required
+def updateProfile(request):
+    context = {}
+    return render(request,'volunteers/updateProfile.html',context)
