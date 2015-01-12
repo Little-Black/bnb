@@ -29,6 +29,12 @@ def volunteerStaffHome(request):
     return render(request,'volunteers/volunteerStaffHome.html',context)
 
 @login_required
+def volunteerStaffUserSearchResult(request):
+    search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
+    context = {'search_results': search_results}
+    return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
+
+@login_required
 def volunteerSubmit(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
