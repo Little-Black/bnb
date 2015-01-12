@@ -52,25 +52,26 @@ class RegistrationForm(forms.Form):
     @return True if and only if the user is successfully registered
     """
     def process(self, request):
-        registrationSuccessful = False
+        registrationSuccessful = True
         if self.is_valid():
             if User.objects.filter(username=self.cleaned_data["username"]):
                 messages.error(request, "This username is already taken.")
+                registrationSuccessful = False
             if User.objects.filter(email=self.cleaned_data["email"]):
                 messages.error(request, "This email is already connected to another account.")
+                registrationSuccessful = False
             if self.cleaned_data["password"] != self.cleaned_data["password_confirmation"]:
                 messages.error(request, "The passwords do not match.")
+                registrationSuccessful = False
             if registrationSuccessful:
-                registrationSuccessful = True
                 user = User.objects.create_user(self.cleaned_data["username"],
                                                 self.cleaned_data["email"],
                                                 self.cleaned_data["password"],
                                                 first_name=self.cleaned_data["first_name"],
                                                 last_name=self.cleaned_data["last_name"])
-                userProfile = UserProfile(user=user,
-                                          address=self.cleaned_data["address"],
-                                          phone=self.cleaned_data["phone"])
-                userProfile.save()
+                for attr in {"address", "phone"}:
+                    user.profile.set(attr, self.cleaned_data[attr])
+                user.profile.save()
                 # send confirmation mail to user (deactivated for the moment)
                 emailMessage = "Hi " + user.first_name + ",\n\
                                 Thank you for registering on BnB's volunteer system.\n\
@@ -78,6 +79,7 @@ class RegistrationForm(forms.Form):
                 #send_mail("Registration on BnB Volunteer System", emailMessage, "BnB Volunteer System", [user.email,])
                 messages.success(request, "Registration successful. You should receive a confirmation mail in the inbox. (currently turned off)")
         else:
+            registrationSuccessful = False
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
         return registrationSuccessful
@@ -105,7 +107,7 @@ class EditProfileForm(forms.Form):
                     messages.info(request, "A confirmation mail is sent to your new email address. (feature not yet implemented, ignore this)")
                     request.user.email = self.cleaned_data["email"]
             for attr in {"first_name", "last_name", "address", "phone"}:
-                request.user.userprofile.set(attr, self.cleaned_data[attr])
+                request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
         else:
             for error in self.errors:
@@ -114,5 +116,5 @@ class EditProfileForm(forms.Form):
 def createUserContext(user):
     data = {}
     for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
-        data[attr] = user.userprofile.get(attr)
+        data[attr] = user.profile.get(attr)
     return data
