@@ -82,3 +82,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Custom fields
+
+LOGIN_URL = '/login/'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'bnbvolunteers.testing@gmail.com'
+EMAIL_HOST_PASSWORD = 'codeforgood2015'
+EMAIL_PORT = 587

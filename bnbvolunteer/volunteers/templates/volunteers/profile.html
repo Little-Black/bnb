@@ -1,9 +1,9 @@
 <html>
 <head>
-    <title> Login </title>
+    <title> Your account </title>
 <head>
 <body>
-    <h2> Login to the Volunteer Credit System </h2>
+    <h2> Profile Information </h2>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -16,8 +16,8 @@
         {% for field in form %}
             <p> {{ field.label_tag }} {{ field }} </p>
         {% endfor %}
-        <input type="submit" value="Login">
+        <input type="submit" value="Submit">
+        <input type="submit" formaction="{% url "volunteerHome" %}" value="Cancel">
     </form>
-    <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
 </body>
 </html>

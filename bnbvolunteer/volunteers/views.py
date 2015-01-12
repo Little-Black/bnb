@@ -2,8 +2,11 @@ from django.shortcuts import render
 from volunteers.models import *
 from django.http.response import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+
 from userManagement import *
 
+@login_required
 def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -14,6 +17,7 @@ def volunteerHome(request):
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerHome.html',context)
 
+@login_required
 def volunteerSubmit(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -41,20 +45,36 @@ def volunteerSubmit(request):
 
 def userLogin(request):
     if request.method == "POST":
-        (loginSuccessful, context) = loginByForm(request, LoginForm(request.POST))
-        if loginSuccessful:
-            return HttpResponseRedirect(reverse('volunteerHome'))
+        form = LoginForm(request.POST)
+        if form.process(request):
+            redirect = request.GET["next"] if "next" in request.GET else reverse("volunteerHome")
+            return HttpResponseRedirect(redirect)
         else:
-            return render(request, "volunteers/login.html", context)
+            return render(request, "volunteers/login.html", {"form": form})
     else:
-        return render(request, "volunteers/login.html", {"form": LoginForm()})
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse("volunteerHome"))
+        else:
+            return render(request, "volunteers/login.html", {"form": LoginForm()})
 
 def userRegistration(request):
     if request.method == "POST":
-        (registrationSuccessful, context) = registerByForm(request, RegistrationForm(request.POST))
-        if registrationSuccessful:
-            return HttpResponseRedirect(reverse('volunteerHome'))
+        form = RegistrationForm(request.POST)
+        if form.process(request):
+            return HttpResponseRedirect(reverse('userLogin'))
         else:
-            return render(request, "volunteers/register.html", context)
+            return render(request, "volunteers/register.html", {"form": form})
     else:
-        return render(request, "volunteers/register.html", {"form": RegistrationForm})
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse("volunteerHome"))
+        else:
+            return render(request, "volunteers/register.html", {"form": RegistrationForm()})
+
+@login_required
+def editProfile(request):
+    if request.method == "POST":
+        form = EditProfileForm(request.POST)
+        form.process(request)
+    else:
+        form = EditProfileForm(createUserContext(request.user))
+    return render(request, "volunteers/profile.html", {"form": form})
