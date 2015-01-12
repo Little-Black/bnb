@@ -17,6 +17,17 @@ def volunteerHome(request):
     return render(request,'volunteers/volunteerHome.html',context)
 
 @login_required
+def volunteerStaffHome(request):
+    try:
+        user = request.user #authenticate(username='admin', password='adMIN')
+        query_results = Userlog.objects.filter(user=user)
+    except:
+        print "Not logged in"
+        query_results = []
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerStaffHome.html',context)
+
+@login_required
 def volunteerSubmit(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -46,7 +57,13 @@ def userLogin(request):
     if request.method == "POST":
         (loginSuccessful, context) = loginByForm(request, LoginForm(request.POST))
         if loginSuccessful:
-            redirect = request.GET["next"] if "next" in request.GET else reverse("volunteerHome")
+            if "next" in request.GET:
+                redirect = request.GET["next"]
+            else:
+                if not request.user.has_perm('staff_status'):
+                    redirect = reverse("volunteerHome")
+                else: 
+                    redirect = reverse("volunteerStaffHome")
             return HttpResponseRedirect(redirect)
         else:
             return render(request, "volunteers/login.html", context)
