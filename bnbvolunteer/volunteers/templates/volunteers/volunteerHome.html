@@ -36,7 +36,6 @@ Voucher pts earned:
 
 <table>
     <tr>
-        <th>User</th>
         <th>Date</th>
         <th>Task</th>
         <th>Hours</th>
@@ -45,7 +44,6 @@ Voucher pts earned:
     </tr>
     {% for item in query_results %}
     <tr> 
-        <td>{{ item.user }}</td>
         <td>{{ item.date }}</td>
         <td>{{ item.task }}</td>
         <td>{{ item.hours }}</td>

@@ -20,7 +20,7 @@ def volunteerHome(request):
 def volunteerStaffHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Userlog.objects.filter(user=user)
+        query_results = Userlog.objects.all()
     except:
         print "Not logged in"
         query_results = []
