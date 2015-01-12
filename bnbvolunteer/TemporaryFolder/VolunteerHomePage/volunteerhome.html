@@ -1,0 +1,53 @@
+<html>
+<!-- Bootstrap -->
+<link href="../Bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="volunteerhome.css" rel="stylesheet">
+<body>
+
+<p class="total-credit"> Total Credits: 999 </p>
+<div "add-entry-and-edit-profile-btns">
+	<button class="add-entry-btn btn btn-default">
+		<span class="glyphicon glyphicon-plus"></span>
+		Add Timesheet Entry
+	</button>
+
+	<button class="edit-profile-btn btn btn-default">
+		Edit Profile Info
+	</button>
+</div>
+
+<button class="spend-points-btn btn btn-default">
+	<span class="glyphicon glyphicon-minus"></span>
+	Spend Points
+</button>
+
+<div class="timesheet panel panel-default">
+	<div class="panel-heading">Timesheet Entries</div>
+	<table class="table">
+	    <tr>
+	        <th>User</th>
+	        <th>Date</th>
+	        <th>Task</th>
+	        <th>Hours</th>
+	        <th>Rate</th>
+	        <th>Points Earned</th>
+	    </tr>
+	    {% for item in query_results %}
+	    <tr> 
+	        <td>{{ item.user }}</td>
+	        <td>{{ item.date }}</td>
+	        <td>{{ item.task }}</td>
+	        <td>{{ item.hours }}</td>
+	        <td>{{ item.rate }}</td>
+	        <td>{{ item.voucherearned }}</td>
+	    </tr>
+	    {% endfor %}
+	</table>
+</div>
+
+<!-- JQuery -->
+<script src="../jquery-1.11.2.min.js"></script>
+<!-- Bootstrap -->
+<script src="../Bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
