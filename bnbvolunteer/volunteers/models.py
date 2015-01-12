@@ -11,5 +11,21 @@ class Userlog(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    address = models.CharField(blank=True, max_length=100)
-    phone = models.CharField(blank=True, max_length=30)
+    address = models.CharField(max_length=100)
+    phone = models.CharField(max_length=30)
+    
+    def get(self, attr):
+        if hasattr(self, attr):
+            return getattr(self, attr)
+        elif hasattr(self.user, attr):
+            return getattr(self.user, attr)
+        else:
+            raise AttributeError("cannot find "+attr)
+    
+    def set(self, attr, value):
+        if hasattr(self, attr):
+            setattr(self, attr, value)
+        elif hasattr(self.user, attr):
+            setattr(self.user, attr, value)
+        else:
+            setattr(self, attr, value)

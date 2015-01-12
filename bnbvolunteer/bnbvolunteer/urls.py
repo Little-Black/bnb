@@ -15,6 +15,6 @@ urlpatterns = patterns('',
     url(r'^volunteer/home/submit/$', views.volunteerSubmit, name="submitNewLog"),
     url(r'^login/$', views.userLogin, name="userLogin"),
     url(r'^register/$', views.userRegistration, name="userRegistration"),
-    url(r'^logout/$', 'django.contrib.auth.views.logout',{'next_page': '/login/'}, name="logout")
-
+    url(r'^logout/$', 'django.contrib.auth.views.logout',{'next_page': '/login/'}, name="logout"),
+    url(r'^profile/$', views.editProfile, name="editProfile"),
 )
