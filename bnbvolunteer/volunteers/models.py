@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import signals
 from django.contrib.auth.models import User
 
 #Userlog is now Activity!!! Userlog just here for reference.
@@ -24,7 +25,7 @@ class Voucher(models.Model):
     redemptionActivity = models.ForeignKey(Activity, default='')
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, related_name="profile")
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
     
@@ -43,3 +44,10 @@ class UserProfile(models.Model):
             setattr(self.user, attr, value)
         else:
             setattr(self, attr, value)
+
+def createUserProfile(sender, instance, **kwargs):
+    if not hasattr(instance, "profile"):
+        UserProfile.objects.create(user=instance)
+
+# Automatically create a profile after user info is saved, if one has not been created already
+signals.post_save.connect(createUserProfile, sender=User)
