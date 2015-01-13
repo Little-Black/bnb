@@ -9,10 +9,12 @@ urlpatterns = patterns('',
     # url(r'^$', 'bnbvolunteer.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+
     url(r'^admin/', include(admin.site.urls)),
     url(r'^volunteer/home/$', views.volunteerHome, name="volunteerHome"),
     url(r'^volunteerStaff/home/$', views.volunteerStaffHome, name="volunteerStaffHome"),
-    url(r'^volunteerStaff/home/userSearchResult$', views.volunteerStaffUserSearchResult, name="volunteerStaffUserSearchResult"),
+    url(r'^volunteerStaff/home/userSearchResult/$', views.volunteerStaffUserSearchResult, name="volunteerStaffUserSearchResult"),
+    url(r'^volunteerStaff/home/user/$', views.volunteerStaffUser, name="volunteerStaffUser"),
     url(r'^volunteer/home/submit/$', views.volunteerSubmit, name="submitNewLog"),
     url(r'^login/$', views.userLogin, name="userLogin"),
     url(r'^register/$', views.userRegistration, name="userRegistration"),

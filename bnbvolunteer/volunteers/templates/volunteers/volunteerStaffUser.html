@@ -2,7 +2,8 @@ Welcome to the staff home page, {{user.first_name}}!
 <br>
 <a href="{% url 'logout' %}">Logout</a>
 <br>
-
+<a href="{% url 'editProfile' %}"> Edit account info </a>
+<br>
 Here you can search for a certain volunteer!
 
 <form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
@@ -18,23 +19,24 @@ Last name:
 
 
 <br>
-Searching Result:
+
 <table>
     <tr>
-        <th>Username</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Phone Number</th>
-        <th>Address</th>
-        <th></th>
+        <th>User</th>
+        <th>Date</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Rate</th>
+        <th>Points Earned</th>
     </tr>
     {% for item in search_results %}
     <tr> 
-	<td> <a href="{% url 'volunteerStaffUser' %}">{{ item.username }}</a></td>
-        <td>{{ item.last_name }}</td>
-        <td>{{ item.first_name }}</td>
-        <td>{{ item.profile.phone }}</td>
-        <td>{{ item.profile.address }}</td>
+        <td>{{ item.user }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.task }}</td>
+        <td>{{ item.hours }}</td>
+        <td>{{ item.rate }}</td>
+        <td>{{ item.voucherearned }}</td>
     </tr>
     {% endfor %}
 </table>

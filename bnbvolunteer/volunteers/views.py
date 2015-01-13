@@ -35,6 +35,12 @@ def volunteerStaffUserSearchResult(request):
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
 @login_required
+def volunteerStaffUser(request):
+    search_results = Userlog.objects.all()
+    context = {'search_results': search_results}
+    return render(request, 'volunteers/volunteerStaffUser.html', context)
+
+@login_required
 def volunteerSubmit(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -100,4 +106,7 @@ def editProfile(request):
         form.process(request)
     else:
         form = EditProfileForm(createUserContext(request.user))
-    return render(request, "volunteers/profile.html", {"form": form})
+    returnpage = "volunteerHome"
+    if request.user.has_perm('staff_status'):
+        returnpage = "volunteerStaffHome"
+    return render(request, "volunteers/profile.html", {"form": form, "return": returnpage})

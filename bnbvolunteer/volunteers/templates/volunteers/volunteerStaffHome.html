@@ -2,7 +2,8 @@ Welcome to the staff home page, {{user.first_name}}!
 <br>
 <a href="{% url 'logout' %}">Logout</a>
 <br>
-
+<a href="{% url 'editProfile' %}"> Edit account info </a>
+<br>
 Here you can search for a certain volunteer!
 
 <form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
