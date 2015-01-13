@@ -1,0 +1,24 @@
+.add-entry-btn{
+	margin-left: 10px;
+}
+.edit-profile-btn{
+	float: right;
+	margin-right: 10px;
+}
+.spend-points-btn{
+	background-color: red;
+	color: white;
+	margin-left: 10px;
+	margin-top: 5px;
+}
+.total-credit{
+	font-weight: bold;
+	font-size: 30px;
+	margin-left: 10px;
+	margin-top: 15px;
+}
+.timesheet{
+	width: 90%;
+	margin: 30px auto auto auto;
+	/*margin-top: 20px;*/
+}

@@ -30,7 +30,7 @@ Searching Result:
     </tr>
     {% for item in search_results %}
     <tr> 
-	<td> <a href="{% url 'volunteerStaffUser' %}">{{ item.username }}</a></td>
+	    <td><a href="../user/?getuser={{item}}" >{{ item.username }}</a></td>
         <td>{{ item.last_name }}</td>
         <td>{{ item.first_name }}</td>
         <td>{{ item.profile.phone }}</td>

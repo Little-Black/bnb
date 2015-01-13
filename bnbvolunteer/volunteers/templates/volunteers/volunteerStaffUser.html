@@ -17,32 +17,45 @@ Last name:
 <input type="submit" value="Search" />
 </form>
 
-
+Here are {{getuser.first_name}}'s logs:
 <br>
-
+{{getuser.first_name}} has {{totalCredit}} in all.
+<br>
 <table>
     <tr>
         <th>User</th>
-        <th>Date</th>
-        <th>Task</th>
-        <th>Hours</th>
-        <th>Rate</th>
-        <th>Points Earned</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+        <th>credits</th>
     </tr>
     {% for item in search_results %}
     <tr> 
         <td>{{ item.user }}</td>
-        <td>{{ item.date }}</td>
-        <td>{{ item.task }}</td>
-        <td>{{ item.hours }}</td>
-        <td>{{ item.rate }}</td>
-        <td>{{ item.voucherearned }}</td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
 </table>
 
+Add a log to {{getuser}}:
 
+<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
 
+Description:
+<input type="text" name="description">
+<br>
+Credits:
+<input type="text" name="credits">
+<br>
+<input type="submit" value="Submit" />
+</form>
+
+{{inform}}
 
 
 

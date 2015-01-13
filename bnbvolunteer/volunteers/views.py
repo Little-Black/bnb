@@ -10,7 +10,7 @@ from userManagement import *
 def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Userlog.objects.filter(user=user)
+        query_results = Activity.objects.filter(user=user)
     except:
         print "Not logged in"
         query_results = []
@@ -21,7 +21,7 @@ def volunteerHome(request):
 def volunteerStaffHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Userlog.objects.all()
+        query_results = Activity.objects.all()
     except:
         print "Not logged in"
         query_results = []
@@ -36,8 +36,24 @@ def volunteerStaffUserSearchResult(request):
 
 @login_required
 def volunteerStaffUser(request):
-    search_results = Userlog.objects.all()
-    context = {'search_results': search_results}
+    inform = ""
+    userSearch_result = User.objects.get(username=request.GET['getuser'])
+    search_results = Activity.objects.filter(user=userSearch_result)
+    creditSum = 0
+    for result in search_results:
+        creditSum += result.credits
+    if request.method == "POST":
+        try:
+            addLog = Activity(user=userSearch_result, description=request.POST['description'], credits=request.POST['credits'])
+            if creditSum + int(addLog.credits) < 0:
+                inform = "Do not have enough credits"
+            else:
+                addLog.save()
+                search_results = Activity.objects.filter(user=userSearch_result)
+                creditSum += int(addLog.credits)
+        except:
+            inform = "Please enter an integer in credits field."
+    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform, 'totalCredit': creditSum}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
 @login_required
@@ -110,3 +126,13 @@ def editProfile(request):
     if request.user.has_perm('staff_status'):
         returnpage = "volunteerStaffHome"
     return render(request, "volunteers/profile.html", {"form": form, "return": returnpage})
+
+@login_required
+def search(request):
+    context = {}
+    return render(request,'volunteers/search.html',context)
+
+@login_required
+def updateProfile(request):
+    context = {}
+    return render(request,'volunteers/updateProfile.html',context)

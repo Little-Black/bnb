@@ -23,26 +23,23 @@ Last name:
 <table>
     <tr>
         <th>User</th>
-        <th>Date</th>
-        <th>Task</th>
-        <th>Hours</th>
-        <th>Rate</th>
-        <th>Points Earned</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+        <th>credits</th>
     </tr>
     {% for item in query_results %}
     <tr> 
-        <td>{{ item.user }}</td>
-        <td>{{ item.date }}</td>
-        <td>{{ item.task }}</td>
-        <td>{{ item.hours }}</td>
-        <td>{{ item.rate }}</td>
-        <td>{{ item.voucherearned }}</td>
+	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
 </table>
-
-
-
 
 
 

@@ -1,78 +1,56 @@
-Welcome to the volunteer home page, {{user.first_name}}!
-<br>
-<a href="{% url 'logout' %}">Logout</a>
-<br>
-<a href="{% url 'editProfile' %}"> Edit account info </a>
-<br>
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
+<body>
 
-Here you can enter a new volunteer work log.
+<p class="total-credit"> Total Credits: 999 </p>
+<div "add-entry-and-edit-profile-btns">
+	<button class="add-entry-btn btn btn-default">
+		<span class="glyphicon glyphicon-plus"></span>
+		Add Timesheet Entry
+	</button>
 
-<form action="{% url 'submitNewLog' %}" method="post">{% csrf_token %}
-
-Date:
-<input type="text" name="date">
-<br>
-Task:
-<input type="text" name="task">
-<br>
-Hours:
-<input type="text" name="hours">
-<br>
-Rate:
-<input type="text" name="rate">
-<br>
-Voucher pts earned:
-<br>
-<div id="dynamicInput">
-          Entry 1<input type="text" name="myInputs">
+	<button class="edit-profile-btn btn btn-default">
+		Edit Profile Info
+	</button>
 </div>
-<input type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
-
-<br>
-
-<input type="submit" value="Submit" />
-</form>
-
-
-<br>
-
-<table>
-    <tr>
-        <th>Date</th>
-        <th>Task</th>
-        <th>Hours</th>
-        <th>Rate</th>
-        <th>Points Earned</th>
-    </tr>
-    {% for item in query_results %}
-    <tr> 
-        <td>{{ item.date }}</td>
-        <td>{{ item.task }}</td>
-        <td>{{ item.hours }}</td>
-        <td>{{ item.rate }}</td>
-        <td>{{ item.voucherearned }}</td>
-    </tr>
-    {% endfor %}
-</table>
 
 
 
+<button class="spend-points-btn btn btn-default">
+	<span class="glyphicon glyphicon-minus"></span>
+	Spend Points
+</button>
 
+<div class="timesheet panel panel-default">
+	<div class="panel-heading">Timesheet Entries</div>
+	<table class="table">
+	    <tr>
+	        <th>User</th>
+	        <th>Date</th>
+	        <th>Task</th>
+	        <th>Hours</th>
+	        <th>Rate</th>
+	        <th>Points Earned</th>
+	    </tr>
+	    <!-- {% for item in query_results %} -->
+	    <tr> 
+	        <!-- <td>{{ item.user }}</td> -->
+	        <!-- <td>{{ item.date }}</td> -->
+	        <!-- <td>{{ item.task }}</td> -->
+	        <!-- <td>{{ item.hours }}</td> -->
+	        <!-- <td>{{ item.rate }}</td> -->
+	        <!-- <td>{{ item.voucherearned }}</td> -->
+	    </tr>
+	    <!-- {% endfor %} -->
+	</table>
+</div>
 
-
-
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>
+<!-- JQuery -->
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
+<!-- Bootstrap -->
+<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
+</body>
+</html>
