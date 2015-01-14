@@ -7,25 +7,26 @@
 
 <h2 class="update-profile-header">Update Profile</h2>
 
+<!-- <form action="{% url 'submitNewLog' %}" method="post"> -->
 <div class="fields">
 	<div class="first-name">
 		<div class="input-label">First Name:</div>
-		<input type="text" class="first-name-input input">
+		<input type="text" name="firstName" class="first-name-input input">
 	</div>
 
 	<div class="last-name">
 		<div class="input-label">Last Name:</div>
-		<input type="text" class="last-name-input input">
+		<input type="text" name="lastName" class="last-name-input input">
 	</div>
 
 	<div class="email">
 		<div class="input-label">Email:</div>
-		<input type="text" class="email-input input">
+		<input type="text" name="email" class="email-input input">
 	</div>
 
 	<div class="phone">
 		<div class="input-label">Phone Number:</div>
-		<input type="text" class="phone-input input">
+		<input type="text" name="phone" class="phone-input input">
 	</div>
 
 	<button class="change-password-btn btn btn-default">Change Password
@@ -34,49 +35,52 @@
 	<div class="changing-password-fields">
 		<div class="old-password">
 			<div class="input-label">Old Password:</div>
-			<input type="password" class="old-password-input input">
+			<input type="password" name="oldPassword" class="old-password-input input">
 		</div>
 		<div class="new-password">
 			<div class="input-label">New Password:</div>
-			<input type="password" class="new-password-input input">
+			<input type="password" name="newPassword" class="new-password-input input">
 		</div>
 		<div class="new-password2">
 			<div class="input-label">New Password Again: </div>
-			<input type="password" class="new-password2-input input">
+			<input type="password" name="newPasword2" class="new-password-input2 input">
 		</div>
+		<span class="password-note">Note here</span>
 	</div>
 
 	<!-- address fields -->
 		<div class="line1">
 			<div class="input-label">Address Line 1: </div>
-			<input type="text" class="address1-input input">
+			<input type="text" name="addressLine1" class="address1-input input">
 		</div>
 
 		<div class="line2">
 			<div class="input-label">Address Line 2: </div>
-			<input type="text" class="address2-input input">
+			<input type="text" name="addressLine2"class="address2-input input">
 		</div>
 
 		<div class="city">
 			<div class="input-label">City:</div>
-			<input type="text" class="city-input input">
+			<input type="text" name="city" class="city-input input">
 		</div>
 
 		<div class="state">
 			<div class="input-label">State:</div>
-			<input type="text" class="state-input input">
+			<input type="text" name="state" class="state-input input">
 		</div>
 
 		<div class="zip">
 			<div class="input-label">Zip Code:</div>
-			<input type="text" class="zip-input input">
+			<input type="text" name="zipCode" class="zip-input input">
 		</div>
 	<!-- end address fields -->
 </div>
 
 <button class="delete-account-btn btn btn-danger">Delete Account</button>
 
-<button class="submit-btn btn btn-primary">Submit</button>
+<input type="submit" class="submit-btn btn btn-primary"></input>
+
+<!-- </form> -->
 
 <!-- JQuery -->
 <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>

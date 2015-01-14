@@ -18,5 +18,8 @@ urlpatterns = patterns('',
     url(r'^profile/$', views.editProfile, name="editProfile"),
     url(r'^search/$', views.search, name="search"),
     url(r'^updateProfile/$', views.updateProfile, name="updateProfile"),
+    # url(r'^updateProfile/submit/$', views.submitUpdatedProfile, name="submitUpdatedProfile"),
     url(r'^codeGenerator/$', views.codeGenerator, name="codeGenerator"),
+    url(r'^generateCodes/$', views.generateCodes, name="generateCodes"),
+    url(r'^viewGeneratedCodes/$', views.viewGeneratedCodes, name="viewGeneratedCodes"),
 )

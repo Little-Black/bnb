@@ -2,7 +2,7 @@
 <html>
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/code.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
 <body>
 
 <ul class="nav nav-tabs">
@@ -12,47 +12,16 @@
   <li role="presentation" class="active"><a href="#">Generate Voucher</a></li>
 </ul>
 
-<button class="generate-code-btn btn btn-default">
-	<!-- <span class="glyphicon glyphicon-plus"></span> -->
-	Generate Code
-</button>
+<form action="{% url 'generateCodes' %}" method="post">{% csrf_token %}
 
-<div class="codeAppear"></div>
-
-<!-- <div class="input-group search">
-  <input type="text" class="form-control" placeholder="Search by volunteer name...">
-  <span class="input-group-btn">
-    <button class="btn btn-default" type="button">Go!</button>
-  </span>
-</div> --><!-- /input-group -->
-
-<!-- <div class="panel panel-default results">
-  Default panel contents
-  <div class="panel-heading">Results</div> -->
-
-<!-- 
-  <table class="table">
-    <tr>
-	        <th>Name</th>
-	        <th>Email</th>
-	        <th>Phone</th>
-	    </tr>
-	    <!-- {% for item in query_results %} --
-	    <tr> 
-	    	<td><a href="#">Someone Volunteering</a></td>
-	    	<td><a href="#">Someone@volunteering.com</a></td>
-	    	<td><a href="#">617-SOME-ONE</a></td>
-	        <!-- <td>{{ item.user }}</td>
-	        <td>{{ item.date }}</td>
-	        <td>{{ item.task }}</td>
-	        <td>{{ item.hours }}</td>
-	        <td>{{ item.rate }}</td>
-	        <td>{{ item.voucherearned }}</td> --
-	    </tr>
-	    <!-- {% endfor %} --
-  </table>
+<div id="dynamicInput">
+    <p class="voucher-points">Voucher Points:</p><input type="text" name="myInputs1">
+    <p class="how-many">How many?:</p><input type="text" name="myInputs1">
 </div>
- -->
+<input type="button" value="Create another type of voucher" onClick="addInput('dynamicInput');">
+
+<input type="submit" value="Submit" />
+</form>
 
 <!-- JQuery -->
 <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>

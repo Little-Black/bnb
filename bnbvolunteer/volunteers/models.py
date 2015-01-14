@@ -22,7 +22,7 @@ class Activity(models.Model):
 class Voucher(models.Model):
     code = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
-    redemptionActivity = models.ForeignKey(Activity, default='')
+    redemptionActivity = models.ForeignKey(Activity, null=True)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
