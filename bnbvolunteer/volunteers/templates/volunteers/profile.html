@@ -3,7 +3,7 @@
     <title> Your account </title>
 <head>
 <body>
-    <h2> Profile Information </h2>
+    <h3> Edit profile information </h3>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -13,11 +13,17 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        {% for field in form %}
+        {% for field in infoForm %}
             <p> {{ field.label_tag }} {{ field }} </p>
         {% endfor %}
-        <input type="submit" value="Submit">
-        <input type="submit" formaction="{% url return %}" value="Cancel">
+        <h3> Change password </h3>
+        {% for field in pwForm %}
+            <p> {{ field.label_tag }} {{ field }} </p>
+        {% endfor %}
+        <input type="submit" name="submit" value="Submit">
+        <input type="submit" formaction="{% url "volunteerHome" %}" value="Cancel">
     </form>
+    <h3> Delete your account </h3>
+    <a href="{% url "deleteAccount" %}"> Are you sure? Your points will be lost forever (a very long time). </a>
 </body>
 </html>
