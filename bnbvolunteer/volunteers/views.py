@@ -11,10 +11,13 @@ def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
         query_results = Activity.objects.filter(user=user)
+        total_credits = 0
+        for log in query_results:
+            total_credits += log.credits
     except:
         print "Not logged in"
         query_results = []
-    context = {'query_results': query_results}
+    context = {'query_results': query_results,'total_credits':total_credits}
     return render(request,'volunteers/volunteerHome.html',context)
 
 @login_required
@@ -30,7 +33,13 @@ def volunteerStaffHome(request):
 
 @login_required
 def volunteerStaffUserSearchResult(request):
-    search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
+    if request.POST['firstname'] == "":
+        if request.POST['lastname'] == "":
+            search_results = User.objects.all()
+        else:
+            search_results = User.objects.filter(last_name=request.POST['lastname'])
+    else:
+        search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
     context = {'search_results': search_results}
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
@@ -72,14 +81,17 @@ def volunteerSubmit(request):
     for input in earned:
         totalearned += int(input)
         print totalearned
-    userlog = Userlog(user=user,date=date,task=task,hours=hours,rate=rate,voucherearned=totalearned) #request.user
+    activity = Activity(user=user,dateDone=date,description=task,credits=totalearned) #request.user
     try: 
-        userlog.save()
+        activity.save()
     except:
         print "ERROR"
     # return render(RequestContext(request),'volunteerHome.html')
-    query_results = Userlog.objects.filter(user=user)
-    context = {'query_results': query_results}
+    query_results = Activity.objects.filter(user=user)
+    total_credits = 0
+    for log in query_results:
+        total_credits += log.credits
+    context = {'query_results': query_results,'total_credits':total_credits}
     return render(request,'volunteers/volunteerHome.html',context)
 
 def userLogin(request):
