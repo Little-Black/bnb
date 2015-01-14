@@ -88,3 +88,8 @@ def search(request):
 def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
+
+@login_required
+def codeGenerator(request):
+    context = {}
+    return render(request,'volunteers/codeGenerator.html',context)

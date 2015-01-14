@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     url(r'^profile/$', views.editProfile, name="editProfile"),
     url(r'^search/$', views.search, name="search"),
     url(r'^updateProfile/$', views.updateProfile, name="updateProfile"),
+    url(r'^codeGenerator/$', views.codeGenerator, name="codeGenerator"),
 )
