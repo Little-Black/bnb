@@ -5,12 +5,23 @@
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
 
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script>
+  $(function() {
+    $( "#datepicker" ).datepicker();
+  });
+  </script>
 </head>
 <body>
 
-<h1>
-Welcome, {{user.username}} !
+<h1 style="margin-left:10px;">
+Welcome, {{user.first_name}}!
 </h1>
+
 
 <p class="total-credit"> Total Credits: {{total_credits}} </p>
 
@@ -19,38 +30,55 @@ Welcome, {{user.username}} !
 		<span class="glyphicon glyphicon-plus"></span>
 		Add Timesheet Entry
 	</button>
+
+	<button class="edit-profile-btn btn btn-default" onclick="location.href='{% url 'editProfile' %}'">
+		Edit Profile Info
+	</button>
 	
-	<div id="tohide">
+	<div id="tohide" style="margin-left:30px;margin-top:10px">
+
+
 	<form action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
 
 	Date:
-	<input type="text" name="date">
+	<input type="text" name="date" id="datepicker">
 	<br>
-	Task:
-	<input type="text" name="task">
-	<br>
-	Hours:
-	<input type="text" name="hours">
-	<br>
-	Rate:
-	<input type="text" name="rate">
-	<br>
-	Voucher pts earned:
-	<br>
-	<div id="dynamicInput">
-	          Entry 1<input type="text" name="myInputs">
-	</div>
-	<input type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
+	Activity Type:
+	<!-- <input type="text" name="activityType"> -->
 
+
+	<select name="activityType" id="activityType">
+	  {% for type in type_choices %}
+	  <option value="{{type}}">{{type}}</option>
+	  {% endfor %}
+	</select>
+<!-- 	<select name="dropdown" id="dropdown">
+<option value="value1">Option 1</option>
+<option value="value2">Option 2</option>
+</select> -->
+
+
+	<br>
+	Task Description:
+	<input type="text" name="description">
+	<br>
+	Voucher credits earned:
+	<br>
+	<div id="dynamicInput" style="margin-left:20px;">
+	        Entry 1 <input type="text" name="myInputs">
+	</div>
+	<input type="button" value="Add another voucher code" style="margin-left:20px;" onClick="addInput('dynamicInput');">
+
+	<br>
 	<br>
 
 	<input type="submit" value="Submit" />
 	</form>
+
+
+
 	</div>
 
-	<button class="edit-profile-btn btn btn-default">
-		Edit Profile Info
-	</button>
 </div>
 
 <div class="timesheet panel panel-default">
@@ -67,7 +95,7 @@ Welcome, {{user.username}} !
 	    <tr> 
 	        <td>{{ item.user }}</td>
 	        <td>{{ item.dateDone }}</td>
-	        <td>???</td>
+	        <td>{{ item.activityType}}</td>
 	        <td>{{ item.description }}</td>
 	        <td>{{ item.credits }}</td>
 	    </tr>
@@ -75,8 +103,23 @@ Welcome, {{user.username}} !
 	</table>
 </div>
 
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    
+                    <div class="top-scroll">
+                        <a href="#top"><i class="fa fa-circle-arrow-up scroll fa-4x"></i></a>
+                    </div>
+                    <hr>
+                    <p>Bikes Not Bombs 2015</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 <!-- JQuery -->
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
+<!-- <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script> -->
 <!-- Bootstrap -->
 <script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
 <!-- Custom JS -->

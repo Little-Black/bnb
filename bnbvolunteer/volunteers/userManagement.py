@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django import forms
 
-from volunteers.models import UserProfile
+from volunteers.models import *
 
 class LoginForm(forms.Form):
     
@@ -33,7 +33,6 @@ class LoginForm(forms.Form):
         else:
             messages.error(request, "Please enter both username and password.")
         return loginSuccessful
-
 
 class RegistrationForm(forms.Form):
     
@@ -71,19 +70,22 @@ class RegistrationForm(forms.Form):
                                                 last_name=self.cleaned_data["last_name"])
                 for attr in {"address", "phone"}:
                     user.profile.set(attr, self.cleaned_data[attr])
+                user.is_active = False
+                user.save()
                 user.profile.save()
-                # send confirmation mail to user (deactivated for the moment)
+                vr = VerificationRequest.createVerificationRequest(user, actionType="register")
+                # send verification mail to user (deactivated for the moment)
                 emailMessage = "Hi " + user.first_name + ",\n\
                                 Thank you for registering on BnB's volunteer system.\n\
-                                Your username is " + user.username + "."
+                                Your username is " + user.username + ".\n\
+                                You can activate your account at /verify/" + vr.code + "."
                 #send_mail("Registration on BnB Volunteer System", emailMessage, "BnB Volunteer System", [user.email,])
-                messages.success(request, "Registration successful. You should receive a confirmation mail in the inbox. (currently turned off)")
+                messages.success(request, "Registration successful. You should receive a verification mail in the inbox. (currently turned off) "+vr.code)
         else:
             registrationSuccessful = False
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
         return registrationSuccessful
-
 
 class EditProfileForm(forms.Form):
     
@@ -109,6 +111,7 @@ class EditProfileForm(forms.Form):
             for attr in {"first_name", "last_name", "address", "phone"}:
                 request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
+            messages.success(request, "Account info successfully saved!")
         else:
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
@@ -118,3 +121,41 @@ def createUserContext(user):
     for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
         data[attr] = user.profile.get(attr)
     return data
+
+class PasswordChangeForm(forms.Form):
+    
+    old_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    confirm_new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    
+    def isFilled(self, request):
+        fieldsFilled = dict()
+        for field in {"old_password", "new_password", "confirm_new_password"}:
+            try:
+                fieldsFilled[field] = request.POST[field]
+            except KeyError:
+                return False
+        return fieldsFilled["old_password"] or fieldsFilled["new_password"] or fieldsFilled["confirm_new_password"]
+    
+    """
+    Attempt to change the password of the current user.
+    @param request: HTTPRequest
+    """    
+    def process(self, request):
+        if self.is_valid():
+            if request.user.check_password(self.cleaned_data["old_password"]):
+                if self.cleaned_data["new_password"] == self.cleaned_data["confirm_new_password"]:
+                    messages.success(request, "Password successfully changed!")
+                    request.user.set_password(self.cleaned_data["new_password"])
+                    request.user.save()
+                else:
+                    messages.error(request, "The new passwords do not match.")
+            else:
+                messages.error(request, "The old password is incorrect.")
+        else:
+            for error in self.errors:
+                messages.error(request, error + " is a required field.")
+
+def deleteAccount(request):
+    vr = VerificationRequest.createVerificationRequest(request.user, actionType="delete")
+    messages.info(request, "A confirmation email is sent to your account. "+vr.code)

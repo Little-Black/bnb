@@ -1,24 +1,21 @@
 from django.shortcuts import render
-from volunteers.models import *
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import random
 
-from userManagement import *
+from volunteers import userManagement
+from volunteers.models import *
+from volunteers.userManagement import *
 
 @login_required
 def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Activity.objects.filter(user=user)
-        total_credits = 0
-        for log in query_results:
-            total_credits += log.credits
+        context = getVolunteerPageContext(request,user)
     except:
         print "Not logged in"
-        query_results = []
-    context = {'query_results': query_results,'total_credits':total_credits}
+        context = {'query_results': [],'total_credits':0,'type_choices':[]}
     return render(request,'volunteers/volunteerHome.html',context)
 
 @login_required
@@ -28,33 +25,110 @@ def volunteerSubmit(request):
     except:
         print "ERROR UGHHH"
     date = request.POST['date']
-    task = request.POST['task']
-    hours = request.POST['hours']
-    rate = request.POST['rate']
-    print request.POST.getlist('myInputs')
+    print request.POST['activityType']
+    try:
+        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+    except:
+        activityType1 = ActivityType(name="Edit me out later")
+        activityType2 = ActivityType(name="Views.py somewhere")
+        activityType1.save()
+        activityType2.save()
+        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+    # activityType.save()
+    description = request.POST['description']
     earned = request.POST.getlist('myInputs')
     totalearned = 0
     for input in earned:
         totalearned += int(input)
-        print totalearned
-    activity = Activity(user=user,dateDone=date,description=task,credits=totalearned) #request.user
-    try: 
-        activity.save()
-    except:
-        print "ERROR"
-    # return render(RequestContext(request),'volunteerHome.html')
+    print date
+    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5]
+    print storedate
+    activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
+    # try: 
+    activity.save()
+    # except:
+    #     print "ERROR"
+
+    context = getVolunteerPageContext(request,user)
+    return render(request,'volunteers/volunteerHome.html',context)
+
+def getVolunteerPageContext(request,user):
     query_results = Activity.objects.filter(user=user)
     total_credits = 0
     for log in query_results:
         total_credits += log.credits
-    context = {'query_results': query_results,'total_credits':total_credits}
-    return render(request,'volunteers/volunteerHome.html',context)
+    type_choices = ActivityType.objects.values_list('name', flat=True)
+    # jq = ActivityType.objects.exclude(id__in=activities)
+    # type_choices = jq.values_list('name', flat=True)
+    if len(type_choices) == 0:
+        type_choices = ["Edit me out later","Views.py somewhere"]
+    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
+    return context
+
+
+@login_required
+def volunteerStaffHome(request):
+    try:
+        user = request.user #authenticate(username='admin', password='adMIN')
+        query_results = Activity.objects.all()
+    except:
+        print "Not logged in"
+        query_results = []
+    context = {'query_results': query_results}
+    return render(request,'volunteers/volunteerStaffHome.html',context)
+
+@login_required
+def volunteerStaffActivity(request):
+    query_results = ActivityType.objects.all()
+    context = {'query_results': query_results}
+    return render(request, 'volunteers/volunteerStaffActivity.html', context)
+
+@login_required
+def volunteerStaffUserSearchResult(request):
+    if request.POST['firstname'] == "":
+        if request.POST['lastname'] == "":
+            search_results = User.objects.all()
+        else:
+            search_results = User.objects.filter(last_name=request.POST['lastname'])
+    else:
+        search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
+    context = {'search_results': search_results}
+    return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
+
+@login_required
+def volunteerStaffUser(request):
+    inform = ""
+    userSearch_result = User.objects.get(username=request.GET['getuser'])
+    search_results = Activity.objects.filter(user=userSearch_result)
+    creditSum = 0
+    for result in search_results:
+        creditSum += result.credits
+    if request.method == "POST":
+        try:
+            addLog = Activity(user=userSearch_result, description=request.POST['description'], credits=request.POST['credits'])
+            if creditSum + int(addLog.credits) < 0:
+                inform = "Do not have enough credits"
+            else:
+                addLog.save()
+                search_results = Activity.objects.filter(user=userSearch_result)
+                creditSum += int(addLog.credits)
+        except:
+            inform = "Please enter an integer in credits field."
+    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform, 'totalCredit': creditSum}
+    return render(request, 'volunteers/volunteerStaffUser.html', context)
+
 
 def userLogin(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.process(request):
-            redirect = request.GET["next"] if "next" in request.GET else reverse("volunteerHome")
+            if "next" in request.GET:
+                redirect = request.GET["next"]
+            else:
+                if not request.user.has_perm('staff_status'):
+                    redirect = reverse("volunteerHome")
+                else: 
+                    redirect = reverse("volunteerStaffHome")
             return HttpResponseRedirect(redirect)
         else:
             return render(request, "volunteers/login.html", {"form": form})
@@ -80,11 +154,28 @@ def userRegistration(request):
 @login_required
 def editProfile(request):
     if request.method == "POST":
-        form = EditProfileForm(request.POST)
-        form.process(request)
+        infoForm = EditProfileForm(request.POST)
+        infoForm.process(request)
+        pwForm = PasswordChangeForm(request.POST)
+        if pwForm.isFilled(request):
+            pwForm.process(request)
     else:
-        form = EditProfileForm(createUserContext(request.user))
-    return render(request, "volunteers/profile.html", {"form": form})
+        infoForm = EditProfileForm(createUserContext(request.user))
+        pwForm = PasswordChangeForm()
+    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm})
+
+def verify(request, code):
+    verificationRequests = VerificationRequest.objects.filter(code=code)
+    if verificationRequests:
+        message = verificationRequests[0].verify()
+        return HttpResponse(message)
+    else:
+        return HttpResponse("Invalid code.")
+
+@login_required
+def deleteAccount(request):
+    userManagement.deleteAccount(request)
+    return HttpResponseRedirect(reverse("editProfile"))
 
 @login_required
 def search(request):
