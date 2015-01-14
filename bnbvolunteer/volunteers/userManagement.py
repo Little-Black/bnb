@@ -125,17 +125,17 @@ def createUserContext(user):
 class PasswordChangeForm(forms.Form):
     
     old_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
-    new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30, label="new_password")
-    new_password_confirm = forms.CharField(widget=forms.PasswordInput(), max_length=30, label="new_password_confirm")
+    new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    confirm_new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
     
     def isFilled(self, request):
         fieldsFilled = dict()
-        for field in {"old_password", "new_password", "new_password_confirm"}:
+        for field in {"old_password", "new_password", "confirm_new_password"}:
             try:
                 fieldsFilled[field] = request.POST[field]
             except KeyError:
                 return False
-        return fieldsFilled["old_password"] or fieldsFilled["new_password"] or fieldsFilled["new_password_confirm"]
+        return fieldsFilled["old_password"] or fieldsFilled["new_password"] or fieldsFilled["confirm_new_password"]
     
     """
     Attempt to change the password of the current user.
@@ -144,7 +144,7 @@ class PasswordChangeForm(forms.Form):
     def process(self, request):
         if self.is_valid():
             if request.user.check_password(self.cleaned_data["old_password"]):
-                if self.cleaned_data["new_password"] == self.cleaned_data["new_password_confirm"]:
+                if self.cleaned_data["new_password"] == self.cleaned_data["confirm_new_password"]:
                     messages.success(request, "Password successfully changed!")
                     request.user.set_password(self.cleaned_data["new_password"])
                     request.user.save()
