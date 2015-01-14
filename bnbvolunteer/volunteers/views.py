@@ -1,10 +1,11 @@
 from django.shortcuts import render
-from volunteers.models import *
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from userManagement import *
+from volunteers import userManagement
+from volunteers.models import *
+from volunteers.userManagement import *
 
 @login_required
 def volunteerHome(request):
@@ -78,11 +79,28 @@ def userRegistration(request):
 @login_required
 def editProfile(request):
     if request.method == "POST":
-        form = EditProfileForm(request.POST)
-        form.process(request)
+        infoForm = EditProfileForm(request.POST)
+        infoForm.process(request)
+        pwForm = PasswordChangeForm(request.POST)
+        if pwForm.isFilled(request):
+            pwForm.process(request)
     else:
-        form = EditProfileForm(createUserContext(request.user))
-    return render(request, "volunteers/profile.html", {"form": form})
+        infoForm = EditProfileForm(createUserContext(request.user))
+        pwForm = PasswordChangeForm()
+    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm})
+
+def verify(request, code):
+    verificationRequests = VerificationRequest.objects.filter(code=code)
+    if verificationRequests:
+        message = verificationRequests[0].verify()
+        return HttpResponse(message)
+    else:
+        return HttpResponse("Invalid code.")
+
+@login_required
+def deleteAccount(request):
+    userManagement.deleteAccount(request)
+    return HttpResponseRedirect(reverse("editProfile"))
 
 @login_required
 def search(request):
@@ -93,3 +111,8 @@ def search(request):
 def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
+
+@login_required
+def codeGenerator(request):
+    context = {}
+    return render(request,'volunteers/codeGenerator.html',context)
