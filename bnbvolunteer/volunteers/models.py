@@ -17,7 +17,7 @@ from threading import Timer
 class Activity(models.Model):
     user = models.ForeignKey(User, default='')
     dateDone = models.CharField(max_length=200)
-    dateEntered = models.CharField(max_length=200)
+    dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
     activityType = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
