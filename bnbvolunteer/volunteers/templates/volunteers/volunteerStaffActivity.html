@@ -1,0 +1,62 @@
+Welcome to the staff home page, {{user.first_name}}!
+<br>
+<a href="{% url 'volunteerStaffHome' %}">Home</a>
+<a href="{% url 'logout' %}">Logout</a>
+<a href="{% url 'editProfile' %}"> Edit account info </a>
+<br>
+Here you can search for a certain volunteer!
+
+<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
+
+First name:
+<input type="text" name="firstname">
+<br>
+Last name:
+<input type="text" name="lastname">
+<br>
+<input type="submit" value="Search" />
+</form>
+
+Here are all the activities:
+<br>
+<table>
+    {% for item in query_results %}
+    <tr> 
+        <td>{{ item.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+Add a new activity!:
+
+<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+
+Description:
+<input type="text" name="description">
+<br>
+Credits:
+<input type="text" name="credits">
+<br>
+<input type="submit" value="Submit" />
+</form>
+
+{{inform}}
+
+
+
+
+<script>
+var counter = 1;
+var limit = 15;
+function addInput(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var newdiv = document.createElement('div');
+          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+     }
+}
+</script>

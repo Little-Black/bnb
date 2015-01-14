@@ -1,0 +1,77 @@
+Welcome to the staff home page, {{user.first_name}}!
+<br>
+<a href="{% url 'volunteerStaffHome' %}">Home</a>
+<a href="{% url 'logout' %}">Logout</a>
+<a href="{% url 'editProfile' %}"> Edit account info </a>
+<br>
+Here you can search for a certain volunteer!
+
+<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
+
+First name:
+<input type="text" name="firstname">
+<br>
+Last name:
+<input type="text" name="lastname">
+<br>
+<input type="submit" value="Search" />
+</form>
+
+Here are {{getuser.first_name}}'s logs:
+<br>
+{{getuser.first_name}} has {{totalCredit}} in all.
+<br>
+<table>
+    <tr>
+        <th>User</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+        <th>credits</th>
+    </tr>
+    {% for item in search_results %}
+    <tr> 
+        <td>{{ item.user }}</td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.credits }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+Add a log to {{getuser}}:
+
+<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+
+Description:
+<input type="text" name="description">
+<br>
+Credits:
+<input type="text" name="credits">
+<br>
+<input type="submit" value="Submit" />
+</form>
+
+{{inform}}
+
+
+
+
+<script>
+var counter = 1;
+var limit = 15;
+function addInput(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var newdiv = document.createElement('div');
+          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+     }
+}
+</script>

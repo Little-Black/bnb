@@ -14,11 +14,16 @@ from threading import Timer
 #     rate = models.PositiveSmallIntegerField(default=2)
 #     voucherearned = models.PositiveSmallIntegerField(default=0)
 
+class ActivityType(models.Model):
+    name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
 class Activity(models.Model):
     user = models.ForeignKey(User, default='')
     dateDone = models.CharField(max_length=200)
     dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
-    activityType = models.CharField(max_length=200)
+    activityType = models.ForeignKey(ActivityType)
     description = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
 
