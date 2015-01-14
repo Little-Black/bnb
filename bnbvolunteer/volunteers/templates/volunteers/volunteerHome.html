@@ -5,12 +5,23 @@
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
 
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script>
+  $(function() {
+    $( "#datepicker" ).datepicker();
+  });
+  </script>
 </head>
 <body>
 
 <h1 style="margin-left:10px;">
 Welcome, {{user.first_name}}!
 </h1>
+
 
 <p class="total-credit"> Total Credits: {{total_credits}} </p>
 
@@ -30,7 +41,7 @@ Welcome, {{user.first_name}}!
 	<form action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
 
 	Date:
-	<input type="text" name="date">
+	<input type="text" name="date" id="datepicker">
 	<br>
 	Activity Type:
 	<!-- <input type="text" name="activityType"> -->
@@ -108,7 +119,7 @@ Welcome, {{user.first_name}}!
     </footer>
 
 <!-- JQuery -->
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
+<!-- <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script> -->
 <!-- Bootstrap -->
 <script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
 <!-- Custom JS -->

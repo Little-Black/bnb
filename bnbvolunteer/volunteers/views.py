@@ -39,11 +39,14 @@ def volunteerSubmit(request):
     totalearned = 0
     for input in earned:
         totalearned += int(input)
-    activity = Activity(user=user,dateDone=date,activityType = activityType, description=description,credits=totalearned) #request.user
-    try: 
-        activity.save()
-    except:
-        print "ERROR"
+    print date
+    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5]
+    print storedate
+    activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
+    # try: 
+    activity.save()
+    # except:
+    #     print "ERROR"
 
     context = getVolunteerPageContext(request,user)
     return render(request,'volunteers/volunteerHome.html',context)

@@ -21,7 +21,7 @@ class ActivityType(models.Model):
 
 class Activity(models.Model):
     user = models.ForeignKey(User, default='')
-    dateDone = models.CharField(max_length=200)
+    dateDone = models.DateField()
     dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
     activityType = models.ForeignKey(ActivityType)
     description = models.CharField(max_length=200)
