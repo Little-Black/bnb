@@ -27,16 +27,15 @@ def volunteerSubmit(request):
     except:
         print "ERROR UGHHH"
     date = request.POST['date']
-    task = request.POST['task']
-    hours = request.POST['hours']
-    rate = request.POST['rate']
+    activityType = request.POST['activityType']
+    description = request.POST['description']
     print request.POST.getlist('myInputs')
     earned = request.POST.getlist('myInputs')
     totalearned = 0
     for input in earned:
         totalearned += int(input)
         print totalearned
-    activity = Activity(user=user,dateDone=date,description=task,credits=totalearned) #request.user
+    activity = Activity(user=user,dateDone=date,activityType = activityType, description=description,credits=totalearned) #request.user
     try: 
         activity.save()
     except:
