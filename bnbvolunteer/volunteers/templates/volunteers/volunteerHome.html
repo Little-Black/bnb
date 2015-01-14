@@ -25,13 +25,28 @@ Welcome, {{user.first_name}}!
 	</button>
 	
 	<div id="tohide" style="margin-left:30px;margin-top:10px">
+
+
 	<form action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
 
 	Date:
 	<input type="text" name="date">
 	<br>
 	Activity Type:
-	<input type="text" name="activityType">
+	<!-- <input type="text" name="activityType"> -->
+
+
+	<select name="activityType" id="activityType">
+	  {% for type in type_choices %}
+	  <option value="{{type}}">{{type}}</option>
+	  {% endfor %}
+	</select>
+<!-- 	<select name="dropdown" id="dropdown">
+<option value="value1">Option 1</option>
+<option value="value2">Option 2</option>
+</select> -->
+
+
 	<br>
 	Task Description:
 	<input type="text" name="description">
@@ -48,6 +63,9 @@ Welcome, {{user.first_name}}!
 
 	<input type="submit" value="Submit" />
 	</form>
+
+
+
 	</div>
 
 </div>

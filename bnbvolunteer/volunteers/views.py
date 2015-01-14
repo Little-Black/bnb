@@ -11,15 +11,56 @@ from volunteers.userManagement import *
 def volunteerHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Activity.objects.filter(user=user)
-        total_credits = 0
-        for log in query_results:
-            total_credits += log.credits
+        context = getVolunteerPageContext(request,user)
     except:
         print "Not logged in"
-        query_results = []
-    context = {'query_results': query_results,'total_credits':total_credits}
+        context = {'query_results': [],'total_credits':0,'type_choices':[]}
     return render(request,'volunteers/volunteerHome.html',context)
+
+@login_required
+def volunteerSubmit(request):
+    try:
+        user = request.user #authenticate(username='admin', password='adMIN')
+    except:
+        print "ERROR UGHHH"
+    date = request.POST['date']
+    print request.POST['activityType']
+    try:
+        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+    except:
+        activityType1 = ActivityType(name="Edit me out later")
+        activityType2 = ActivityType(name="Views.py somewhere")
+        activityType1.save()
+        activityType2.save()
+        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+    # activityType.save()
+    description = request.POST['description']
+    earned = request.POST.getlist('myInputs')
+    totalearned = 0
+    for input in earned:
+        totalearned += int(input)
+    activity = Activity(user=user,dateDone=date,activityType = activityType, description=description,credits=totalearned) #request.user
+    try: 
+        activity.save()
+    except:
+        print "ERROR"
+
+    context = getVolunteerPageContext(request,user)
+    return render(request,'volunteers/volunteerHome.html',context)
+
+def getVolunteerPageContext(request,user):
+    query_results = Activity.objects.filter(user=user)
+    total_credits = 0
+    for log in query_results:
+        total_credits += log.credits
+    type_choices = ActivityType.objects.values_list('name', flat=True)
+    # jq = ActivityType.objects.exclude(id__in=activities)
+    # type_choices = jq.values_list('name', flat=True)
+    if len(type_choices) == 0:
+        type_choices = ["Edit me out later","Views.py somewhere"]
+    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
+    return context
+
 
 @login_required
 def volunteerStaffHome(request):
@@ -72,33 +113,6 @@ def volunteerStaffUser(request):
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform, 'totalCredit': creditSum}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
-@login_required
-def volunteerSubmit(request):
-    try:
-        user = request.user #authenticate(username='admin', password='adMIN')
-    except:
-        print "ERROR UGHHH"
-    date = request.POST['date']
-    activityType = request.POST['activityType']
-    description = request.POST['description']
-    print request.POST.getlist('myInputs')
-    earned = request.POST.getlist('myInputs')
-    totalearned = 0
-    for input in earned:
-        totalearned += int(input)
-        print totalearned
-    activity = Activity(user=user,dateDone=date,activityType = activityType, description=description,credits=totalearned) #request.user
-    try: 
-        activity.save()
-    except:
-        print "ERROR"
-    # return render(RequestContext(request),'volunteerHome.html')
-    query_results = Activity.objects.filter(user=user)
-    total_credits = 0
-    for log in query_results:
-        total_credits += log.credits
-    context = {'query_results': query_results,'total_credits':total_credits}
-    return render(request,'volunteers/volunteerHome.html',context)
 
 def userLogin(request):
     if request.method == "POST":
