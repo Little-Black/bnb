@@ -90,7 +90,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
-    
+    credit = models.PositiveSmallIntegerField(default=0)
     def get(self, attr):
         if hasattr(self, attr):
             return getattr(self, attr)

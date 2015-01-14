@@ -7,24 +7,10 @@ Welcome to the staff home page, {{user.first_name}}!
 <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
 <a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
 <a href="{% url 'volunteerStaffLog' %}"> Logs </a>
-<br>
-Here you can search for a certain volunteer!
 
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
+<br>
 
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
 
-Here are {{getuser.first_name}}'s logs:
-<br>
-{{getuser.first_name}} has {{getuser.profile.credit}} credits in all.
-<br>
 <table>
     <tr>
         <th>User</th>
@@ -34,35 +20,38 @@ Here are {{getuser.first_name}}'s logs:
         <th>description</th>
         <th>credits</th>
     </tr>
-    {% for item in search_results %}
+    {% for item in Logs %}
     <tr> 
-        <td>{{ item.user }}</td>
+	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
-        <td>{{ item.activityType }}</td>
+        <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
         <td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
 </table>
 
-Add a log to {{getuser}}:
-
-<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
-
-Description:
-<input type="text" name="description">
 <br>
-Credits:
-<input type="text" name="credits">
+Add logs here:
 <br>
-<input type="submit" value="Submit" />
+
+<form action="" method="post">{% csrf_token %}
+<table id="add">
+	<tr>
+		<th>User</th>
+		<th>Description</th>
+		<th>Credits</th>
+	</tr>
+	<tr id="line">
+		<th><input type="text" name="user"></th>
+		<th><input type="text" name="description"></th>
+		<th><input type="text" name="credits"></th>
+	</tr>
+</table>
+<input type="button" value="Add One" onClick="addInput();">
+
 </form>
-
-{{inform}}
-
-
-
 
 <script>
 var counter = 1;
@@ -72,9 +61,9 @@ function addInput(divName){
           alert("You have reached the limit of adding " + counter + " inputs");
      }
      else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
+	     var line = document.getElementById("line");
+	     var newline = line.cloneNode(true);
+          document.getElementById('add').appendChild(newline);
           counter++;
      }
 }

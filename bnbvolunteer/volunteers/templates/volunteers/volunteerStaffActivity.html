@@ -4,45 +4,34 @@ Welcome to the staff home page, {{user.first_name}}!
 <a href="{% url 'logout' %}">Logout</a>
 <a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
-Here you can search for a certain volunteer!
-
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-First name:
-<input type="text" name="firstname">
+<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
 <br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
+
 
 Here are all the activities:
 <br>
 <table>
     {% for item in query_results %}
     <tr> 
-        <td>{{ item.name }}</td>
+	    <td>{{ item.name }}</td>
+	    {% if item.id != 12 %}
+	    <td><a href="?delete={{item.id}}">Delete</a></td>
+	    {% endif%}
     </tr>
     {% endfor %}
 </table>
 
 Add a new activity!:
 
-<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+<form action="" method="post">{% csrf_token %}
 
-Description:
-<input type="text" name="description">
-<br>
-Credits:
-<input type="text" name="credits">
+Name:
+<input type="text" name="activityName">
 <br>
 <input type="submit" value="Submit" />
 </form>
-
-{{inform}}
-
-
 
 
 <script>

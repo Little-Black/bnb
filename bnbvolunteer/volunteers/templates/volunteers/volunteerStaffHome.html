@@ -5,21 +5,8 @@ Welcome to the staff home page, {{user.first_name}}!
 <a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
 <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-
-<br>
-Here you can search for a certain volunteer!
-
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
-
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
 
 <br>
 
@@ -32,7 +19,7 @@ Last name:
         <th>description</th>
         <th>credits</th>
     </tr>
-    {% for item in query_results %}
+    {% for item in Logs %}
     <tr> 
 	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
@@ -43,7 +30,6 @@ Last name:
     </tr>
     {% endfor %}
 </table>
-
 
 
 

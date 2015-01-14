@@ -23,31 +23,64 @@ def volunteerHome(request):
 
 @login_required
 def volunteerStaffHome(request):
+    Logs = Activity.objects.all()
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Activity.objects.all()
     except:
         print "Not logged in"
-        query_results = []
-    context = {'query_results': query_results}
+    context = {'Logs': Logs}
     return render(request,'volunteers/volunteerStaffHome.html',context)
 
 @login_required
+def volunteerStaffLog(request):
+    Logs = Activity.objects.all()
+    context = {'Logs': Logs}
+    return render(request, 'volunteers/volunteerStaffLog.html', context)
+
+
+@login_required
 def volunteerStaffActivity(request):
+    if request.method == "POST":
+        if not request.POST['activityName'] == "":
+            ActivityType(name=request.POST['activityName']).save()
+    if 'delete' in request.GET:
+        ActivityType.objects.get(id=request.GET['delete']).delete()
+        return HttpResponseRedirect(reverse("volunteerStaffActivity"))
     query_results = ActivityType.objects.all()
     context = {'query_results': query_results}
     return render(request, 'volunteers/volunteerStaffActivity.html', context)
 
 @login_required
 def volunteerStaffUserSearchResult(request):
-    if request.POST['firstname'] == "":
-        if request.POST['lastname'] == "":
-            search_results = User.objects.all()
-        else:
-            search_results = User.objects.filter(last_name=request.POST['lastname'])
+    inform = ""
+    if request.method == "GET":
+        search_results = User.objects.all() 
     else:
-        search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
-    context = {'search_results': search_results}
+        if 'firstname' in request.POST:
+            if request.POST['firstname'] == "":
+                if request.POST['lastname'] == "":
+                    search_results = User.objects.all()
+                else:
+                    search_results = User.objects.filter(last_name=request.POST['lastname'])
+            else:
+                search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
+        else:
+            search_results = User.objects.all()
+            for user in search_results:
+                if user.username in request.POST.keys():
+                    if request.POST[user.username]:
+                        activityType = ActivityType.objects.get(name="N/A")
+                        addLog = Activity(user=user, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
+                        if int(request.POST['credits']) + user.profile.credit >= 0:
+                            addLog.save();
+                            user.profile.credit += int(request.POST['credits'])
+                            user.profile.save()
+                        else:
+                            inform += user.username + ', '
+    if not inform == "":
+        inform = "No enough credits for " + inform[:-2] +"!" 
+    Logs = Activity.objects.all()
+    context = {'search_results': search_results, 'Logs': Logs, 'inform': inform}
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
 @login_required
@@ -60,7 +93,8 @@ def volunteerStaffUser(request):
         creditSum += result.credits
     if request.method == "POST":
         try:
-            addLog = Activity(user=userSearch_result, description=request.POST['description'], credits=request.POST['credits'])
+            activityType = ActivityType.objects.get(name="N/A")
+            addLog = Activity(user=userSearch_result, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
             if creditSum + int(addLog.credits) < 0:
                 inform = "Do not have enough credits"
             else:
@@ -69,7 +103,9 @@ def volunteerStaffUser(request):
                 creditSum += int(addLog.credits)
         except:
             inform = "Please enter an integer in credits field."
-    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform, 'totalCredit': creditSum}
+    userSearch_result.profile.credit = creditSum
+    userSearch_result.profile.save()
+    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
 @login_required

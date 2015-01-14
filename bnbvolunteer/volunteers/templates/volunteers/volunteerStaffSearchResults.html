@@ -4,6 +4,10 @@ Welcome to the staff home page, {{user.first_name}}!
 <a href="{% url 'logout' %}">Logout</a>
 <a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
+<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
+<br>
 
 Here you can search for a certain volunteer!
 
@@ -21,6 +25,7 @@ Last name:
 
 <br>
 Searching Result:
+<form action="" method="post">{% csrf_token %}
 <table>
     <tr>
         <th>Username</th>
@@ -28,21 +33,50 @@ Searching Result:
         <th>First Name</th>
         <th>Phone Number</th>
         <th>Address</th>
-        <th></th>
+	<th>Credits Avaliable</th>
+	<th>Selected</th>
     </tr>
     {% for item in search_results %}
     <tr> 
-	    <td><a href="../user/?getuser={{item}}" >{{ item.username }}</a></td>
+	    <td><a href="../user/?getuser={{item}}" >{{ item }}</a></td>
         <td>{{ item.last_name }}</td>
         <td>{{ item.first_name }}</td>
         <td>{{ item.profile.phone }}</td>
-        <td>{{ item.profile.address }}</td>
+	<td>{{ item.profile.address }}</td>
+	<td>{{ item.profile.credit }}</td>
+	<td><input name="{{item.username}}"type="checkbox"><td>
     </tr>
     {% endfor %}
 </table>
-
-
-
+Add logs here!
+<br>
+Description: <input type="text" name="description">
+Credits: <input type="text" name="credits">
+<input type="submit" value="Submit">
+</form>
+{{inform}}
+<br>
+<br>
+<table>
+    <tr>
+        <th>User</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+	<th>credits</th>
+    </tr>
+    {% for item in Logs %}
+    <tr> 
+	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType.name }}</td>
+        <td>{{ item.description }}</td>
+	<td>{{ item.credits }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 
 
