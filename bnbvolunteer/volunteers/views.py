@@ -77,6 +77,14 @@ def volunteerStaffHome(request):
     context = {'query_results': query_results}
     return render(request,'volunteers/volunteerStaffHome.html',context)
 
+    # try:
+    #     user = request.user #authenticate(username='admin', password='adMIN')
+    #     context = getVolunteerPageContext(request,user)
+    # except:
+    #     print "Not logged in"
+    #     context = {'query_results': [],'total_credits':0,'type_choices':[]}
+    # return render(request,'volunteers/volunteerHome.html',context)
+
 @login_required
 def volunteerStaffActivity(request):
     query_results = ActivityType.objects.all()
