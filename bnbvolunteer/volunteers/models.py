@@ -54,8 +54,11 @@ class VerificationRequest(models.Model):
         self._selfDestruct()
         return message
     
-    def _selfDestruct(self):
+    def _selfDestruct(self, hasExpired=False):
         if self.isValid:
+            if hasExpired:
+                if self.actionType == "register":
+                    self.user.delete()
             self.isValid = False
             self.delete()
     
@@ -73,13 +76,13 @@ class VerificationRequest(models.Model):
             return gString
     
     @classmethod
-    def createVerificationRequest(cls, user, actionType):
+    def createVerificationRequest(cls, user, actionType, timeLimit=60*60*48):
         prevRequest = VerificationRequest.objects.filter(user=user)
         if prevRequest:
             # There can only be at most 1 such request
             prevRequest[0]._selfDestruct()
         request = VerificationRequest.objects.create(user=user, code=VerificationRequest._generateLetterString(20), actionType=actionType)
-        Timer(60*60*24, request._selfDestruct).start()
+        Timer(timeLimit, request._selfDestruct, [True,]).start()
         return request
     
     def __unicode__(self):
