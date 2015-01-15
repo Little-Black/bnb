@@ -38,18 +38,36 @@ def volunteerSubmit(request):
     description = request.POST['description']
     earned = request.POST.getlist('myInputs')
     totalearned = 0
-    for input in earned:
-        totalearned += int(input)
-    print date
-    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5]
-    print storedate
+    invalid = []
+    valid_vouchers = Voucher.objects.exclude(redemptionActivity__isnull=False)
+    # print Voucher.objects.all()[1].redemptionActivity.description
+    print "valid: " + str(valid_vouchers)
+    vouchers_used = []
+    for voucher_code in earned: #input
+        voucher_set = valid_vouchers.filter(code = voucher_code)
+        if len(voucher_set)==1:
+            # print voucher
+            voucher = voucher_set[0]
+            totalearned+=voucher.credits
+            vouchers_used.append(voucher)
+        elif len(voucher_set)==0:
+            invalid.append(voucher_code)
+        else: 
+            return HttpResponse("Error: Multiple vouchers exist for that code")
+    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
     activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
     # try: 
-    activity.save()
+    if len(invalid) == 0:
+        activity.save()
     # except:
     #     print "ERROR"
+    for voucher in valid_vouchers:
+        voucher.redemptionActivity = activity
+        voucher.save()
 
     context = getVolunteerPageContext(request,user)
+    # return HttpResponse("Hi there!")
+    context['invalid_vouchers']=invalid
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -243,7 +261,7 @@ def generateCodes(request):
             while (Voucher.objects.filter(code=newCode).exists()):
                 newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points))
+            voucher = Voucher(code=newCode, credits=int(points), activity=None)
             voucher.save()
             generatedVouchers.append(voucher)
     context = {'generatedVouchers': generatedVouchers}
