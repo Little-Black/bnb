@@ -1,0 +1,9 @@
+.bnb-header, .staff-header{
+	text-align: center;
+}
+.bnb-header{
+	margin-bottom: 0;
+}
+.staff-header{
+	margin-top: 0;
+}
