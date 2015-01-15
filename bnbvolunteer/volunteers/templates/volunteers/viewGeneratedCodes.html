@@ -2,8 +2,12 @@
 <html>
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<!-- <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/viewGeneratedCodes.css' %}" /> -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/viewGeneratedCodes.css' %}" />
 <body>
+
+<h1 class="bnb-header">Bikes Not Bombs</h1>
+<h3 class="staff-header">2015</h3>
 
 <ul class="nav nav-tabs">
   <li role="presentation"><a href="#">Volunteer Profile</a></li>
@@ -11,24 +15,26 @@
   <li role="presentation"><a href="#">View Timesheet</a></li>
   <li role="presentation" class="active"><a href="#">Generate Voucher</a></li>
 </ul>
+	<a href="../codeGenerator"><button class="make-voucher-btn btn btn-default">Make more vouchers
+	</button></a>
 
-<div class="panel panel-default results">
-  Below are the generated voucher codes and choresponding point values.
-  <div class="panel-heading">Generated Vouchers</div>
+	<div class="panel panel-default results">
+	  <!-- Below are the generated voucher codes and choresponding point values. -->
+	  <div class="panel-heading">Generated Vouchers</div>
 
-  <table class="table">
-    <tr>
-	        <th>Code</th>
-	        <th>Points</th>
-	    </tr>
-	    {% for voucher in generatedVouchers %}
-	    <tr> 
-	        <td>{{ voucher.code }}</td>
-	        <td>{{ voucher.credits }}</td>
-	    </tr>
-	    {% endfor %}
-  </table>
-</div>
+	  <table class="table">
+	    <tr>
+		        <th>Code</th>
+		        <th>Points</th>
+		    </tr>
+		    {% for voucher in generatedVouchers %}
+		    <tr> 
+		        <td>{{ voucher.code }}</td>
+		        <td>{{ voucher.credits }}</td>
+		    </tr>
+		    {% endfor %}
+	  </table>
+	</div>
 
 
 <!--JQuery-->

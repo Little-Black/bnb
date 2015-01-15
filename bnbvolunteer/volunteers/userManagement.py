@@ -3,10 +3,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django import forms
 
 from volunteers.models import *
+from volunteers.emailTemplates import *
 
 class LoginForm(forms.Form):
     
@@ -74,13 +74,8 @@ class RegistrationForm(forms.Form):
                 user.save()
                 user.profile.save()
                 vr = VerificationRequest.createVerificationRequest(user, actionType="register")
-                # send verification mail to user (deactivated for the moment)
-                emailMessage = "Hi " + user.first_name + ",\n\
-                                Thank you for registering on BnB's volunteer system.\n\
-                                Your username is " + user.username + ".\n\
-                                You can activate your account at /verify/" + vr.code + "."
-                #send_mail("Registration on BnB Volunteer System", emailMessage, "BnB Volunteer System", [user.email,])
-                messages.success(request, "Registration successful. You should receive a verification mail in the inbox. (currently turned off) "+vr.code)
+                sendRegVerificationEmail(user)
+                messages.success(request, "Registration successful. You should receive a verification mail in the inbox.")
         else:
             registrationSuccessful = False
             for error in self.errors:
@@ -158,4 +153,5 @@ class PasswordChangeForm(forms.Form):
 
 def deleteAccount(request):
     vr = VerificationRequest.createVerificationRequest(request.user, actionType="delete")
-    messages.info(request, "A confirmation email is sent to your account. "+vr.code)
+    sendDeleteAccEmail(request.user)
+    messages.info(request, "A confirmation email is sent to your account.")

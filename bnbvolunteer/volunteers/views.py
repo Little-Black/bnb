@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-import random
+from random import randint
 
 from volunteers import userManagement
 from volunteers.models import *
@@ -38,18 +38,36 @@ def volunteerSubmit(request):
     description = request.POST['description']
     earned = request.POST.getlist('myInputs')
     totalearned = 0
-    for input in earned:
-        totalearned += int(input)
-    print date
-    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5]
-    print storedate
+    invalid = []
+    valid_vouchers = Voucher.objects.exclude(redemptionActivity__isnull=False)
+    # print Voucher.objects.all()[1].redemptionActivity.description
+    print "valid: " + str(valid_vouchers)
+    vouchers_used = []
+    for voucher_code in earned: #input
+        voucher_set = valid_vouchers.filter(code = voucher_code)
+        if len(voucher_set)==1:
+            # print voucher
+            voucher = voucher_set[0]
+            totalearned+=voucher.credits
+            vouchers_used.append(voucher)
+        elif len(voucher_set)==0:
+            invalid.append(voucher_code)
+        else: 
+            return HttpResponse("Error: Multiple vouchers exist for that code")
+    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
     activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
     # try: 
-    activity.save()
+    if len(invalid) == 0:
+        activity.save()
     # except:
     #     print "ERROR"
+    for voucher in valid_vouchers:
+        voucher.redemptionActivity = activity
+        voucher.save()
 
     context = getVolunteerPageContext(request,user)
+    # return HttpResponse("Hi there!")
+    context['invalid_vouchers']=invalid
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -75,6 +93,14 @@ def volunteerStaffHome(request):
         print "Not logged in"
     context = {'Logs': Logs}
     return render(request,'volunteers/volunteerStaffHome.html',context)
+
+    # try:
+    #     user = request.user #authenticate(username='admin', password='adMIN')
+    #     context = getVolunteerPageContext(request,user)
+    # except:
+    #     print "Not logged in"
+    #     context = {'query_results': [],'total_credits':0,'type_choices':[]}
+    # return render(request,'volunteers/volunteerHome.html',context)
 
 @login_required
 def volunteerStaffLog(request):
@@ -219,58 +245,6 @@ def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
 
-# @login_required
-# def submitUpdatedProfile(request):
-#     try:
-#         user = request.user #authenticate(username='admin', password='adMIN')
-#     except:
-#         print "ERROR UGHHH"
-#     firstName = request.POST['firstName']
-#     lastName = request.POST['lastName']
-#     email = request.POST['email']
-#     phone = request.POST['phone']
-#     oldPassword = request.POST['oldPassword']
-#     newPassword = request.POST['newPassword']
-#     newPassword2 = request.POST['newPassword2'] #will add form verification so we don't have to worry about this here
-#     addressLine1 = request.POST['addressLine1']
-#     addressLine2 = request.POST['addressLine2']
-#     city = request.POST['city']
-#     state = request.POST['state']
-#     zipCode = request.POST['zipCode']
-
-#     successNote = []
-#     failedNote = []
-
-#     #Check if the user actually made changes to any of the fields...
-#     if !(user.first_name == firstName):    
-#         user.first_name = firstName
-#         successNote.append("First name was successfully updated!")
-#     if !(user.last_name == lastName):
-#         user.last_name = lastName
-#         successNote.append("Last name was successfully updated!")
-#     if !(user.email == email):
-#         user.email = email
-#         successNote.append("Email was successfully updated!")
-
-#     oldPassIsCorrect = check_password(oldPassword, user.password)
-#     if oldPassIsCorrect:
-#         user.password = newPassword
-#     else:
-#         #Old password is wrong! Noooooo, now they must try again.
-#         failedNote.append("Old password is not correct. Please try again.")
-
-#     user.profile.phone = phone
-#     user.profile.address = addressLine1+addressLine2+city+state+zipCode
-
-#     try:
-#         user.save()
-#         user.profile.save()
-#     except:
-#         print "ERROR SAVING USER UPDATES"
-
-#     context = {'successNote': successNote,'failedNote':failedNote}
-#     return render(request,'volunteers/updateProfile.html',context)
-
 @login_required
 def codeGenerator(request):
     context = {}
@@ -278,7 +252,7 @@ def codeGenerator(request):
 
 #Returns a random integer between min (inclusive) to max (inclusive)
 def getRandomInt(min, max):
-    return random.randint(min, max)
+    return randint(min, max)
 
 alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 #Returns a string of a single random capitalized letter of the alphabet 
@@ -319,7 +293,7 @@ def generateCodes(request):
             while (Voucher.objects.filter(code=newCode).exists()):
                 newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points))
+            voucher = Voucher(code=newCode, credits=int(points), activity=None)
             voucher.save()
             generatedVouchers.append(voucher)
     context = {'generatedVouchers': generatedVouchers}

@@ -26,6 +26,7 @@
 </ul>
 <br>
 
+<<<<<<< HEAD
 <table>
     <tr>
         <th>User</th>
@@ -47,6 +48,29 @@
     {% endfor %}
 </table>
 
+=======
+<div class="timesheet panel panel-default">
+  <div class="panel-heading">Timesheet Entries</div>
+  <table class="table">
+      <tr>
+          <th>User</th>
+          <th>Date Done</th>
+          <th>Activity Type</th>
+          <th>Description</th>
+          <th>Credits Earned</th>
+      </tr>
+      {% for item in query_results %}
+      <tr> 
+          <td>{{ item.user }}</td>
+          <td>{{ item.dateDone }}</td>
+          <td>{{ item.activityType}}</td>
+          <td>{{ item.description }}</td>
+          <td>{{ item.credits }}</td>
+      </tr>
+      {% endfor %}
+  </table>
+</div>
+>>>>>>> 58897b5383fe124cb13f1d36774c44727e591ae0
 
 
 <script>
