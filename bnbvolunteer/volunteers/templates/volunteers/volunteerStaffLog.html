@@ -8,7 +8,7 @@
 <a href="{% url 'logout' %}">Logout</a>
 <br>
 <ul class="nav nav-tabs">
-	<li role="presentation" class="active">
+	<li role="presentation">
 	<a href="{% url 'volunteerStaffHome' %}">Home</a>
 	</li>
 	<li role="presentation">
@@ -20,47 +20,36 @@
 	<li role="presentation">
 <a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
 	</li>
-	<li role="presentation">
+	<li role="presentation" class="active">
 <a href="{% url 'volunteerStaffLog' %}"> Logs </a>
 </li>
 </ul>
 <br>
 
-<table>
+
+<div class="panel panel-default results">
+    <div class="panel-heading">Logs</div>
+<table class="table">
     <tr>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
         <th>activityType</th>
         <th>description</th>
-        <th>credits</th>
+	<th>credits</th>
     </tr>
     {% for item in Logs %}
     <tr> 
-	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
+	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
         <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
-        <td>{{ item.credits }}</td>
+	<td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
 </table>
+</div>
 
 
 
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>

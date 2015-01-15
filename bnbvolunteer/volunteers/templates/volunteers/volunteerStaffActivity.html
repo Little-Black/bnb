@@ -1,48 +1,58 @@
-Welcome to the staff home page, {{user.first_name}}!
-<br>
-<a href="{% url 'volunteerStaffHome' %}">Home</a>
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<body>
+
 <a href="{% url 'logout' %}">Logout</a>
-<a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
-Here you can search for a certain volunteer!
+<ul class="nav nav-tabs">
+	<li role="presentation">
+	<a href="{% url 'volunteerStaffHome' %}">Home</a>
+	</li>
+	<li role="presentation">
+	<a href="{% url 'editProfile' %}"> Edit account info </a><li>
+	</li>
+	<li role="presentation"class="active">
+<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
+</li>
+</ul>
 
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
 
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
-
-Here are all the activities:
-<br>
-<table>
+<div class="input-group search">
+	</div>
+<div class="panel panel-default results">
+    <div class="panel-heading">Activities</div>
+    <table class="table">
+    <tr>
+    </tr>
     {% for item in query_results %}
     <tr> 
-        <td>{{ item.name }}</td>
+	    <td>{{ item.name }}</td>
+	    {% if item.id != 1 %}
+	    <td><a href="?delete={{item.id}}">Delete</a></td>
+	    {% endif%}
     </tr>
     {% endfor %}
 </table>
+</div>
 
 Add a new activity!:
 
-<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+<form action="" method="post">{% csrf_token %}
 
-Description:
-<input type="text" name="description">
-<br>
-Credits:
-<input type="text" name="credits">
+Name:
+<input type="text" name="activityName">
 <br>
 <input type="submit" value="Submit" />
 </form>
-
-{{inform}}
-
-
 
 
 <script>

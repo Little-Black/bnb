@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='activity',
-            name='dateEntered',
-            field=models.DateTimeField(auto_now_add=True),
+        migrations.AddField(
+            model_name='userprofile',
+            name='credit',
+            field=models.PositiveSmallIntegerField(default=0),
             preserve_default=True,
         ),
     ]
