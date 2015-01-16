@@ -1,7 +1,8 @@
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
-
+from datetime import datetime
+from datetime import date
 from random import random
 from threading import Timer
 
@@ -21,7 +22,7 @@ class ActivityType(models.Model):
 
 class Activity(models.Model):
     user = models.ForeignKey(User, default='')
-    dateDone = models.DateField()
+    dateDone = models.DateField(default=date.today)
     dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
     activityType = models.ForeignKey(ActivityType)
     description = models.CharField(max_length=200)
@@ -30,7 +31,7 @@ class Activity(models.Model):
 class Voucher(models.Model):
     code = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
-    redemptionActivity = models.ForeignKey(Activity, null=True)
+    redemptionActivity = models.ForeignKey(Activity, null=True, blank=True)
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User, unique=True)
@@ -93,7 +94,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
-    
+    credit = models.PositiveSmallIntegerField(default=0)
     def get(self, attr):
         if hasattr(self, attr):
             return getattr(self, attr)

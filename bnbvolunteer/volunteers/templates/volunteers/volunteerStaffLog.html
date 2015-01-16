@@ -1,0 +1,55 @@
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<body>
+
+<a href="{% url 'logout' %}">Logout</a>
+<br>
+<ul class="nav nav-tabs">
+	<li role="presentation">
+	<a href="{% url 'volunteerStaffHome' %}">Home</a>
+	</li>
+	<li role="presentation">
+	<a href="{% url 'editProfile' %}"> Edit account info </a><li>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+	</li>
+	<li role="presentation" class="active">
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
+</li>
+</ul>
+<br>
+
+
+<div class="panel panel-default results">
+    <div class="panel-heading">Logs</div>
+<table class="table">
+    <tr>
+        <th>User</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+	<th>credits</th>
+    </tr>
+    {% for item in Logs %}
+    <tr> 
+	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType.name }}</td>
+        <td>{{ item.description }}</td>
+	<td>{{ item.credits }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+
+
+

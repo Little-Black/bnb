@@ -1,28 +1,54 @@
-Welcome to the staff home page, {{user.first_name}}!
-<br>
-<a href="{% url 'volunteerStaffHome' %}">Home</a>
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<body>
+
 <a href="{% url 'logout' %}">Logout</a>
-<a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
+<ul class="nav nav-tabs">
+	<li role="presentation" class="active">
+	<a href="{% url 'volunteerStaffHome' %}">Home</a>
+	</li>
+	<li role="presentation">
+	<a href="{% url 'editProfile' %}"> Edit account info </a><li>
+	</li>
+	<li role="presentation">
 <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-
-<br>
-Here you can search for a certain volunteer!
-
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
-
-
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
+</li>
+</ul>
 <br>
 
+<<<<<<< HEAD
+<table>
+    <tr>
+        <th>User</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+        <th>credits</th>
+    </tr>
+    {% for item in Logs %}
+    <tr> 
+	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.credits }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+=======
 <div class="timesheet panel panel-default">
   <div class="panel-heading">Timesheet Entries</div>
   <table class="table">
@@ -44,7 +70,7 @@ Last name:
       {% endfor %}
   </table>
 </div>
-
+>>>>>>> 58897b5383fe124cb13f1d36774c44727e591ae0
 
 
 <script>

@@ -20,10 +20,14 @@
 
 <h1 style="margin-left:10px;">
 Welcome, {{user.first_name}}!
+
 </h1>
 
 
 <p class="total-credit"> Total Credits: {{total_credits}} </p>
+
+<p> Sorry, the following vouchers are invalid:</p>
+<p> {{invalid_vouchers}} </p>
 
 <div "add-entry-and-edit-profile-btns">
 	<button class="add-entry-btn btn btn-default" onclick="$('#tohide').toggle();">
@@ -62,7 +66,7 @@ Welcome, {{user.first_name}}!
 	Task Description:
 	<input type="text" name="description">
 	<br>
-	Voucher credits earned:
+	Voucher code(s):
 	<br>
 	<div id="dynamicInput" style="margin-left:20px;">
 	        Entry 1 <input type="text" name="myInputs">
