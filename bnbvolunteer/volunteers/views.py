@@ -3,6 +3,7 @@ from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from random import randint
+from django.utils.safestring import mark_safe
 
 from volunteers import userManagement
 from volunteers.models import *
@@ -37,21 +38,26 @@ def volunteerSubmit(request):
     # activityType.save()
     description = request.POST['description']
     earned = request.POST.getlist('myInputs')
+    print earned
     totalearned = 0
     invalid = []
+    invalid_boolean = "False"
     valid_vouchers = Voucher.objects.exclude(redemptionActivity__isnull=False)
     # print Voucher.objects.all()[1].redemptionActivity.description
     print "valid: " + str(valid_vouchers)
     vouchers_used = []
     for voucher_code in earned: #input
-        voucher_set = valid_vouchers.filter(code = voucher_code)
+        voucher_set = valid_vouchers.filter(code = voucher_code.encode('utf8'))
+        print voucher_code.encode('utf8')
         if len(voucher_set)==1:
             # print voucher
             voucher = voucher_set[0]
             totalearned+=voucher.credits
             vouchers_used.append(voucher)
+            print "VALID!"
         elif len(voucher_set)==0:
-            invalid.append(voucher_code)
+            invalid.append((voucher_code.encode('utf8')))
+            invalid_boolean = "True"
         else: 
             return HttpResponse("Error: Multiple vouchers exist for that code")
     storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
@@ -61,13 +67,15 @@ def volunteerSubmit(request):
         activity.save()
     # except:
     #     print "ERROR"
-    for voucher in valid_vouchers:
+    for voucher in vouchers_used:
         voucher.redemptionActivity = activity
         voucher.save()
 
     context = getVolunteerPageContext(request,user)
     # return HttpResponse("Hi there!")
-    context['invalid_vouchers']=invalid
+    context['invalid_vouchers']=mark_safe(invalid)
+    context['invalid_boolean']=invalid_boolean
+    print invalid_boolean
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -293,7 +301,7 @@ def generateCodes(request):
             while (Voucher.objects.filter(code=newCode).exists()):
                 newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points), activity=None)
+            voucher = Voucher(code=newCode, credits=int(points))
             voucher.save()
             generatedVouchers.append(voucher)
     context = {'generatedVouchers': generatedVouchers}
