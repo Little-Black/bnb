@@ -1,9 +1,10 @@
-.bnb-header, .staff-header{
+.bnb-header, .subheader{
 	text-align: center;
 }
 .bnb-header{
-	margin-bottom: 0;
+	margin-bottom: 10px;
 }
-.staff-header{
+.subheader{
 	margin-top: 0;
+	font-style: italic;
 }
