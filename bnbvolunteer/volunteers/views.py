@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
 from random import randint
 
 from volunteers import userManagement
@@ -65,8 +66,7 @@ def getVolunteerPageContext(request,user):
     context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
     return context
 
-
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def volunteerStaffHome(request):
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -195,34 +195,29 @@ def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def codeGenerator(request):
     context = {}
     return render(request,'volunteers/codeGenerator.html',context)
 
-#Returns a random integer between min (inclusive) to max (inclusive)
-def getRandomInt(min, max):
-    return randint(min, max)
-
-alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-#Returns a string of a single random capitalized letter of the alphabet 
-def getRandomLetter():
-    letterInt = getRandomInt(0,25)
-    return alphabet[letterInt]
-
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
+    
+    #Returns a string of a single random capitalized letter of the alphabet 
+    def getRandomLetter():
+        return chr(65+randint(0,25))
+    
     code = ""
     for i in range(0,8):
         if (i%2 == 0):
             letter = getRandomLetter()
             code += str(letter)
         else:
-            integer = getRandomInt(1,9)
+            integer = randint(1,9)
             code += str(integer)
     return code
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def generateCodes(request):
     generatedVouchers = []
     for counter in range(1,16):
@@ -249,7 +244,7 @@ def generateCodes(request):
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def viewGeneratedCodes(request):
     generatedVouchers = request.generatedVouchers
     context = {'generatedVouchers': generatedVouchers}

@@ -73,7 +73,7 @@ class RegistrationForm(forms.Form):
                 user.is_active = False
                 user.save()
                 user.profile.save()
-                vr = VerificationRequest.createVerificationRequest(user, actionType="register")
+                VerificationRequest.createVerificationRequest(user, actionType="register")
                 sendRegVerificationEmail(user)
                 messages.success(request, "Registration successful. You should receive a verification mail in the inbox.")
         else:
@@ -101,8 +101,11 @@ class EditProfileForm(forms.Form):
                 if User.objects.filter(email=self.cleaned_data["email"]):
                     messages.error(request, "This email is already connected to another account.")
                 else:
-                    messages.info(request, "A confirmation mail is sent to your new email address. (feature not yet implemented, ignore this)")
-                    request.user.email = self.cleaned_data["email"]
+                    messages.info(request, "A confirmation mail is sent to your new email address.")
+                    request.user.profile.newEmail = self.cleaned_data["email"]
+                    request.user.profile.save()
+                    VerificationRequest.createVerificationRequest(request.user, actionType="updateEmail")
+                    sendEmailUpdateEmail(request.user)
             for attr in {"first_name", "last_name", "address", "phone"}:
                 request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
@@ -152,6 +155,6 @@ class PasswordChangeForm(forms.Form):
                 messages.error(request, error + " is a required field.")
 
 def deleteAccount(request):
-    vr = VerificationRequest.createVerificationRequest(request.user, actionType="delete")
-    sendDeleteAccEmail(request.user)
     messages.info(request, "A confirmation email is sent to your account.")
+    VerificationRequest.createVerificationRequest(request.user, actionType="delete")
+    sendDeleteAccEmail(request.user)
