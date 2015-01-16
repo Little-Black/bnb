@@ -3,7 +3,7 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
 <body>
 
 <a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
@@ -52,29 +52,17 @@
 </table>
 </div>
 
-Add a new activity!:
+<div class="add-new-act">
+  <p class="add-label">Add a new activity type</p>
 
-<form action="" method="post">{% csrf_token %}
+  <form action="" method="post">{% csrf_token %}
 
-Name:
-<input type="text" name="activityName">
-<br>
-<input type="submit" value="Submit" />
-</form>
+  <p class="name-label">Name:</p>
+  <input type="text" name="activityName">
+  <br>
+  <input class="submit-btn btn btn-default" type="submit" value="Submit" />
+  </form>
+</div>
 
-
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>
+</body>
+</html>

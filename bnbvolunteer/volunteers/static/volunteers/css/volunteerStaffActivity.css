@@ -1,0 +1,16 @@
+.add-new-act{
+	margin: 20px 0 0 20px;
+}
+.panel{
+	width: 90%;
+	margin: 20px auto auto auto;
+}
+.name-label{
+	display: inline;
+}
+.submit-btn{
+	margin-top: 10px;
+}
+.add-label{
+	font-size: 20px;
+}
