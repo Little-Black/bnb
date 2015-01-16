@@ -6,14 +6,31 @@
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
 <body>
 
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
+<br>
+
 <h1 class="bnb-header">Bikes Not Bombs</h1>
 <h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
 
 <ul class="nav nav-tabs">
-  <li role="presentation"><a href="#">Volunteer Profile</a></li>
-  <li role="presentation"><a href="#">Search</a></li>
-  <li role="presentation"><a href="#">View Timesheet</a></li>
-  <li role="presentation" class="active"><a href="#">Generate Voucher</a></li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'editProfile' %}">Edit Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
+  </li>
+  <li role="presentation" class="active">
+    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+  </li>
 </ul>
 
 <form action="{% url 'generateCodes' %}" method="post">{% csrf_token %}

@@ -2,53 +2,37 @@
 <html>
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
 <body>
 
-<a href="{% url 'logout' %}">Logout</a>
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
 <br>
+
+<h1 class="bnb-header">Bikes Not Bombs</h1>
+<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+
 <ul class="nav nav-tabs">
-	<li role="presentation" class="active">
-	<a href="{% url 'volunteerStaffHome' %}">Home</a>
-	</li>
-	<li role="presentation">
-	<a href="{% url 'editProfile' %}"> Edit account info </a><li>
-	</li>
-	<li role="presentation">
-<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-	</li>
-	<li role="presentation">
-<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
-	</li>
-	<li role="presentation">
-<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
-</li>
+  <li role="presentation" class="active">
+    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'editProfile' %}">Edit Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+  </li>
 </ul>
-<br>
 
-<<<<<<< HEAD
-<table>
-    <tr>
-        <th>User</th>
-        <th>DateDone</th>
-        <th>DateEntered</th>
-        <th>activityType</th>
-        <th>description</th>
-        <th>credits</th>
-    </tr>
-    {% for item in Logs %}
-    <tr> 
-	    <td><a href="user/?getuser={{item.user}}">{{ item.user }}</a></td>
-        <td>{{ item.dateDone }}</td>
-        <td>{{ item.dateEntered }}</td>
-        <td>{{ item.activityType.name }}</td>
-        <td>{{ item.description }}</td>
-        <td>{{ item.credits }}</td>
-    </tr>
-    {% endfor %}
-</table>
-
-=======
 <div class="timesheet panel panel-default">
   <div class="panel-heading">Timesheet Entries</div>
   <table class="table">
@@ -70,7 +54,6 @@
       {% endfor %}
   </table>
 </div>
->>>>>>> 58897b5383fe124cb13f1d36774c44727e591ae0
 
 
 <script>
