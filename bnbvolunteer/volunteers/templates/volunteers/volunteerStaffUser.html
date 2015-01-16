@@ -1,46 +1,75 @@
-Welcome to the staff home page, {{user.first_name}}!
-<br>
-<a href="{% url 'volunteerStaffHome' %}">Home</a>
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<body>
+
 <a href="{% url 'logout' %}">Logout</a>
-<a href="{% url 'editProfile' %}"> Edit account info </a>
 <br>
-Here you can search for a certain volunteer!
+<ul class="nav nav-tabs">
+	<li role="presentation">
+	<a href="{% url 'volunteerStaffHome' %}">Home</a>
+	</li>
+	<li role="presentation">
+	<a href="{% url 'editProfile' %}"> Edit account info </a><li>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+	</li>
+	<li role="presentation" class="active">
+<a href="{% url 'volunteerStaffUserSearchResult' %}"> Users </a>
+	</li>
+	<li role="presentation">
+<a href="{% url 'volunteerStaffLog' %}"> Logs </a>
+</li>
+</ul>
 
 <form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
 
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
+<div class="input-group search">
+
+
+<input type="text" class="form-control" Placeholder="Last Name"  name="lastname">
+<span class="input-group-btn">
+	<input type="submit"  class="btn btn-default" value="Go!">
+</span>
+</div>
 </form>
 
-Here are {{getuser.first_name}}'s logs:
-<br>
-{{getuser.first_name}} has {{totalCredit}} in all.
-<br>
-<table>
+
+<div class="panel panel-default results">
+	<div class="panel-heading">{{getuser}}'s Logs</div>
+<table class="table">
     <tr>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
         <th>activityType</th>
         <th>description</th>
-        <th>credits</th>
+	<th>credits</th>
     </tr>
     {% for item in search_results %}
     <tr> 
-        <td>{{ item.user }}</td>
+	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
-        <td>{{ item.activityType }}</td>
+        <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
-        <td>{{ item.credits }}</td>
+	<td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
+    <tr>
+	<th/>
+	<th/>
+	<th/>
+	<th/>
+	<th/>
+	<th>{{getuser.profile.credit}} credits in all</th>
+    </tr>
 </table>
+</div>
+
 
 Add a log to {{getuser}}:
 

@@ -1,27 +1,37 @@
-Welcome to the staff home page, {{user.first_name}}!
-<br>
-<a href="{% url 'volunteerStaffHome' %}">Home</a>
-<a href="{% url 'logout' %}">Logout</a>
-<a href="{% url 'editProfile' %}"> Edit account info </a>
-<br>
-<a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
+<body>
 
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
 <br>
-Here you can search for a certain volunteer!
 
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
+<h1 class="bnb-header">Bikes Not Bombs</h1>
+<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
 
-First name:
-<input type="text" name="firstname">
-<br>
-Last name:
-<input type="text" name="lastname">
-<br>
-<input type="submit" value="Search" />
-</form>
-
-
-<br>
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active">
+    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'editProfile' %}">Edit Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+  </li>
+</ul>
 
 <div class="timesheet panel panel-default">
   <div class="panel-heading">Timesheet Entries</div>
@@ -44,7 +54,6 @@ Last name:
       {% endfor %}
   </table>
 </div>
-
 
 
 <script>

@@ -3,7 +3,7 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
 <body>
 
 <a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
@@ -22,59 +22,42 @@
   <li role="presentation">
     <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
   </li>
-  <li role="presentation">
+  <li role="presentation" class="active">
     <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
   </li>
   <li role="presentation">
     <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
   </li>
-  <li role="presentation" class="active">
+  <li role="presentation">
     <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
   </li>
 </ul>
+<br>
 
 
-<div class="input-group search">
-	</div>
 <div class="panel panel-default results">
-    <div class="panel-heading">Activities</div>
-    <table class="table">
+    <div class="panel-heading">Logs</div>
+<table class="table">
     <tr>
+        <th>User</th>
+        <th>DateDone</th>
+        <th>DateEntered</th>
+        <th>activityType</th>
+        <th>description</th>
+	<th>credits</th>
     </tr>
-    {% for item in query_results %}
+    {% for item in Logs %}
     <tr> 
-	    <td>{{ item.name }}</td>
-	    {% if item.id != 1 %}
-	    <td><a href="?delete={{item.id}}">Delete</a></td>
-	    {% endif%}
+	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
+        <td>{{ item.dateDone }}</td>
+        <td>{{ item.dateEntered }}</td>
+        <td>{{ item.activityType.name }}</td>
+        <td>{{ item.description }}</td>
+	<td>{{ item.credits }}</td>
     </tr>
     {% endfor %}
 </table>
 </div>
 
-Add a new activity!:
-
-<form action="" method="post">{% csrf_token %}
-
-Name:
-<input type="text" name="activityName">
-<br>
-<input type="submit" value="Submit" />
-</form>
 
 
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>

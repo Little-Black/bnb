@@ -1,0 +1,10 @@
+.voucher-points, .how-many{
+	display: inline;
+	margin: 20px 5px 0 20px;
+}
+.create-more-btn, .submit-btn{
+	margin: 20px 10px 5px; 20px;
+}
+.nav{
+	margin-bottom: 20px;
+}

@@ -1,10 +1,14 @@
+{% load staticfiles%}
 <html>
 <head>
     <title> Your account </title>
-<head>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/updateProfile.css' %}" />
+</head>
 <body>
-    <a href="{% url "volunteerHome" %}"> Home Page </a>
-    <h3> Edit profile information </h3>
+    <a href="{% url "volunteerHome" %}"><button class="home btn btn-default"> Back </button></a>
+    <h3 class="title"> Edit profile information </h3>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -13,18 +17,34 @@
         </ul>
     {% endif %}
     <form method="post">
-        {% csrf_token %}
-        {% for field in infoForm %}
-            <p> {{ field.label_tag }} {{ field }} </p>
-        {% endfor %}
-        <h3> Change password </h3>
-        {% for field in pwForm %}
-            <p> {{ field.label_tag }} {{ field }} </p>
-        {% endfor %}
-        <input type="submit" name="submit" value="Submit">
-        <input type="submit" formaction="{% url "volunteerHome" %}" value="Cancel">
+        <div class="fields">
+            {% csrf_token %}
+            {% for field in infoForm %}
+                <div>
+                    <div class="input-label"> {{ field.label_tag }} </div>
+                    {{ field }} 
+                </div>
+            {% endfor %}
+            <h3> Change password </h3>
+            {% for field in pwForm %}
+                <div>
+                    <div class="input-label"> {{ field.label_tag }} </div>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <input type="submit" class="submit-btn btn btn-primary" name="submit" value="Submit">
+            <input type="submit" class="btn btn-default" formaction="{% url "volunteerHome" %}" value="Cancel">
+        </div>
     </form>
-    <h3> Delete your account </h3>
-    <a href="{% url "deleteAccount" %}"> Are you sure? Your points will be lost forever (a very long time). </a>
+    <h3 class="delete-title"> Delete your account </h3>
+    <p class="delete-note">Are you sure? Your points will be lost forever (a very long time).</p>
+    <a href="{% url "deleteAccount" %}"><button class="delete-account-btn btn btn-danger">Delete Account</button></a>
+    <!-- <a href="{% url "deleteAccount" %}"> Are you sure? Your points will be lost forever (a very long time). </a> -->
+
+<!-- JQuery -->
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
+<!-- Bootstrap -->
+<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
+<script src="{% static 'volunteers/js/updateProfile.js' %}"></script>
 </body>
 </html>

@@ -39,18 +39,36 @@ def volunteerSubmit(request):
     description = request.POST['description']
     earned = request.POST.getlist('myInputs')
     totalearned = 0
-    for input in earned:
-        totalearned += int(input)
-    print date
-    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5]
-    print storedate
+    invalid = []
+    valid_vouchers = Voucher.objects.exclude(redemptionActivity__isnull=False)
+    # print Voucher.objects.all()[1].redemptionActivity.description
+    print "valid: " + str(valid_vouchers)
+    vouchers_used = []
+    for voucher_code in earned: #input
+        voucher_set = valid_vouchers.filter(code = voucher_code)
+        if len(voucher_set)==1:
+            # print voucher
+            voucher = voucher_set[0]
+            totalearned+=voucher.credits
+            vouchers_used.append(voucher)
+        elif len(voucher_set)==0:
+            invalid.append(voucher_code)
+        else: 
+            return HttpResponse("Error: Multiple vouchers exist for that code")
+    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
     activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
     # try: 
-    activity.save()
+    if len(invalid) == 0:
+        activity.save()
     # except:
     #     print "ERROR"
+    for voucher in valid_vouchers:
+        voucher.redemptionActivity = activity
+        voucher.save()
 
     context = getVolunteerPageContext(request,user)
+    # return HttpResponse("Hi there!")
+    context['invalid_vouchers']=invalid
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -68,13 +86,12 @@ def getVolunteerPageContext(request,user):
 
 @user_passes_test(lambda user: user.is_staff)
 def volunteerStaffHome(request):
+    Logs = Activity.objects.all()
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
-        query_results = Activity.objects.all()
     except:
         print "Not logged in"
-        query_results = []
-    context = {'query_results': query_results}
+    context = {'Logs': Logs}
     return render(request,'volunteers/volunteerStaffHome.html',context)
 
     # try:
@@ -86,21 +103,51 @@ def volunteerStaffHome(request):
     # return render(request,'volunteers/volunteerHome.html',context)
 
 @login_required
+def volunteerStaffLog(request):
+    Logs = Activity.objects.all()
+    context = {'Logs': Logs}
+    return render(request, 'volunteers/volunteerStaffLog.html', context)
+
+
+@login_required
 def volunteerStaffActivity(request):
+    if request.method == "POST":
+        if not request.POST['activityName'] == "":
+            ActivityType(name=request.POST['activityName']).save()
+    if 'delete' in request.GET:
+        ActivityType.objects.get(id=request.GET['delete']).delete()
+        return HttpResponseRedirect(reverse("volunteerStaffActivity"))
     query_results = ActivityType.objects.all()
     context = {'query_results': query_results}
     return render(request, 'volunteers/volunteerStaffActivity.html', context)
 
 @login_required
 def volunteerStaffUserSearchResult(request):
-    if request.POST['firstname'] == "":
-        if request.POST['lastname'] == "":
-            search_results = User.objects.all()
-        else:
-            search_results = User.objects.filter(last_name=request.POST['lastname'])
+    inform = ""
+    if request.method == "GET":
+        search_results = User.objects.all() 
     else:
-        search_results = User.objects.filter(last_name=request.POST['lastname']).filter(first_name=request.POST['firstname'])
-    context = {'search_results': search_results}
+        if 'lastname' in request.POST.keys():
+            if request.POST['lastname'] != "":    
+                search_results = User.objects.filter(last_name=request.POST['lastname'])
+            else:
+                search_results = User.objects.all()
+        else:
+            search_results = User.objects.all()
+            for user in search_results:
+                if user.username in request.POST.keys():
+                    if request.POST[user.username]:
+                        activityType = ActivityType.objects.get(name="N/A")
+                        addLog = Activity(user=user, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
+                        if int(request.POST['credits']) + user.profile.credit >= 0:
+                            addLog.save();
+                            user.profile.credit += int(request.POST['credits'])
+                            user.profile.save()
+                        else:
+                            inform += user.username + ', '
+    if not inform == "":
+        inform = "No enough credits for " + inform[:-2] +"!" 
+    context = {'search_results': search_results,  'inform': inform}
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
 @login_required
@@ -113,7 +160,8 @@ def volunteerStaffUser(request):
         creditSum += result.credits
     if request.method == "POST":
         try:
-            addLog = Activity(user=userSearch_result, description=request.POST['description'], credits=request.POST['credits'])
+            activityType = ActivityType.objects.get(name="N/A")
+            addLog = Activity(user=userSearch_result, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
             if creditSum + int(addLog.credits) < 0:
                 inform = "Do not have enough credits"
             else:
@@ -122,7 +170,9 @@ def volunteerStaffUser(request):
                 creditSum += int(addLog.credits)
         except:
             inform = "Please enter an integer in credits field."
-    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform, 'totalCredit': creditSum}
+    userSearch_result.profile.credit = creditSum
+    userSearch_result.profile.save()
+    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
 
@@ -238,7 +288,7 @@ def generateCodes(request):
             while (Voucher.objects.filter(code=newCode).exists()):
                 newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points))
+            voucher = Voucher(code=newCode, credits=int(points), activity=None)
             voucher.save()
             generatedVouchers.append(voucher)
     context = {'generatedVouchers': generatedVouchers}
