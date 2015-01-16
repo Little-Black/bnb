@@ -1,9 +1,12 @@
 {% load staticfiles %}
 <html>
 <!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
+</head>
 <body>
 
 <a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
@@ -34,17 +37,35 @@
 </ul>
 <br>
 
+<form method="post" action="">{% csrf_token %}
+	Activity done between 
+       	<input name="dateDoneDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>
+	and
+	<input name="dateDoneUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDoneUp}}>
+	<input type="submit" Value="Search">
+</form>
+
+
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js'%}"></script>
+<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+			$('#date1').datepicker({format: "yyyy-mm-dd"});
+			$('#date2').datepicker({format: "yyyy-mm-dd"});
+			});
+	</script>
 
 <div class="panel panel-default results">
-    <div class="panel-heading">Logs</div>
+    <div class="panel-heading">Timesheet</div>
 <table class="table">
     <tr>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
-        <th>activityType</th>
-        <th>description</th>
-	<th>credits</th>
+        <th>ActivityType</th>
+        <th>Description</th>
+	<th>Credits</th>
+	<th>Staff</th>
     </tr>
     {% for item in Logs %}
     <tr> 
@@ -54,10 +75,11 @@
         <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
 	<td>{{ item.credits }}</td>
+	<td>{{ item.staff }}</td>
     </tr>
     {% endfor %}
 </table>
 </div>
 
-
-
+</body>
+</html>
