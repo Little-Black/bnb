@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
 from random import randint
+from django.utils.safestring import mark_safe
 
 from volunteers import userManagement
 from volunteers.models import *
@@ -40,21 +42,26 @@ def volunteerSubmit(request):
     # activityType.save()
     description = request.POST['description']
     earned = request.POST.getlist('myInputs')
+    print earned
     totalearned = 0
     invalid = []
+    invalid_boolean = "False"
     valid_vouchers = Voucher.objects.exclude(redemptionActivity__isnull=False)
     # print Voucher.objects.all()[1].redemptionActivity.description
     print "valid: " + str(valid_vouchers)
     vouchers_used = []
     for voucher_code in earned: #input
-        voucher_set = valid_vouchers.filter(code = voucher_code)
+        voucher_set = valid_vouchers.filter(code = voucher_code.encode('utf8'))
+        print voucher_code.encode('utf8')
         if len(voucher_set)==1:
             # print voucher
             voucher = voucher_set[0]
             totalearned+=voucher.credits
             vouchers_used.append(voucher)
+            print "VALID!"
         elif len(voucher_set)==0:
-            invalid.append(voucher_code)
+            invalid.append((voucher_code.encode('utf8')))
+            invalid_boolean = "True"
         else: 
             return HttpResponse("Error: Multiple vouchers exist for that code")
     storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
@@ -64,13 +71,15 @@ def volunteerSubmit(request):
         activity.save()
     # except:
     #     print "ERROR"
-    for voucher in valid_vouchers:
+    for voucher in vouchers_used:
         voucher.redemptionActivity = activity
         voucher.save()
 
     context = getVolunteerPageContext(request,user)
     # return HttpResponse("Hi there!")
-    context['invalid_vouchers']=invalid
+    context['invalid_vouchers']=mark_safe(invalid)
+    context['invalid_boolean']=invalid_boolean
+    print invalid_boolean
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -86,8 +95,7 @@ def getVolunteerPageContext(request,user):
     context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
     return context
 
-
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def volunteerStaffHome(request):
     Logs = Activity.objects.all()
     try:
@@ -254,34 +262,29 @@ def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def codeGenerator(request):
     context = {}
     return render(request,'volunteers/codeGenerator.html',context)
 
-#Returns a random integer between min (inclusive) to max (inclusive)
-def getRandomInt(min, max):
-    return randint(min, max)
-
-alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-#Returns a string of a single random capitalized letter of the alphabet 
-def getRandomLetter():
-    letterInt = getRandomInt(0,25)
-    return alphabet[letterInt]
-
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
+    
+    #Returns a string of a single random capitalized letter of the alphabet 
+    def getRandomLetter():
+        return chr(65+randint(0,25))
+    
     code = ""
     for i in range(0,8):
         if (i%2 == 0):
             letter = getRandomLetter()
             code += str(letter)
         else:
-            integer = getRandomInt(1,9)
+            integer = randint(1,9)
             code += str(integer)
     return code
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def generateCodes(request):
     generatedVouchers = []
     for counter in range(1,16):
@@ -302,13 +305,13 @@ def generateCodes(request):
             while (Voucher.objects.filter(code=newCode).exists()):
                 newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points), activity=None)
+            voucher = Voucher(code=newCode, credits=int(points))
             voucher.save()
             generatedVouchers.append(voucher)
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def viewGeneratedCodes(request):
     generatedVouchers = request.generatedVouchers
     context = {'generatedVouchers': generatedVouchers}

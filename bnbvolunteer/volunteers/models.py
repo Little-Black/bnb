@@ -49,6 +49,10 @@ class VerificationRequest(models.Model):
             self.user.is_active = True
             self.user.save()
             message = "Email successfully verified, account now active."
+        elif self.actionType == "updateEmail":
+            (self.user.email, self.user.profile.newEmail) = (self.user.profile.newEmail, "")
+            self.user.save()
+            message = "Email successfully updated."
         elif self.actionType == "delete":
             self.user.delete()
             message = "Email successfully verified, your account will be deleted."
@@ -68,8 +72,8 @@ class VerificationRequest(models.Model):
     @classmethod
     def _generateLetterString(cls, length):
         def generateRandomChar():
-            smallCaseFactor = (1 if random() >= 0.5 else 0)
-            return chr(int(26*random())+32*smallCaseFactor+65)
+            lowercaseFactor = (1 if random() >= 0.5 else 0)
+            return chr(int(26*random())+32*lowercaseFactor+65)
         gString = ""
         for i in xrange(length):
             gString += generateRandomChar()
@@ -96,7 +100,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
+    newEmail = models.EmailField(blank=True) # holds unverified email address
     credit = models.PositiveSmallIntegerField(default=0)
+    
     def get(self, attr):
         if hasattr(self, attr):
             return getattr(self, attr)

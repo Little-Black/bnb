@@ -49,55 +49,39 @@
 <div class="panel panel-default results">
     <div class="panel-heading">Users</div>
     <form action="" method="post">{% csrf_token %}
-<table class="table">
-    <tr>
-        <th>Username</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Phone Number</th>
-        <th>Address</th>
-	<th>Credits Avaliable</th>
-	<th>Selected</th>
-    </tr>
-    {% for item in search_results %}
-    <tr> 
-	    <td><a href="../user/?getuser={{item}}" >{{ item }}</a></td>
-        <td>{{ item.last_name }}</td>
-        <td>{{ item.first_name }}</td>
-        <td>{{ item.profile.phone }}</td>
-	<td>{{ item.profile.address }}</td>
-	<td>{{ item.profile.credit }}</td>
-	<td><input name="{{item.username}}"type="checkbox"><td>
-    </tr>
-    {% endfor %}
-</table>
+    <table class="table">
+        <tr>
+            <th>Username</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Phone Number</th>
+            <th>Address</th>
+    	<th>Credits Avaliable</th>
+    	<th>Selected</th>
+        </tr>
+        {% for item in search_results %}
+        <tr> 
+    	    <td><a href="../user/?getuser={{item}}" >{{ item }}</a></td>
+            <td>{{ item.last_name }}</td>
+            <td>{{ item.first_name }}</td>
+            <td>{{ item.profile.phone }}</td>
+    	<td>{{ item.profile.address }}</td>
+    	<td>{{ item.profile.credit }}</td>
+    	<td><input name="{{item.username}}"type="checkbox"></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="add-logs">
+  <p class="add-label">Add logs to selected users</p>
+  <p class="description-label">Description:</p><input type="text" name="description">
+  <p class="credits-label">Credits:</p><input type="text" name="credits">
+  <input type="submit" value="Submit" class="btn btn-default">
+  </form>
+  {{inform}}
 </div>
 
 
-Add logs to selected users:
-<br>
-Description: <input type="text" name="description">
-Credits: <input type="text" name="credits">
-<input type="submit" value="Submit" class="btn btn-default">
-</form>
-{{inform}}
-<br>
-<br>
-
-
-
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>
+</body>
+</html>
