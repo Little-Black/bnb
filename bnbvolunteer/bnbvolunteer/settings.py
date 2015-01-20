@@ -82,10 +82,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
 # Custom fields
 
-LOGIN_URL = '/login/'
+FORCE_SCRIPT_NAME = ''
+LOGIN_URL = FORCE_SCRIPT_NAME + '/login/'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

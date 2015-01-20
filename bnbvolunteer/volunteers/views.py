@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from random import randint
@@ -226,26 +227,28 @@ def volunteerStaffUser(request):
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
-
 def userLogin(request):
+    def redirect():
+        if "next" in request.GET:
+            return request.GET["next"]
+        else:
+            return reverse("volunteerStaffHome") if request.user.has_perm("staff_status") else reverse("volunteerHome")
+            
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.process(request):
-            if "next" in request.GET:
-                redirect = request.GET["next"]
-            else:
-                if not request.user.has_perm('staff_status'):
-                    redirect = reverse("volunteerHome")
-                else: 
-                    redirect = reverse("volunteerStaffHome")
-            return HttpResponseRedirect(redirect)
+            return HttpResponseRedirect(redirect())
         else:
             return render(request, "volunteers/login.html", {"form": form})
     else:
         if request.user.is_authenticated():
-            return HttpResponseRedirect(reverse("volunteerHome"))
+            return HttpResponseRedirect(redirect())
         else:
             return render(request, "volunteers/login.html", {"form": LoginForm()})
+
+def userLogout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("userLogin"))
 
 def userRegistration(request):
     if request.method == "POST":
