@@ -150,16 +150,20 @@ def volunteerStaffUserSearchResult(request):
                 search_results = User.objects.all()
         else:
             search_results = User.objects.all()
-            for user in search_results:
-                if user.username in request.POST.keys():
-                    if request.POST[user.username]:
-                        addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
-                        if int(request.POST['credits']) + user.profile.credit >= 0:
-                            addLog.save();
-                            user.profile.credit += int(request.POST['credits'])
-                            user.profile.save()
-                        else:
-                            inform += user.username + ', '
+            try:  
+                s = 1 + int(request.POST['credits'])
+                for user in search_results:
+                    if user.username in request.POST.keys():
+                        if request.POST[user.username]:
+                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
+                            if int(request.POST['credits']) + user.profile.credit >= 0:
+                                addLog.save();
+                                user.profile.credit += int(request.POST['credits'])
+                                user.profile.save()
+                            else:
+                                inform += user.username + ', '
+            except:
+                inform = "Please type an integer in credits."
     if not inform == "":
         inform = "No enough credits for " + inform[:-2] +"!" 
     context = {'search_results': search_results,  'inform': inform}
@@ -183,7 +187,7 @@ def volunteerStaffUser(request):
                 search_results = Activity.objects.filter(user=userSearch_result)
                 creditSum += int(addLog.credits)
         except:
-            inform = "Please enter an integer in credits field."
+            inform = "Please type an integer in credits."
     userSearch_result.profile.credit = creditSum
     userSearch_result.profile.save()
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
