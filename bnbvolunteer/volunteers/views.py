@@ -230,6 +230,16 @@ def userRegistration(request):
         else:
             return render(request, "volunteers/register.html", {"form": RegistrationForm()})
 
+def resetPassword(request):
+    if request.method == "POST":
+        form = RequestPasswordResetForm(request.POST)
+        if form.process(request):
+            return HttpResponseRedirect(reverse('userLogin'))
+        else:
+            return render(request, "volunteers/resetPassword.html", {"form": form})
+    else:
+        return render(request, "volunteers/resetPassword.html", {"form": RequestPasswordResetForm()})
+
 @login_required
 def editProfile(request):
     if request.method == "POST":
