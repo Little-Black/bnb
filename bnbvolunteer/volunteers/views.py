@@ -114,15 +114,27 @@ def volunteerStaffHome(request):
     #     context = {'query_results': [],'total_credits':0,'type_choices':[]}
     # return render(request,'volunteers/volunteerHome.html',context)
 
-@login_required
+@user_passes_test(lambda user: user.is_staff)
 def volunteerStaffLog(request):
+    type_choices = ActivityType.objects.all()
     Logs = Activity.objects.all().order_by('-dateEntered')
     if request.method == "POST":
-        
-        Logs = Activity.objects.exclude(dateDone__gt=request.POST['dateDoneUp']).filter(dateDone__gte=request.POST['dateDoneDown']).order_by('-dateEntered')
-        context = {'Logs': Logs, 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown']}
+        Logs = Activity.objects.exclude(dateDone__gt=request.POST['dateDoneUp']).filter(dateDone__gte=request.POST['dateDoneDown'])
+        if not request.POST['activityType'] == "All":
+            activityType = ActivityType.objects.get(name=request.POST['activityType'])
+            Logs = Logs.filter(activityType = activityType)
+        try:
+            Logs = Logs.filter(credits__gte = request.POST['creditsDown'])
+        except:
+            Logs = Logs
+        try:
+            Logs = Logs.exclude(credits__gt = request.POST['creditsUp'])
+        except:
+            Logs = Logs
+        Logs = Logs.order_by('-dateEntered')
+        context = {'Logs': Logs, 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown'], 'type_choices': type_choices, 'typeSelected': request.POST['activityType'], 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp']}
     else:
-        context = {'Logs': Logs, 'dateDoneUp': date.today().isoformat(), 'dateDoneDown': "2000-01-01"}
+        context = {'Logs': Logs, 'dateDoneUp': date.today().isoformat(), 'dateDoneDown': "2000-01-01", 'type_choices': type_choices, 'typeSelected': "All", 'creditsDown': "", 'creditsUp': ""}
     return render(request, 'volunteers/volunteerStaffLog.html', context)
 
 
@@ -149,6 +161,25 @@ def volunteerStaffUserSearchResult(request):
                 search_results = User.objects.filter(last_name=request.POST['lastname'])
             else:
                 search_results = User.objects.all()
+            try:
+                search_results = search_results.filter(profile__credit__gte = request.POST['creditsDown'])
+            except:
+                search_results = search_results
+            try:
+                search_results = search_results.exclude(profile__credit__gt = request.POST['creditsUp'])
+            except:
+                search_results = search_results
+            try:
+                b = int(request.POST['phone']) + 1
+                phone = request.POST['phone']
+                search_results = search_results.filter(profile__phone = request.POST['phone'])
+            except:
+                search_results = search_results
+                phone = ""
+            if not request.POST['email'] == "":
+                search_results = search_results.filter(email = request.POST['email'])
+            context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
+            return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
         else:
             search_results = User.objects.all()
             try:  
@@ -165,6 +196,8 @@ def volunteerStaffUserSearchResult(request):
                                 inform += user.username + ', '
             except:
                 inform = "Please type an integer in credits."
+                context = {'search_results': search_results,  'inform': inform}
+                return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
     if not inform == "":
         inform = "No enough credits for " + inform[:-2] +"!" 
     context = {'search_results': search_results,  'inform': inform}
@@ -316,15 +349,17 @@ def generateCodes(request):
         if (points == "" or quantity == ""):
             print "You left a field blank yo.."
             #TODO: redirect them to the same page with an error message telling the user to try again TODO
-
-        for i in range(int(quantity)):
-            newCode = generateCode()
-            while (Voucher.objects.filter(code=newCode).exists()):
+        try:
+            for i in range(int(quantity)):
                 newCode = generateCode()
+                while (Voucher.objects.filter(code=newCode).exists()):
+                    newCode = generateCode()
 
-            voucher = Voucher(code=newCode, credits=int(points))
-            voucher.save()
-            generatedVouchers.append(voucher)
+                voucher = Voucher(code=newCode, credits=int(points))
+                voucher.save()
+                generatedVouchers.append(voucher)
+        except: 
+            return render(request, 'volunteers/codeGenerator.html', {})
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
