@@ -10,6 +10,9 @@ from volunteers import userManagement
 from volunteers.models import *
 from volunteers.userManagement import *
 
+from datetime import date
+from datetime import datetime
+
 @login_required
 def volunteerHome(request):
     try:
@@ -112,8 +115,13 @@ def volunteerStaffHome(request):
 
 @login_required
 def volunteerStaffLog(request):
-    Logs = Activity.objects.all()
-    context = {'Logs': Logs}
+    Logs = Activity.objects.all().order_by('-dateEntered')
+    if request.method == "POST":
+        
+        Logs = Activity.objects.exclude(dateDone__gt=request.POST['dateDoneUp']).filter(dateDone__gte=request.POST['dateDoneDown']).order_by('-dateEntered')
+        context = {'Logs': Logs, 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown']}
+    else:
+        context = {'Logs': Logs, 'dateDoneUp': date.today().isoformat(), 'dateDoneDown': "2000-01-01"}
     return render(request, 'volunteers/volunteerStaffLog.html', context)
 
 
@@ -142,17 +150,20 @@ def volunteerStaffUserSearchResult(request):
                 search_results = User.objects.all()
         else:
             search_results = User.objects.all()
-            for user in search_results:
-                if user.username in request.POST.keys():
-                    if request.POST[user.username]:
-                        activityType = ActivityType.objects.get(name="N/A")
-                        addLog = Activity(user=user, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
-                        if int(request.POST['credits']) + user.profile.credit >= 0:
-                            addLog.save();
-                            user.profile.credit += int(request.POST['credits'])
-                            user.profile.save()
-                        else:
-                            inform += user.username + ', '
+            try:  
+                s = 1 + int(request.POST['credits'])
+                for user in search_results:
+                    if user.username in request.POST.keys():
+                        if request.POST[user.username]:
+                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
+                            if int(request.POST['credits']) + user.profile.credit >= 0:
+                                addLog.save();
+                                user.profile.credit += int(request.POST['credits'])
+                                user.profile.save()
+                            else:
+                                inform += user.username + ', '
+            except:
+                inform = "Please type an integer in credits."
     if not inform == "":
         inform = "No enough credits for " + inform[:-2] +"!" 
     context = {'search_results': search_results,  'inform': inform}
@@ -168,8 +179,7 @@ def volunteerStaffUser(request):
         creditSum += result.credits
     if request.method == "POST":
         try:
-            activityType = ActivityType.objects.get(name="N/A")
-            addLog = Activity(user=userSearch_result, activityType=activityType,  description=request.POST['description'], credits=request.POST['credits'])
+            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
             if creditSum + int(addLog.credits) < 0:
                 inform = "Do not have enough credits"
             else:
@@ -177,7 +187,7 @@ def volunteerStaffUser(request):
                 search_results = Activity.objects.filter(user=userSearch_result)
                 creditSum += int(addLog.credits)
         except:
-            inform = "Please enter an integer in credits field."
+            inform = "Please type an integer in credits."
     userSearch_result.profile.credit = creditSum
     userSearch_result.profile.save()
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
@@ -228,7 +238,10 @@ def editProfile(request):
     else:
         infoForm = EditProfileForm(createUserContext(request.user))
         pwForm = PasswordChangeForm()
-    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm})
+    returnPage = "volunteerHome"
+    if request.user.has_perm("staff_status"):
+        returnPage = "volunteerStaffHome"
+    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
     verificationRequests = VerificationRequest.objects.filter(code=code)

@@ -21,12 +21,14 @@ class ActivityType(models.Model):
         return self.name
 
 class Activity(models.Model):
-    user = models.ForeignKey(User, default='')
+    user = models.ForeignKey(User, default='', related_name='user')
     dateDone = models.DateField(default=date.today)
     dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
-    activityType = models.ForeignKey(ActivityType)
+    activityType = models.ForeignKey(ActivityType, null=True, default='')
     description = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
+    staff = models.ForeignKey(User, null=True, related_name='staff')
+
 
 class Voucher(models.Model):
     code = models.CharField(max_length=200)

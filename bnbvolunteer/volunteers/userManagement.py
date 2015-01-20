@@ -109,6 +109,7 @@ class EditProfileForm(forms.Form):
             for attr in {"first_name", "last_name", "address", "phone"}:
                 request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
+            request.user.profile.save()
             messages.success(request, "Account info successfully saved!")
         else:
             for error in self.errors:
