@@ -90,20 +90,16 @@
 </div>
 
 
-Add a log to {{getuser}}:
+<div class="add-logs">
+	<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+  <p class="add-label">Add logs to selected users</p>
+  <p class="description-label">Description:</p><input type="text" name="description">
+  <p class="credits-label">Credits:</p><input type="number" name="credits">
+  <input type="submit" value="Submit" class="btn btn-default">
+  </form>
+  {{inform}}
+</div>
 
-<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
-
-Description:
-<input type="text" name="description">
-<br>
-Credits:
-<input type="text" name="credits">
-<br>
-<input type="submit" value="Submit" />
-</form>
-
-{{inform}}
 
 
 
