@@ -68,16 +68,18 @@
 <div class="panel panel-default results">
 	<div class="panel-heading">Timesheet</div>
 <table class="table">
-    <tr>
+	<tr>
+	<th>Id</th>
         <th>DateDone</th>
         <th>DateEntered</th>
-        <th>activityType</th>
-        <th>description</th>
-	<th>credits</th>
+        <th>ActivityType</th>
+        <th>Description</th>
+	<th>Credits</th>
 	<th>Staff</th>
     </tr>
     {% for item in search_results %}
     <tr> 
+	<td>{{ item.id }}</td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
         <td>{{ item.activityType.name }}</td>

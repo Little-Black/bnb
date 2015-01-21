@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <html>
 <!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
 <body>
@@ -75,7 +75,9 @@
             <th>Phone Number</th>
             <th>Address</th>
     	<th>Credits Avaliable</th>
-    	<th>Selected</th>
+	<th>Selected
+		<input type="checkbox" name="allSelect" id="allSelect"></input>
+	</th>
         </tr>
         {% for item in search_results %}
         <tr> 
@@ -85,11 +87,22 @@
             <td>{{ item.profile.phone }}</td>
     	<td>{{ item.profile.address }}</td>
     	<td>{{ item.profile.credit }}</td>
-    	<td><input name="{{item.username}}"type="checkbox"></td>
+	<td><input id="checkbox-{{item.id}}"  name="{{item.username}}"type="checkbox"></td>
         </tr>
         {% endfor %}
     </table>
 </div>
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js'%}"></script>
+<script type="text/javascript">
+	$('#allSelect').click(function(event){
+		if(this.checked){
+			$(':checkbox').each(function(){this.checked = true;});
+			}
+		else{
+			$(':checkbox').each(function(){this.checked = false;});
+			}	
+			});
+	</script>
 
 <div class="add-logs">
   <p class="add-label">Add logs to selected users</p>
