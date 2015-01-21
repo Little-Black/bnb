@@ -14,6 +14,8 @@ from volunteers.userManagement import *
 from datetime import date
 from datetime import datetime
 
+import csv
+
 @login_required
 def volunteerHome(request):
     try:
@@ -368,3 +370,22 @@ def viewGeneratedCodes(request):
     generatedVouchers = request.generatedVouchers
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
+
+def exportCodes(request):
+    generatedVouchers = Voucher.objects.all()
+    now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
+
+    if len(generatedVouchers) == 0:
+        print "THERE ARE NO VOUCHERS TO EXPORT?!?"
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="voucherCodes-'+now+'.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Codes', 'Credits'])
+
+    for voucher in generatedVouchers:
+        writer.writerow([str(voucher.code), str(voucher.credits)])
+
+    return response

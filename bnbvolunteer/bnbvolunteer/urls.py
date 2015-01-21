@@ -30,4 +30,5 @@ urlpatterns = patterns('',
     url(r'^codeGenerator/$', views.codeGenerator, name="codeGenerator"),
     url(r'^generateCodes/$', views.generateCodes, name="generateCodes"),
     url(r'^viewGeneratedCodes/$', views.viewGeneratedCodes, name="viewGeneratedCodes"),
+    url(r'^exportCodes/$', views.exportCodes, name="exportCodes"),
 )
