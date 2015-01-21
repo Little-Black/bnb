@@ -1,16 +1,17 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
-from random import randint
 from django.utils.safestring import mark_safe
 
 from volunteers import userManagement
 from volunteers.models import *
 from volunteers.userManagement import *
 
+from random import randint
 from datetime import date
 from datetime import datetime
 
@@ -301,12 +302,17 @@ def editProfile(request):
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
-    try:
-        verificationRequests = VerificationRequest.objects.get(code=code)
-        message = verificationRequests.verify()
-        return HttpResponse(message)
-    except VerificationRequest.DoesNotExist:
-        return HttpResponse("Invalid code.")
+    cacheKey = (request.META["REMOTE_ADDR"], "verify")
+    if cache.get(cacheKey, 0) >= 5:
+        return HttpResponse("You have entered too many invalid codes. Try again later.")
+    else:
+        try:
+            verificationRequests = VerificationRequest.objects.get(code=code)
+            message = verificationRequests.verify()
+            return HttpResponse(message)
+        except VerificationRequest.DoesNotExist:
+            cache.set(cacheKey, cache.get(cacheKey, 0)+1)
+            return HttpResponse("Invalid code.")
 
 @login_required
 def deleteAccount(request):

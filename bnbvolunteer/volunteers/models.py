@@ -99,7 +99,6 @@ class VerificationRequest(models.Model):
     def __unicode__(self):
         return "code="+self.code
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
     address = models.CharField(max_length=100)

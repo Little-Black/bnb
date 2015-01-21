@@ -1,11 +1,12 @@
 # This file contains functions creating and modifying users.
 
+from django import forms
+from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django import forms
-from captcha.fields import CaptchaField
 
+from captcha.fields import CaptchaField
 from volunteers.models import *
 from volunteers.emailTemplates import *
 
@@ -19,6 +20,10 @@ class LoginForm(forms.Form):
     username = forms.CharField(max_length=30)
     password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
     captcha = CaptchaField()
+    
+    @staticmethod
+    def _cacheKey(request):
+        return (request.META["REMOTE_ADDR"], "login")
     
     """
     Attempt to login an user who filled out the login form.
@@ -38,13 +43,15 @@ class LoginForm(forms.Form):
             else:
                 messages.error(request, "Invalid username or password.")
         else:
-            messages.error(request, "Please enter both username and password.")
+            messages.error(request, "Please enter username, password, and correct captcha (if applicable).")
+        if not loginSuccessful:
+            cache.set(LoginForm._cacheKey(request), cache.get(LoginForm._cacheKey(request),0)+1)
         return loginSuccessful
     
     @classmethod
     def createLoginForm(cls, request, data=None):
         form = LoginForm(data)
-        form.fields["captcha"].required = True
+        form.fields["captcha"].required = cache.get(LoginForm._cacheKey(request),0) >= 5
         return form
     
 class RegistrationForm(forms.Form):

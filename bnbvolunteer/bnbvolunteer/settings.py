@@ -93,3 +93,14 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'bnbvolunteers.testing@gmail.com'
 EMAIL_HOST_PASSWORD = 'codeforgood2015'
 EMAIL_PORT = 587
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'vcs_cache_table',
+        'TIMEOUT': 300,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
