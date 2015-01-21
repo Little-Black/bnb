@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django import forms
+from captcha.fields import CaptchaField
 
 from volunteers.models import *
 from volunteers.emailTemplates import *
@@ -17,6 +18,7 @@ class LoginForm(forms.Form):
     
     username = forms.CharField(max_length=30)
     password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    captcha = CaptchaField()
     
     """
     Attempt to login an user who filled out the login form.
@@ -38,7 +40,13 @@ class LoginForm(forms.Form):
         else:
             messages.error(request, "Please enter both username and password.")
         return loginSuccessful
-
+    
+    @classmethod
+    def createLoginForm(cls, request, data=None):
+        form = LoginForm(data)
+        form.fields["captcha"].required = True
+        return form
+    
 class RegistrationForm(forms.Form):
     
     email = forms.EmailField()
@@ -49,6 +57,7 @@ class RegistrationForm(forms.Form):
     last_name = forms.CharField(max_length=30)
     address = forms.CharField(max_length=100)
     phone = forms.CharField(max_length=30)
+    captcha = CaptchaField()
 
     """
     Attempt to register an user who filled out the registration form.

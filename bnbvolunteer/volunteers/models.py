@@ -29,7 +29,6 @@ class Activity(models.Model):
     credits = models.PositiveSmallIntegerField(default=0)
     staff = models.ForeignKey(User, null=True, related_name='staff')
 
-
 class Voucher(models.Model):
     code = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
@@ -44,9 +43,6 @@ class VerificationRequest(models.Model):
     data = models.CharField(max_length=200, blank=True)
     
     def verify(self):
-        return self._postVerificationAction()
-    
-    def _postVerificationAction(self):
         if self.actionType == "register":
             self.user.is_active = True
             self.user.save()

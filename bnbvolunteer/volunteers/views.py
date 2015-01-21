@@ -235,18 +235,17 @@ def userLogin(request):
             return request.GET["next"]
         else:
             return reverse("volunteerStaffHome") if request.user.has_perm("staff_status") else reverse("volunteerHome")
-            
+    
     if request.method == "POST":
-        form = LoginForm(request.POST)
+        form = LoginForm.createLoginForm(request, request.POST)
         if form.process(request):
             return HttpResponseRedirect(redirect())
-        else:
-            return render(request, "volunteers/login.html", {"form": form})
     else:
         if request.user.is_authenticated():
             return HttpResponseRedirect(redirect())
         else:
-            return render(request, "volunteers/login.html", {"form": LoginForm()})
+            form = LoginForm.createLoginForm(request)
+    return render(request, "volunteers/login.html", {"form": form})
 
 def userLogout(request):
     logout(request)
