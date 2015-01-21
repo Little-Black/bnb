@@ -75,7 +75,8 @@
 <div class="panel panel-default results">
     <div class="panel-heading">Timesheet</div>
 <table class="table">
-    <tr>
+	<tr>
+		<th>Id</th>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
@@ -86,6 +87,7 @@
     </tr>
     {% for item in Logs %}
     <tr> 
+	    <td>{{ item.id }}</td>
 	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>

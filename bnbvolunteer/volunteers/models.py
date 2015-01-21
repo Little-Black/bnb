@@ -33,6 +33,7 @@ class Voucher(models.Model):
     code = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
     redemptionActivity = models.ForeignKey(Activity, null=True, blank=True)
+    generateDate = models.DateField(default=date.today)
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User)
