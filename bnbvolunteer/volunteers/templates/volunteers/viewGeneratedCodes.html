@@ -18,21 +18,24 @@
 	<a href="../codeGenerator"><button class="make-voucher-btn btn btn-default">Make more vouchers
 	</button></a>
 
+	<a href="../exportCodes"><button class="export-voucher-btn btn btn-default">Export existing voucher codes
+	</button></a>
+
 	<div class="panel panel-default results">
 	  <!-- Below are the generated voucher codes and choresponding point values. -->
 	  <div class="panel-heading">Generated Vouchers</div>
 
 	  <table class="table">
 	    <tr>
-		        <th>Code</th>
-		        <th>Points</th>
-		    </tr>
-		    {% for voucher in generatedVouchers %}
-		    <tr> 
-		        <td>{{ voucher.code }}</td>
-		        <td>{{ voucher.credits }}</td>
-		    </tr>
-		    {% endfor %}
+	        <th>Code</th>
+	        <th>Credits</th>
+	    </tr>
+	    {% for voucher in generatedVouchers %}
+	    <tr> 
+	        <td>{{ voucher.code }}</td>
+	        <td>{{ voucher.credits }}</td>
+	    </tr>
+	    {% endfor %}
 	  </table>
 	</div>
 
