@@ -8,6 +8,8 @@ from django import forms
 from volunteers.models import *
 from volunteers.emailTemplates import *
 
+from random import randint
+
 def _isValidPassword(pwString):
     return len(pwString) >= 6
 
@@ -169,11 +171,24 @@ class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField()
     username = forms.CharField(max_length=30)
     
+    @classmethod
+    def _generatePassword(cls):
+        def generateRandomChar():
+            randNumber = randint(0,61)
+            if randNumber < 10:
+                return chr(48+randNumber)
+            else:
+                return chr(65+(randNumber-10)/26*32+(randNumber-10)%26)
+        gString = ""
+        for i in xrange(8):
+            gString += generateRandomChar()
+        return gString
+    
     def process(self, request):
         if self.is_valid():
             try:
                 user = User.objects.get(email=self.cleaned_data["email"], username=self.cleaned_data["username"])
-                VerificationRequest.createVerificationRequest(user, actionType="resetPassword")
+                VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
                 sendResetPasswordEmail(user)
                 messages.success(request, "A confirmation email is sent to your inbox.")
             except User.DoesNotExist:

@@ -263,15 +263,15 @@ def userRegistration(request):
         else:
             return render(request, "volunteers/register.html", {"form": RegistrationForm()})
 
-def resetPassword(request):
+def forgetPassword(request):
     if request.method == "POST":
         form = RequestPasswordResetForm(request.POST)
         if form.process(request):
             return HttpResponseRedirect(reverse('userLogin'))
         else:
-            return render(request, "volunteers/resetPassword.html", {"form": form})
+            return render(request, "volunteers/forgetPassword.html", {"form": form})
     else:
-        return render(request, "volunteers/resetPassword.html", {"form": RequestPasswordResetForm()})
+        return render(request, "volunteers/forgetPassword.html", {"form": RequestPasswordResetForm()})
 
 @login_required
 def editProfile(request):
@@ -290,11 +290,11 @@ def editProfile(request):
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
-    verificationRequests = VerificationRequest.objects.filter(code=code)
-    if verificationRequests:
-        message = verificationRequests[0].verify()
+    try:
+        verificationRequests = VerificationRequest.objects.get(code=code)
+        message = verificationRequests.verify()
         return HttpResponse(message)
-    else:
+    except VerificationRequest.DoesNotExist:
         return HttpResponse("Invalid code.")
 
 @login_required
