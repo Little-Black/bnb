@@ -275,15 +275,15 @@ def userRegistration(request):
         else:
             return render(request, "volunteers/register.html", {"form": RegistrationForm()})
 
-def resetPassword(request):
+def forgetPassword(request):
     if request.method == "POST":
         form = RequestPasswordResetForm(request.POST)
         if form.process(request):
             return HttpResponseRedirect(reverse('userLogin'))
         else:
-            return render(request, "volunteers/resetPassword.html", {"form": form})
+            return render(request, "volunteers/forgetPassword.html", {"form": form})
     else:
-        return render(request, "volunteers/resetPassword.html", {"form": RequestPasswordResetForm()})
+        return render(request, "volunteers/forgetPassword.html", {"form": RequestPasswordResetForm()})
 
 @login_required
 def editProfile(request):
@@ -302,11 +302,11 @@ def editProfile(request):
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
-    verificationRequests = VerificationRequest.objects.filter(code=code)
-    if verificationRequests:
-        message = verificationRequests[0].verify()
+    try:
+        verificationRequests = VerificationRequest.objects.get(code=code)
+        message = verificationRequests.verify()
         return HttpResponse(message)
-    else:
+    except VerificationRequest.DoesNotExist:
         return HttpResponse("Invalid code.")
 
 @login_required
@@ -371,18 +371,58 @@ def codeGenerator(request):
 def generateCode():
     
     #Returns a string of a single random capitalized letter of the alphabet 
-    def getRandomLetter():
-        return chr(65+randint(0,25))
+    def getRandomLetterInt():
+        return 65+randint(0,25)
     
     code = ""
-    for i in range(0,8):
+    letterCount = 0
+    intCount = 0
+    for i in range(0,6):
         if (i%2 == 0):
-            letter = getRandomLetter()
-            code += str(letter)
+            letterInt = getRandomLetterInt() 
+            letterCount += letterInt
+            code += str(chr(letterInt))
         else:
             integer = randint(1,9)
+            intCount += integer
             code += str(integer)
+
+    endLetter = str(chr(65+(letterCount%26)))
+    endInt = str(intCount%9)
+
+    code = code + endLetter + endInt
+
     return code
+
+#Checks a given code to see if it follows our voucher code rules. If it's valid, codeCheck() returns True. If not, returns False.
+def codeCheck(code):
+    letterCount = 0
+    intCount = 0
+    for i in range(0,6):
+        char = code[i]
+        if (i%2==0):
+            letterInt = ord(char)
+            if (letterInt < 65) or (letterInt > 90): #numbers chorespond to ascii characters
+                print "not in range"
+                return False
+            letterCount += letterInt
+        else:
+            try:
+                intCount += int(char)
+            except ValueError:
+                print "whoops, that isn't an INTEGER!!!"
+                return False
+
+    try:
+        #check if the endLetter and endInteger match as expected. If not, return False. 
+        if ( ord(code[len(code)-2]) != (65 + (letterCount%26)) or int(code[len(code)-1]) != (intCount%9) ):
+            print "end character is not as expected"
+            return False
+    except ValueError:
+        print "whoops, that isn't an INTEGER!!!!"
+        return False
+
+    return True
 
 @user_passes_test(lambda user: user.is_staff)
 def generateCodes(request):

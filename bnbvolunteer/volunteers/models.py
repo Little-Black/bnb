@@ -42,6 +42,7 @@ class VerificationRequest(models.Model):
     actionType = models.CharField(max_length=100)
     isValid = models.BooleanField(default=True)
     creationTime = models.DateTimeField(auto_now_add=True)
+    data = models.CharField(max_length=200, blank=True)
     
     def verify(self):
         return self._postVerificationAction()
@@ -56,10 +57,9 @@ class VerificationRequest(models.Model):
             self.user.save()
             message = "Email successfully updated."
         elif self.actionType == "resetPassword":
-            newPassword = VerificationRequest._generateLetterString(8)
-            self.user.set_password(newPassword)
+            self.user.set_password(self.data)
             self.user.save()
-            message = "Password successfully reset. Your new password is: " + newPassword
+            message = "Password successfully reset."
         elif self.actionType == "deleteAcc":
             self.user.delete()
             message = "Email successfully verified, your account will be deleted."
@@ -90,13 +90,13 @@ class VerificationRequest(models.Model):
             return gString
     
     @classmethod
-    def createVerificationRequest(cls, user, actionType, timeLimit=60*60*48):
+    def createVerificationRequest(cls, user, actionType, timeLimit=60*60*48, **kwargs):
         prevRequests = VerificationRequest.objects.filter(user=user)
         # at most 1 request for each type
         for prevRequest in prevRequests:
             if prevRequest.actionType == actionType:
                 prevRequest._selfDestruct()
-        request = VerificationRequest.objects.create(user=user, code=VerificationRequest._generateLetterString(20), actionType=actionType)
+        request = VerificationRequest.objects.create(user=user, code=VerificationRequest._generateLetterString(20), actionType=actionType, **kwargs)
         Timer(timeLimit, request._selfDestruct, [True,]).start()
         return request
     
