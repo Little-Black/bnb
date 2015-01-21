@@ -8,6 +8,9 @@ from django import forms
 from volunteers.models import *
 from volunteers.emailTemplates import *
 
+def _isValidPassword(pwString):
+    return len(pwString) >= 6
+
 class LoginForm(forms.Form):
     
     username = forms.CharField(max_length=30)
@@ -27,7 +30,7 @@ class LoginForm(forms.Form):
                     login(request, user)
                     loginSuccessful = True
                 else:
-                    messages.error(request, "Account has been disabled. Please contact admin.")
+                    messages.error(request, "You must verify your email address first.")
             else:
                 messages.error(request, "Invalid username or password.")
         else:
@@ -61,6 +64,9 @@ class RegistrationForm(forms.Form):
                 registrationSuccessful = False
             if self.cleaned_data["password"] != self.cleaned_data["password_confirmation"]:
                 messages.error(request, "The passwords do not match.")
+                registrationSuccessful = False
+            if not _isValidPassword(self.cleaned_data["password"]):
+                messages.error(request, "The password must be at least 6 characters long.")
                 registrationSuccessful = False
             if registrationSuccessful:
                 user = User.objects.create_user(self.cleaned_data["username"],
@@ -143,19 +149,40 @@ class PasswordChangeForm(forms.Form):
     def process(self, request):
         if self.is_valid():
             if request.user.check_password(self.cleaned_data["old_password"]):
-                if self.cleaned_data["new_password"] == self.cleaned_data["confirm_new_password"]:
-                    messages.success(request, "Password successfully changed!")
-                    request.user.set_password(self.cleaned_data["new_password"])
-                    request.user.save()
+                if not _isValidPassword(self.cleaned_data["new_password"]):
+                    messages.error(request, "The new password must be at least 6 characters long.")
                 else:
-                    messages.error(request, "The new passwords do not match.")
+                    if self.cleaned_data["new_password"] == self.cleaned_data["confirm_new_password"]:
+                        messages.success(request, "Password successfully changed!")
+                        request.user.set_password(self.cleaned_data["new_password"])
+                        request.user.save()
+                    else:
+                        messages.error(request, "The new passwords do not match.")
             else:
                 messages.error(request, "The old password is incorrect.")
         else:
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
 
+class RequestPasswordResetForm(forms.Form):
+    
+    email = forms.EmailField()
+    username = forms.CharField(max_length=30)
+    
+    def process(self, request):
+        if self.is_valid():
+            try:
+                user = User.objects.get(email=self.cleaned_data["email"], username=self.cleaned_data["username"])
+                VerificationRequest.createVerificationRequest(user, actionType="resetPassword")
+                sendResetPasswordEmail(user)
+                messages.success(request, "A confirmation email is sent to your inbox.")
+            except User.DoesNotExist:
+                messages.error(request, "Cannot find an user with given email and username.")
+        else:
+            for error in self.errors:
+                messages.error(request, error + " is a required field.")
+
 def deleteAccount(request):
     messages.info(request, "A confirmation email is sent to your account.")
-    VerificationRequest.createVerificationRequest(request.user, actionType="delete")
+    VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
     sendDeleteAccEmail(request.user)
