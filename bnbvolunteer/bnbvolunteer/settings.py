@@ -85,8 +85,8 @@ STATIC_URL = '/static/'
 
 # Custom fields
 
-FORCE_SCRIPT_NAME = ''
-LOGIN_URL = FORCE_SCRIPT_NAME + '/login/'
+SITE_URL = 'http://frozen-beyond-2591.herokuapp.com'
+LOGIN_URL = '/login/'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
