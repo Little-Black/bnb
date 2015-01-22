@@ -1,7 +1,7 @@
 # This file contains functions creating and modifying users.
 
 from django import forms
-from django.core.cache import cache
+#from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -45,13 +45,14 @@ class LoginForm(forms.Form):
         else:
             messages.error(request, "Please enter username, password, and correct captcha (if applicable).")
         if not loginSuccessful:
-            cache.set(LoginForm._cacheKey(request), cache.get(LoginForm._cacheKey(request),0)+1)
+            pass
+            #cache.set(LoginForm._cacheKey(request), cache.get(LoginForm._cacheKey(request),0)+1)
         return loginSuccessful
     
     @classmethod
     def createLoginForm(cls, request, data=None):
         form = LoginForm(data)
-        form.fields["captcha"].required = cache.get(LoginForm._cacheKey(request),0) >= 5
+        #form.fields["captcha"].required = cache.get(LoginForm._cacheKey(request),0) >= 5
         return form
     
 class RegistrationForm(forms.Form):

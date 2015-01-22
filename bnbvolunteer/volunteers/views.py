@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
-from django.core.cache import cache
+#from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.safestring import mark_safe
 
+from bnbvolunteer import settings
 from volunteers import userManagement
 from volunteers.models import *
 from volunteers.userManagement import *
@@ -303,15 +304,15 @@ def editProfile(request):
 
 def verify(request, code):
     cacheKey = (request.META["REMOTE_ADDR"], "verify")
-    if cache.get(cacheKey, 0) >= 5:
-        return HttpResponse("You have entered too many invalid codes. Try again later.")
+    #if cache.get(cacheKey, 0) >= 5:
+    #    return HttpResponse("You have entered too many invalid codes. Try again later.")
     else:
         try:
             verificationRequests = VerificationRequest.objects.get(code=code)
             message = verificationRequests.verify()
             return HttpResponse(message)
         except VerificationRequest.DoesNotExist:
-            cache.set(cacheKey, cache.get(cacheKey, 0)+1)
+            #cache.set(cacheKey, cache.get(cacheKey, 0)+1)
             return HttpResponse("Invalid code.")
 
 @login_required
@@ -482,3 +483,13 @@ def exportCodes(request):
         writer.writerow([str(voucher.code), str(voucher.credits)])
 
     return response
+
+# decorators
+def redirect_to_https(viewFunction):
+    def _redirect_to_https(request, *args, **kwargs):
+        if not request.is_secure():
+            if not getattr(settings, "HTTPS_REDIRECT", True):
+                redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
+                return HttpResponseRedirect(redirect)
+        return viewFunction(request, *args, **kwargs)
+    return _redirect_to_https
