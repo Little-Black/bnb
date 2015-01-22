@@ -1,65 +1,32 @@
+{% extends "volunteers/staff_templates/base_staff_generateVoucher.html" %}
 {% load staticfiles %}
-<html>
-<!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/viewGeneratedCodes.css' %}" />
-<body>
 
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/viewGeneratedCodes.css' %}" />
+{% endblock specificCss %}
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block tabcontent %}
+  <a href="../exportCodes"><button class="export-voucher-btn btn btn-default">Export existing voucher codes
+  </button></a>
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+  <div class="panel panel-default results">
+    <!-- Below are the generated voucher codes and choresponding point values. -->
+    <div class="panel-heading">Generated Vouchers</div>
 
-<ul class="nav nav-tabs">
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'editProfile' %}">Edit Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
-  </li>
-  <li role="presentation" class="active">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-  </li>
-</ul>
+    <table class="table">
+      <tr>
+          <th>Code</th>
+          <th>Credits</th>
+      </tr>
+      {% for voucher in generatedVouchers %}
+      <tr> 
+          <td>{{ voucher.code }}</td>
+          <td>{{ voucher.credits }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock tabcontent %}
 
-	<a href="../exportCodes"><button class="export-voucher-btn btn btn-default">Export existing voucher codes
-	</button></a>
-
-	<div class="panel panel-default results">
-	  <!-- Below are the generated voucher codes and choresponding point values. -->
-	  <div class="panel-heading">Generated Vouchers</div>
-
-	  <table class="table">
-	    <tr>
-	        <th>Code</th>
-	        <th>Credits</th>
-	    </tr>
-	    {% for voucher in generatedVouchers %}
-	    <tr> 
-	        <td>{{ voucher.code }}</td>
-	        <td>{{ voucher.credits }}</td>
-	    </tr>
-	    {% endfor %}
-	  </table>
-	</div>
-
-
-<!--JQuery-->
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
-<!-- Bootstrap-->
-<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
-<!-- <script src="{% static 'volunteers/js/viewGeneratedCodes.js' %}"></script> -->
-</body>
-</html>
+{% block jsfiles %}
+{% endblock jsfiles %}

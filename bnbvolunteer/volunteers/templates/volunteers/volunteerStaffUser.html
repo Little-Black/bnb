@@ -1,38 +1,11 @@
+{% extends "volunteers/staff_templates/base_staff_search.html" %}
 {% load staticfiles %}
-<html>
-<!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
-<body>
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+{% endblock specificCss %}
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
-
-<ul class="nav nav-tabs">
-	<li role="presentation">
-	<a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-	</li>
-	<li role="presentation">
-	<a href="{% url 'editProfile' %}">Edit Profile</a><li>
-	</li>
-	<li role="presentation" class="active">
-<a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
-	</li>
-	<li role="presentation">
-<a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
-</li>
-  <li role="presentation">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-	<li role="presentation">
-<a href="{% url 'volunteerStaffActivity' %}">Activities</a>
-	</li>
-</ul>
-
+{% block tabcontent %}
 <form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
 
 <div class="input-group search">
@@ -40,41 +13,41 @@
 
 <input type="text" class="form-control" Placeholder="Last Name"  name="lastname">
 <span class="input-group-btn">
-	<input type="submit"  class="btn btn-default" value="Go!">
+  <input type="submit"  class="btn btn-default" value="Go!">
 </span>
 </div>
 </form>
 
 <div class="panel panel-default results">
-	<div class="panel-heading">{{ getuser }}</div>
+  <div class="panel-heading">{{ getuser }}</div>
 <table class="table">
     <tr>
         <th>Last Name</th>
         <th>First Name</th>
         <th>Phone Number</th>
         <th>Address</th>
-	<th>Credits Avaliable</th>
+  <th>Credits Avaliable</th>
     </tr>
     <tr> 
         <td>{{ getuser.last_name }}</td>
         <td>{{ getuser.first_name }}</td>
         <td>{{ getuser.profile.phone }}</td>
-	<td>{{ getuser.profile.address }}</td>
-	<td>{{ getuser.profile.credit }}</td>
+  <td>{{ getuser.profile.address }}</td>
+  <td>{{ getuser.profile.credit }}</td>
     </tr>
 </table>
 </div>
 <br>
 <div class="panel panel-default results">
-	<div class="panel-heading">Timesheet</div>
+  <div class="panel-heading">Timesheet</div>
 <table class="table">
     <tr>
         <th>DateDone</th>
         <th>DateEntered</th>
         <th>activityType</th>
         <th>description</th>
-	<th>credits</th>
-	<th>Staff</th>
+  <th>credits</th>
+  <th>Staff</th>
     </tr>
     {% for item in search_results %}
     <tr> 
@@ -82,8 +55,8 @@
         <td>{{ item.dateEntered }}</td>
         <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
-	<td>{{ item.credits }}</td>
-	<td>{{ item.staff }}</td>
+  <td>{{ item.credits }}</td>
+  <td>{{ item.staff }}</td>
     </tr>
     {% endfor %}
 </table>
@@ -91,7 +64,7 @@
 
 
 <div class="add-logs">
-	<form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+  <form action="?getuser={{getuser}}" method="post">{% csrf_token %}
   <p class="add-label">Add logs to selected users</p>
   <p class="description-label">Description:</p><input type="text" name="description">
   <p class="credits-label">Credits:</p><input type="number" name="credits">
@@ -99,23 +72,7 @@
   </form>
   {{inform}}
 </div>
+{% endblock tabcontent %}
 
-
-
-
-
-<script>
-var counter = 1;
-var limit = 15;
-function addInput(divName){
-     if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
-     }
-     else {
-          var newdiv = document.createElement('div');
-          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
-          document.getElementById(divName).appendChild(newdiv);
-          counter++;
-     }
-}
-</script>
+{% block jsfiles %}
+{% endblock jsfiles %}

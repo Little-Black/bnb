@@ -1,41 +1,13 @@
+{% extends "volunteers/staff_templates/base_staff_activities.html" %}
 {% load staticfiles %}
-<html>
-<!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
-<body>
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
+{% endblock specificCss %}
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
-
-<ul class="nav nav-tabs">
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'editProfile' %}">Edit Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-  <li role="presentation" class="active">
-    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-  </li>
-</ul>
-
-
+{% block tabcontent %}
 <div class="input-group search">
-	</div>
+  </div>
 <div class="panel panel-default results">
     <div class="panel-heading">Activities</div>
     <table class="table">
@@ -43,10 +15,10 @@
     </tr>
     {% for item in query_results %}
     <tr> 
-	    <td>{{ item.name }}</td>
-	    {% if item.id != 1 %}
-	    <td><a href="?delete={{item.id}}">Delete</a></td>
-	    {% endif%}
+      <td>{{ item.name }}</td>
+      {% if item.id != 1 %}
+      <td><a href="?delete={{item.id}}">Delete</a></td>
+      {% endif%}
     </tr>
     {% endfor %}
 </table>
@@ -63,6 +35,7 @@
   <input class="submit-btn btn btn-default" type="submit" value="Submit" />
   </form>
 </div>
+{% endblock tabcontent %}
 
-</body>
-</html>
+{% block jsfiles %}
+{% endblock jsfiles %}

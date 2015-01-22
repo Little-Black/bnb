@@ -1,0 +1,43 @@
+{% extends "volunteers/base.html" %}
+{% load staticfiles %}
+
+{% block cssfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+	{% block specificCss %}
+	{% endblock specificCss %}
+{% endblock cssfiles %}
+
+{% block tabs %}
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
+<br>
+
+<h1 class="bnb-header">Bikes Not Bombs</h1>
+<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active">
+    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'editProfile' %}">Edit Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+  </li>
+</ul>
+{% endblock tabs %}
+
+{% block tabcontent %}
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+{% endblock jsfiles %}
