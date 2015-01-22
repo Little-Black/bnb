@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.safestring import mark_safe
 
+from bnbvolunteer import settings
 from volunteers import userManagement
 from volunteers.models import *
 from volunteers.userManagement import *
@@ -332,7 +333,7 @@ def verify(request, code):
             message = verificationRequests.verify()
             return HttpResponse(message)
         except VerificationRequest.DoesNotExist:
-            cache.set(cacheKey, cache.get(cacheKey, 0)+1)
+            cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
             return HttpResponse("Invalid code.")
 
 @login_required
@@ -522,3 +523,13 @@ def exportCodes(request):
         writer.writerow([str(voucher.code), str(voucher.credits)])
 
     return response
+
+# decorators
+def redirect_to_https(viewFunction):
+    def _redirect_to_https(request, *args, **kwargs):
+        if not request.is_secure():
+            if not getattr(settings, "HTTPS_REDIRECT", True):
+                redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
+                return HttpResponseRedirect(redirect)
+        return viewFunction(request, *args, **kwargs)
+    return _redirect_to_https

@@ -1,9 +1,11 @@
 # Contains functions that generate email messages.
 
 from django.core.mail import send_mail
+from bnbvolunteer import settings
 
 def _getVerificationURL(user, actionType):
-    return "http://localhost:8000/verify/" + user.verificationrequest_set.get(actionType=actionType).code
+    siteURL = getattr(settings, "SITE_URL", "http://localhost:8000")
+    return siteURL + "/verify/" + user.verificationrequest_set.get(actionType=actionType).code
 
 def sendRegVerificationEmail(user):
     message = "Hi " + user.first_name + ",\n\

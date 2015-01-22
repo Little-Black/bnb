@@ -85,22 +85,11 @@ STATIC_URL = '/static/'
 
 # Custom fields
 
-FORCE_SCRIPT_NAME = ''
-LOGIN_URL = FORCE_SCRIPT_NAME + '/login/'
+SITE_URL = 'http://frozen-beyond-2591.herokuapp.com'
+LOGIN_URL = '/login/'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'bnbvolunteers.testing@gmail.com'
 EMAIL_HOST_PASSWORD = 'codeforgood2015'
 EMAIL_PORT = 587
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'vcs_cache_table',
-        'TIMEOUT': 300,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
-    }
-}
