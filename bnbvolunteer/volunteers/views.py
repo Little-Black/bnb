@@ -304,6 +304,8 @@ def editProfile(request):
 
 def verify(request, code):
     cacheKey = (request.META["REMOTE_ADDR"], "verify")
+    if False:
+        pass
     #if cache.get(cacheKey, 0) >= 5:
     #    return HttpResponse("You have entered too many invalid codes. Try again later.")
     else:
