@@ -1,7 +1,7 @@
 # Contains functions that generate email messages.
 
 from django.core.mail import send_mail
-import settings
+from bnbvolunteer import settings
 
 def _getVerificationURL(user, actionType):
     siteURL = getattr(settings, "SITE_URL", "http://localhost:8000")
