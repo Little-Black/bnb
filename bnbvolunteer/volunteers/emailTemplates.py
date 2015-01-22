@@ -3,7 +3,7 @@
 from django.core.mail import send_mail
 
 def _getVerificationURL(user, actionType):
-    return "http://localhost:8000/verify/" + filter(lambda vr: vr.actionType == actionType, user.verificationrequest_set.all())[0].code
+    return "http://localhost:8000/verify/" + user.verificationrequest_set.get(actionType=actionType).code
 
 def sendRegVerificationEmail(user):
     message = "Hi " + user.first_name + ",\n\
@@ -13,7 +13,7 @@ def sendRegVerificationEmail(user):
     send_mail("Registration on BnB Volunteer System", message, "BnB Volunteer System", [user.email,])
 
 def sendResetPasswordEmail(user):
-    message = _getVerificationURL(user, "resetPassword")
+    message = "Hi " + user.first_name + ",\n  You have requested to reset your password. Your password will be changed to " + user.verificationrequest_set.get(actionType="resetPassword").data + " after you access the link below:\n" + _getVerificationURL(user, "resetPassword") + "\nThis link is only valid for 48 hours. If you did not request a password change, ignore this email."
     send_mail("Resetting your BnB Volunteer System Password", message, "BnB Volunteer System", [user.email,])
 
 def sendEmailUpdateEmail(user):

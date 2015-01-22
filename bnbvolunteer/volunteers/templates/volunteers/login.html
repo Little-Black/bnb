@@ -13,12 +13,14 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        {% for field in form %}
-            <p> {{ field.label_tag }} {{ field }} </p>
-        {% endfor %}
-	<input type="submit" value="Login">
+        <p> Username: {{ form.username }} </p>
+        <p> Password: {{ form.password }} </p>
+        {% if form.captcha.field.required %}
+            <p> {{ form.captcha }} </p>
+        {% endif %}
+   	    <input type="submit" value="Login">
     </form>
-    <a href="{% url "resetPassword" %}"> Forget password </a> <br>
+    <a href="{% url "forgetPassword" %}"> Forget password </a> <br>
     <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
 </body>
 </html>

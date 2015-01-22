@@ -1,16 +1,17 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
-from random import randint
 from django.utils.safestring import mark_safe
 
 from volunteers import userManagement
 from volunteers.models import *
 from volunteers.userManagement import *
 
+from random import randint
 from datetime import date
 from datetime import datetime
 
@@ -121,7 +122,14 @@ def volunteerStaffLog(request):
     type_choices = ActivityType.objects.all()
     Logs = Activity.objects.all().order_by('-dateEntered')
     if request.method == "POST":
-        Logs = Activity.objects.exclude(dateDone__gt=request.POST['dateDoneUp']).filter(dateDone__gte=request.POST['dateDoneDown'])
+        try:
+            Logs = Logs.exclude(dateDone__gt = request.POST['dateDoneUp'])
+        except:
+            Logs = Logs
+        try:
+            Logs = Logs.filter(dateDone__gte = request.POST['dateDoneDown'])
+        except:
+            Logs = Logs
         if not request.POST['activityType'] == "All":
             activityType = ActivityType.objects.get(name=request.POST['activityType'])
             Logs = Logs.filter(activityType = activityType)
@@ -136,7 +144,7 @@ def volunteerStaffLog(request):
         Logs = Logs.order_by('-dateEntered')
         context = {'Logs': Logs, 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown'], 'type_choices': type_choices, 'typeSelected': request.POST['activityType'], 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp']}
     else:
-        context = {'Logs': Logs, 'dateDoneUp': date.today().isoformat(), 'dateDoneDown': "2000-01-01", 'type_choices': type_choices, 'typeSelected': "All", 'creditsDown': "", 'creditsUp': ""}
+        context = {'Logs': Logs, 'dateDoneUp': "", 'dateDoneDown': "", 'type_choices': type_choices, 'typeSelected': "All", 'creditsDown': "", 'creditsUp': ""}
     return render(request, 'volunteers/volunteerStaffLog.html', context)
 
 
@@ -178,8 +186,11 @@ def volunteerStaffUserSearchResult(request):
             except:
                 search_results = search_results
                 phone = ""
-            if not request.POST['email'] == "":
-                search_results = search_results.filter(email = request.POST['email'])
+            try:
+                if not request.POST['email'] == "":
+                    search_results = search_results.filter(email = request.POST['email'])
+            except:
+                    search_results = search_results
             context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
             return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
         else:
@@ -235,18 +246,17 @@ def userLogin(request):
             return request.GET["next"]
         else:
             return reverse("volunteerStaffHome") if request.user.has_perm("staff_status") else reverse("volunteerHome")
-            
+    
     if request.method == "POST":
-        form = LoginForm(request.POST)
+        form = LoginForm.createLoginForm(request, request.POST)
         if form.process(request):
             return HttpResponseRedirect(redirect())
-        else:
-            return render(request, "volunteers/login.html", {"form": form})
     else:
         if request.user.is_authenticated():
             return HttpResponseRedirect(redirect())
         else:
-            return render(request, "volunteers/login.html", {"form": LoginForm()})
+            form = LoginForm.createLoginForm(request)
+    return render(request, "volunteers/login.html", {"form": form})
 
 def userLogout(request):
     logout(request)
@@ -265,15 +275,15 @@ def userRegistration(request):
         else:
             return render(request, "volunteers/register.html", {"form": RegistrationForm()})
 
-def resetPassword(request):
+def forgetPassword(request):
     if request.method == "POST":
         form = RequestPasswordResetForm(request.POST)
         if form.process(request):
             return HttpResponseRedirect(reverse('userLogin'))
         else:
-            return render(request, "volunteers/resetPassword.html", {"form": form})
+            return render(request, "volunteers/forgetPassword.html", {"form": form})
     else:
-        return render(request, "volunteers/resetPassword.html", {"form": RequestPasswordResetForm()})
+        return render(request, "volunteers/forgetPassword.html", {"form": RequestPasswordResetForm()})
 
 @login_required
 def editProfile(request):
@@ -292,12 +302,17 @@ def editProfile(request):
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
-    verificationRequests = VerificationRequest.objects.filter(code=code)
-    if verificationRequests:
-        message = verificationRequests[0].verify()
-        return HttpResponse(message)
+    cacheKey = (request.META["REMOTE_ADDR"], "verify")
+    if cache.get(cacheKey, 0) >= 5:
+        return HttpResponse("You have entered too many invalid codes. Try again later.")
     else:
-        return HttpResponse("Invalid code.")
+        try:
+            verificationRequests = VerificationRequest.objects.get(code=code)
+            message = verificationRequests.verify()
+            return HttpResponse(message)
+        except VerificationRequest.DoesNotExist:
+            cache.set(cacheKey, cache.get(cacheKey, 0)+1)
+            return HttpResponse("Invalid code.")
 
 @login_required
 def deleteAccount(request):
@@ -316,7 +331,45 @@ def updateProfile(request):
 
 @user_passes_test(lambda user: user.is_staff)
 def codeGenerator(request):
-    context = {}
+    query_results = Voucher.objects.all()
+    if request.method == 'POST':
+        if "isRedemed" in request.POST.keys():
+            try:
+                query_results = query_results.filter(generateDate__gte = request.POST['dateDown'])
+            except:
+                query_results = query_results
+            try:
+                query_results = query_results.exclude(generateDate__gt = request.POST['dateUp'])
+            except:
+                query_results = query_results
+            try:
+                query_results = query_results.filter(credits__gte = request.POST['creditsDown'])
+            except:
+                query_results = query_results
+            try:
+                query_results = query_results.exclude(credits__gt = request.POST['creditsUp'])
+            except:
+                query_results = query_results
+            if request.POST['isRedemed'] == "Yes":
+                query_results = query_results.exclude(redemptionActivity__isnull = True )
+            if request.POST['isRedemed'] == "No":
+                query_results = query_results.filter(redemptionActivity__isnull = True)
+        else:
+            for idNum in request.POST.keys(): 
+                try:
+                    voucher = Voucher.objects.get(code=idNum)
+                    voucher.delete()
+                except:
+                    idNum = idNum
+            query_results = Voucher.objects.all()
+    query_results = query_results.order_by('-id')[:30]
+    context = {'query_results': query_results }
+    context['isRedemed'] = "All"
+    try:
+        for item in request.POST.keys():
+            context[item] = request.POST[item]
+    except:
+        context = context
     return render(request,'volunteers/codeGenerator.html',context)
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9

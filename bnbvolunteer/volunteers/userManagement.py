@@ -1,12 +1,16 @@
 # This file contains functions creating and modifying users.
 
+from django import forms
+from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django import forms
 
+from captcha.fields import CaptchaField
 from volunteers.models import *
 from volunteers.emailTemplates import *
+
+from random import randint
 
 def _isValidPassword(pwString):
     return len(pwString) >= 6
@@ -15,6 +19,11 @@ class LoginForm(forms.Form):
     
     username = forms.CharField(max_length=30)
     password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    captcha = CaptchaField()
+    
+    @staticmethod
+    def _cacheKey(request):
+        return (request.META["REMOTE_ADDR"], "login")
     
     """
     Attempt to login an user who filled out the login form.
@@ -34,9 +43,17 @@ class LoginForm(forms.Form):
             else:
                 messages.error(request, "Invalid username or password.")
         else:
-            messages.error(request, "Please enter both username and password.")
+            messages.error(request, "Please enter username, password, and correct captcha (if applicable).")
+        if not loginSuccessful:
+            cache.set(LoginForm._cacheKey(request), cache.get(LoginForm._cacheKey(request),0)+1)
         return loginSuccessful
-
+    
+    @classmethod
+    def createLoginForm(cls, request, data=None):
+        form = LoginForm(data)
+        form.fields["captcha"].required = cache.get(LoginForm._cacheKey(request),0) >= 5
+        return form
+    
 class RegistrationForm(forms.Form):
     
     email = forms.EmailField()
@@ -47,6 +64,7 @@ class RegistrationForm(forms.Form):
     last_name = forms.CharField(max_length=30)
     address = forms.CharField(max_length=100)
     phone = forms.CharField(max_length=30)
+    captcha = CaptchaField()
 
     """
     Attempt to register an user who filled out the registration form.
@@ -169,11 +187,24 @@ class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField()
     username = forms.CharField(max_length=30)
     
+    @classmethod
+    def _generatePassword(cls):
+        def generateRandomChar():
+            randNumber = randint(0,61)
+            if randNumber < 10:
+                return chr(48+randNumber)
+            else:
+                return chr(65+(randNumber-10)/26*32+(randNumber-10)%26)
+        gString = ""
+        for i in xrange(8):
+            gString += generateRandomChar()
+        return gString
+    
     def process(self, request):
         if self.is_valid():
             try:
                 user = User.objects.get(email=self.cleaned_data["email"], username=self.cleaned_data["username"])
-                VerificationRequest.createVerificationRequest(user, actionType="resetPassword")
+                VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
                 sendResetPasswordEmail(user)
                 messages.success(request, "A confirmation email is sent to your inbox.")
             except User.DoesNotExist:
