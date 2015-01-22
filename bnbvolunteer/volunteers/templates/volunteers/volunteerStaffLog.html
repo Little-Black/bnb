@@ -1,5 +1,7 @@
 {% extends "volunteers/staff_templates/base_staff_viewTimesheet.html" %}
 {% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
 
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
@@ -29,6 +31,17 @@
   <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
   <br>
   <input type="submit" Value="Search" class="btn btn-default">
+</div>
+<div class="add-logs">
+	<p class="credits-label">{{ num }} timesheets found. </p>
+	<p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
+	<br>
+	<input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">	
+	<input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
+	<br>
+	<p class="credits-label">Go to page </p>
+	<input name="toPage" type="text" >
+	<input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
 </form>
 </div>
 

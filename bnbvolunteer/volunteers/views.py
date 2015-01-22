@@ -142,9 +142,29 @@ def volunteerStaffLog(request):
         except:
             Logs = Logs
         Logs = Logs.order_by('-dateEntered')
-        context = {'Logs': Logs, 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown'], 'type_choices': type_choices, 'typeSelected': request.POST['activityType'], 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp']}
+        context = { 'dateDoneUp': request.POST['dateDoneUp'], 'dateDoneDown': request.POST['dateDoneDown'], 'type_choices': type_choices, 'typeSelected': request.POST['activityType'], 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp']}
     else:
-        context = {'Logs': Logs, 'dateDoneUp': "", 'dateDoneDown': "", 'type_choices': type_choices, 'typeSelected': "All", 'creditsDown': "", 'creditsUp': ""}
+        context = { 'dateDoneUp': "", 'dateDoneDown': "", 'type_choices': type_choices, 'typeSelected': "All", 'creditsDown': "", 'creditsUp': ""}
+    num = len(Logs)
+    try:
+        Logs = Logs[30*int(request.GET['page']):]
+        pageNum = int(request.GET['page'])+1
+    except:
+        pageNum = 1
+    try:
+        if request.GET['page'] == "?":
+            toPage = min((num-1)/30 , max(int(request.POST['toPage'])-1, 0))
+            Logs = Logs[30*toPage:]
+            pageNum = toPage + 1
+    except:
+        pageNum = 1
+    Logs = Logs[:30]
+    context['Logs'] = Logs
+    context['num'] = num
+    context['lastPage'] = max(pageNum-2, 0)
+    context['nextPage'] = min(pageNum, (num-1)/30)
+    context['pageNum'] = pageNum
+    context['allPage'] = max((num-1)/30 + 1, 1)
     return render(request, 'volunteers/volunteerStaffLog.html', context)
 
 
@@ -152,7 +172,8 @@ def volunteerStaffLog(request):
 def volunteerStaffActivity(request):
     if request.method == "POST":
         if not request.POST['activityName'] == "":
-            ActivityType(name=request.POST['activityName']).save()
+            if len(ActivityType.objects.filter(name=request.POST['activityName'])) == 0:
+                ActivityType(name=request.POST['activityName']).save()
     if 'delete' in request.GET:
         ActivityType.objects.get(id=request.GET['delete']).delete()
         return HttpResponseRedirect(reverse("volunteerStaffActivity"))
@@ -361,8 +382,22 @@ def codeGenerator(request):
                     voucher.delete()
                 except:
                     idNum = idNum
-            query_results = Voucher.objects.all()
-    query_results = query_results.order_by('-id')[:30]
+            query_results = Voucher.objects.all()        
+    query_results = query_results.order_by('-id')
+    num = len(query_results)
+    try:
+        query_results = query_results[30*int(request.GET['page']):]
+        pageNum = int(request.GET['page'])+1
+    except:
+        pageNum = 1
+    try:
+        if request.GET['page'] == "?":
+            toPage = min((num-1)/30 , max(int(request.POST['toPage'])-1, 0))
+            query_results = query_results[30*toPage:]
+            pageNum = toPage + 1
+    except:
+        pageNum = 1
+    query_results=query_results[:30]
     context = {'query_results': query_results }
     context['isRedemed'] = "All"
     try:
@@ -370,6 +405,11 @@ def codeGenerator(request):
             context[item] = request.POST[item]
     except:
         context = context
+    context['num'] = num
+    context['lastPage'] = max(pageNum-2, 0)
+    context['nextPage'] = min(pageNum, (num-1)/30)
+    context['pageNum'] = pageNum
+    context['allPage'] = max((num-1)/30 + 1, 1)
     return render(request,'volunteers/codeGenerator.html',context)
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
