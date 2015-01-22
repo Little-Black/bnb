@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect, HttpResponse
-#from django.core.cache import cache
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
@@ -304,17 +304,15 @@ def editProfile(request):
 
 def verify(request, code):
     cacheKey = (request.META["REMOTE_ADDR"], "verify")
-    if False:
-        pass
-    #if cache.get(cacheKey, 0) >= 5:
-    #    return HttpResponse("You have entered too many invalid codes. Try again later.")
+    if cache.get(cacheKey, 0) >= 5:
+        return HttpResponse("You have entered too many invalid codes. Try again later.")
     else:
         try:
             verificationRequests = VerificationRequest.objects.get(code=code)
             message = verificationRequests.verify()
             return HttpResponse(message)
         except VerificationRequest.DoesNotExist:
-            #cache.set(cacheKey, cache.get(cacheKey, 0)+1)
+            cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
             return HttpResponse("Invalid code.")
 
 @login_required
