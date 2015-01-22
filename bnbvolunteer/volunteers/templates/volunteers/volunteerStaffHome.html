@@ -1,61 +1,35 @@
+{% extends "volunteers/staff_templates/base_staff_profile.html" %}
 {% load staticfiles %}
-<html>
-<!-- Bootstrap -->
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
-<body>
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
+{% endblock specificCss %}
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+{% block tabcontent %}
+  <div class="timesheet panel panel-default">
+    <div class="panel-heading">Timesheet Entries</div>
+    <table class="table">
+        <tr>
+            <th>User</th>
+            <th>Date Done</th>
+            <th>Activity Type</th>
+            <th>Description</th>
+            <th>Credits Earned</th>
+        </tr>
+        {% for item in query_results %}
+        <tr> 
+            <td>{{ item.user }}</td>
+            <td>{{ item.dateDone }}</td>
+            <td>{{ item.activityType}}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.credits }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+  </div>
+{% endblock tabcontent %}
 
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active">
-    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'editProfile' %}">Edit Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-  </li>
-</ul>
-
-<div class="timesheet panel panel-default">
-  <div class="panel-heading">Timesheet Entries</div>
-  <table class="table">
-      <tr>
-          <th>User</th>
-          <th>Date Done</th>
-          <th>Activity Type</th>
-          <th>Description</th>
-          <th>Credits Earned</th>
-      </tr>
-      {% for item in query_results %}
-      <tr> 
-          <td>{{ item.user }}</td>
-          <td>{{ item.dateDone }}</td>
-          <td>{{ item.activityType}}</td>
-          <td>{{ item.description }}</td>
-          <td>{{ item.credits }}</td>
-      </tr>
-      {% endfor %}
-  </table>
-</div>
-
-
+{% block jsfiles %}
 <script>
 var counter = 1;
 var limit = 15;
@@ -71,3 +45,4 @@ function addInput(divName){
      }
 }
 </script>
+{% endblock jsfiles %}

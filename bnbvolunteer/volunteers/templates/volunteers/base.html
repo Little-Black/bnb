@@ -1,0 +1,21 @@
+{% load staticfiles %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+{% block cssfiles %}
+{% endblock cssfiles %}
+<body>
+
+{% block tabs %}
+{% endblock tabs %}
+
+{% block tabcontent %}
+{% endblock tabcontent %}
+
+<!--JQuery-->
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
+<!-- Bootstrap-->
+<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
+{% block jsfiles %}
+{% endblock jsfiles %}
+</body>
+</html>

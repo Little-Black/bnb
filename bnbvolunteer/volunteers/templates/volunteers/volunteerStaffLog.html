@@ -1,104 +1,72 @@
+{% extends "volunteers/staff_templates/base_staff_viewTimesheet.html" %}
 {% load staticfiles %}
-<html>
-<!-- Bootstrap -->
-<head>
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
-</head>
-<body>
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+{% endblock specificCss %}
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
-
-<ul class="nav nav-tabs">
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'editProfile' %}">Edit Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
-  </li>
-  <li role="presentation" class="active">
-    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
-  </li>
-</ul>
-<br>
-
+{% block tabcontent %}
 <div class="add-logs">
 <form method="post" action="">{% csrf_token %}
-	<p class="add-label">Filters: </p>
-	<p class="credits-label">Activity done between </p>
-       	<input name="dateDoneDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>
-	<p class="credits-label">and </p>
-	<input name="dateDoneUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDoneUp}}>
-	<br>
-	<p class="credits-label">Activity Type</p>
-	<select name="activityType">
-		<option value="All">All</option>
-		{% for type in type_choices %}
-		<option {% if type.name == typeSelected %}selected{% endif %} value="{{type}}">{{type}}</option>
-		{% endfor %}	
-	</select>
-	<br>
-	<p class="credits-label">Credits between</p>
-	<input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
-	<p class="credits-label">and </p>
-	<input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
-	<br>
-	<input type="submit" Value="Search" class="btn btn-default">
+  <p class="add-label">Filters: </p>
+  <p class="credits-label">Activity done between </p>
+        <input name="dateDoneDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>
+  <p class="credits-label">and </p>
+  <input name="dateDoneUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDoneUp}}>
+  <br>
+  <p class="credits-label">Activity Type</p>
+  <select name="activityType">
+    <option value="All">All</option>
+    {% for type in type_choices %}
+    <option {% if type.name == typeSelected %}selected{% endif %} value="{{type}}">{{type}}</option>
+    {% endfor %}  
+  </select>
+  <br>
+  <p class="credits-label">Credits between</p>
+  <input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
+  <p class="credits-label">and </p>
+  <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
+  <br>
+  <input type="submit" Value="Search" class="btn btn-default">
 </form>
 </div>
 
 <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js'%}"></script>
 <script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
 <script type="text/javascript">
-	$(document).ready(function(){
-			$('#date1').datepicker({format: "yyyy-mm-dd"});
-			$('#date2').datepicker({format: "yyyy-mm-dd"});
-			});
-	</script>
+  $(document).ready(function(){
+      $('#date1').datepicker({format: "yyyy-mm-dd"});
+      $('#date2').datepicker({format: "yyyy-mm-dd"});
+      });
+  </script>
 
 <div class="panel panel-default results">
     <div class="panel-heading">Timesheet</div>
 <table class="table">
-	<tr>
-		<th>Id</th>
+    <tr>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
         <th>ActivityType</th>
         <th>Description</th>
-	<th>Credits</th>
-	<th>Staff</th>
+  <th>Credits</th>
+  <th>Staff</th>
     </tr>
     {% for item in Logs %}
     <tr> 
-	    <td>{{ item.id }}</td>
-	    <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
+      <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
         <td>{{ item.activityType.name }}</td>
         <td>{{ item.description }}</td>
-	<td>{{ item.credits }}</td>
-	<td>{{ item.staff }}</td>
+  <td>{{ item.credits }}</td>
+  <td>{{ item.staff }}</td>
     </tr>
     {% endfor %}
 </table>
 </div>
+{% endblock tabcontent %}
 
-</body>
-</html>
+{% block jsfiles %}
+{% endblock jsfiles %}

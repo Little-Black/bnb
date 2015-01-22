@@ -1,0 +1,68 @@
+{% load staticfiles %}
+<html>
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
+<body>
+
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
+<br>
+
+<h1 class="bnb-header">Bikes Not Bombs</h1>
+<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+
+<ul class="nav nav-tabs">
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'editProfile' %}">Edit Profile</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffUserSearchResult' %}">Search</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'volunteerStaffLog' %}">View Timesheet</a>
+  </li>
+  <li role="presentation">
+    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
+  </li>
+  <li role="presentation" class="active">
+    <a href="{% url 'volunteerStaffActivity' %}"> Activities </a>
+  </li>
+</ul>
+
+
+<div class="input-group search">
+	</div>
+<div class="panel panel-default results">
+    <div class="panel-heading">Activities</div>
+    <table class="table">
+    <tr>
+    </tr>
+    {% for item in query_results %}
+    <tr> 
+	    <td>{{ item.name }}</td>
+	    {% if item.id != 1 %}
+	    <td><a href="?delete={{item.id}}">Delete</a></td>
+	    {% endif%}
+    </tr>
+    {% endfor %}
+</table>
+</div>
+
+<div class="add-new-act">
+  <p class="add-label">Add a new activity type</p>
+
+  <form action="" method="post">{% csrf_token %}
+
+  <p class="name-label">Name:</p>
+  <input type="text" name="activityName">
+  <br>
+  <input class="submit-btn btn btn-default" type="submit" value="Submit" />
+  </form>
+</div>
+
+</body>
+</html>
