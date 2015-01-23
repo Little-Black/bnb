@@ -358,15 +358,15 @@ def editProfile(request):
 def verify(request, code):
     cacheKey = (request.META["REMOTE_ADDR"], "verify")
     if cache.get(cacheKey, 0) >= 5:
-        return HttpResponse("You have entered too many invalid codes. Try again later.")
+        message = "You are temporarily blocked from this page because you have entered too many invalid codes."
     else:
         try:
             verificationRequests = VerificationRequest.objects.get(code=code)
             message = verificationRequests.verify()
-            return HttpResponse(message)
         except VerificationRequest.DoesNotExist:
             cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
-            return HttpResponse("Invalid code.")
+            message = "Invalid code."
+    return render(request, "volunteers/verify.html", {"message": message})
 
 @login_required
 def deleteAccount(request):
@@ -560,7 +560,7 @@ def exportCodes(request):
 def redirect_to_https(viewFunction):
     def _redirect_to_https(request, *args, **kwargs):
         if not request.is_secure():
-            if not getattr(settings, "HTTPS_REDIRECT", True):
+            if getattr(settings, "HTTPS_REDIRECT", False):
                 redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
                 return HttpResponseRedirect(redirect)
         return viewFunction(request, *args, **kwargs)
