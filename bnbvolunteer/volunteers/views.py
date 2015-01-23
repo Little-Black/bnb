@@ -488,7 +488,7 @@ def exportCodes(request):
 def redirect_to_https(viewFunction):
     def _redirect_to_https(request, *args, **kwargs):
         if not request.is_secure():
-            if not getattr(settings, "HTTPS_REDIRECT", True):
+            if getattr(settings, "HTTPS_REDIRECT", False):
                 redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
                 return HttpResponseRedirect(redirect)
         return viewFunction(request, *args, **kwargs)
