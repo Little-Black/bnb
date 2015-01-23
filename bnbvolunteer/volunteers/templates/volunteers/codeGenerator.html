@@ -69,7 +69,19 @@
 	<p class="credits-label">and </p>
 	<input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
 	<br>
-	<input type="submit" Value="Search" class="btn btn-default">
+	<input type="submit"  formaction="?page=0" Value="Search" class="btn btn-default">
+</div>
+
+<div class="add-logs">
+	<p class="credits-label">{{ num }} vouchers found. </p>
+	<p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
+	<br>
+	<input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">	
+	<input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
+	<br>
+	<p class="credits-label">Go to page </p>
+	<input name="toPage" type="text" >
+	<input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
 </form>
 </div>
 <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
