@@ -122,7 +122,20 @@ def volunteerStaffHome(request):
 def volunteerStaffLog(request):
     type_choices = ActivityType.objects.all()
     Logs = Activity.objects.all().order_by('-dateEntered')
-    if request.method == "POST":
+    if request.method == "POST" and not 'activityType' in request.POST.keys():
+        for idNum in request.POST.keys(): 
+            try:
+                activity = Activity.objects.get(id=int(idNum))
+                user = activity.user
+                totalCredit = user.profile.credit
+                totalCredit -= activity.credits
+                user.profile.credit = totalCredit
+                user.profile.save()
+                activity.delete()
+            except:
+                idNum = idNum
+        Logs = Activity.objects.all().order_by('-dateEntered')
+    if request.method == "POST" and 'activityType' in request.POST.keys():
         try:
             Logs = Logs.exclude(dateDone__gt = request.POST['dateDoneUp'])
         except:
@@ -185,12 +198,13 @@ def volunteerStaffActivity(request):
 @login_required
 def volunteerStaffUserSearchResult(request):
     inform = ""
+    type_choices = ActivityType.objects.all()
     if request.method == "GET":
         search_results = User.objects.all() 
     else:
         if 'lastname' in request.POST.keys():
             if request.POST['lastname'] != "":    
-                search_results = User.objects.filter(last_name=request.POST['lastname'])
+                search_results = User.objects.filter(last_name__icontains=request.POST['lastname'])
             else:
                 search_results = User.objects.all()
             try:
@@ -213,16 +227,21 @@ def volunteerStaffUserSearchResult(request):
                     search_results = search_results.filter(email = request.POST['email'])
             except:
                     search_results = search_results
-            context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
+            try:
+                context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
+                context['type_choices'] = type_choices
+            except:
+                context = {'search_results': search_results}
             return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
         else:
             search_results = User.objects.all()
             try:  
                 s = 1 + int(request.POST['credits'])
+                activityType = ActivityType.objects.get(name = request.POST['activityType'])
                 for user in search_results:
                     if user.username in request.POST.keys():
                         if request.POST[user.username]:
-                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
+                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
                             if int(request.POST['credits']) + user.profile.credit >= 0:
                                 addLog.save();
                                 user.profile.credit += int(request.POST['credits'])
@@ -230,25 +249,37 @@ def volunteerStaffUserSearchResult(request):
                             else:
                                 inform += user.username + ', '
             except:
-                inform = "Please type an integer in credits."
+                inform = "Invalid credits or Done Date."
                 context = {'search_results': search_results,  'inform': inform}
+                context['type_choices'] = type_choices
                 return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
     if not inform == "":
         inform = "No enough credits for " + inform[:-2] +"!" 
     context = {'search_results': search_results,  'inform': inform}
+    context['type_choices'] = type_choices
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
 @login_required
 def volunteerStaffUser(request):
     inform = ""
+    type_choices = ActivityType.objects.all()
     userSearch_result = User.objects.get(username=request.GET['getuser'])
     search_results = Activity.objects.filter(user=userSearch_result)
+    if request.method == "POST" and not 'activityType' in request.POST.keys():
+        for idNum in request.POST.keys(): 
+            try:
+                activity = Activity.objects.get(id=int(idNum))
+                activity.delete()
+            except:
+                idNum = idNum
+        search_results = Activity.objects.filter(user=userSearch_result)
     creditSum = 0
     for result in search_results:
         creditSum += result.credits
-    if request.method == "POST":
+    if request.method == "POST" and 'activityType' in request.POST.keys():
+        activityType = ActivityType.objects.get(name = request.POST['activityType'])
         try:
-            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
+            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
             if creditSum + int(addLog.credits) < 0:
                 inform = "Do not have enough credits"
             else:
@@ -256,10 +287,11 @@ def volunteerStaffUser(request):
                 search_results = Activity.objects.filter(user=userSearch_result)
                 creditSum += int(addLog.credits)
         except:
-            inform = "Please type an integer in credits."
+            inform = "Invalid credits or Date Done."
     userSearch_result.profile.credit = creditSum
     userSearch_result.profile.save()
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
+    context['type_choices'] = type_choices
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
 def userLogin(request):

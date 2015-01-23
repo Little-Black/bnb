@@ -2,6 +2,7 @@
 {% load staticfiles %}
 
 {% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
 {% endblock specificCss %}
 
@@ -48,7 +49,9 @@
             <th>Phone Number</th>
             <th>Address</th>
       <th>Credits Avaliable</th>
-      <th>Selected</th>
+      <th>Selected
+		<input type="checkbox" name="allSelect" id="allSelect"></input> 
+      </th>
         </tr>
         {% for item in search_results %}
         <tr> 
@@ -58,16 +61,25 @@
             <td>{{ item.profile.phone }}</td>
       <td>{{ item.profile.address }}</td>
       <td>{{ item.profile.credit }}</td>
-      <td><input name="{{item.username}}"type="checkbox"></td>
+      <td><input name="{{item.username}}"type="checkbox" id="checkbox-{{ item.id }}"></td>
         </tr>
         {% endfor %}
     </table>
 </div>
 
 <div class="add-logs">
-  <p class="add-label">Add logs to selected users</p>
+  <p class="add-label">Add activities to selected users</p>
   <p class="description-label">Description:</p><input type="text" name="description">
-  <p class="credits-label">Credits:</p><input type="number" name="credits">
+  <p class="credits-label">Credits:</p>
+  <input type="number" name="credits">
+  <p class="credits-label">Activity Type:</p>
+  <select name="activityType">
+    {% for type in type_choices %}
+    <option {% if type.name == typeSelected %}selected{% endif %} value="{{type}}">{{type}}</option>
+    {% endfor %}  
+  </select>
+  <p class="credits-label">Date Done:</p>
+  <input name="dateDone" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDone}}>
   <input type="submit" value="Submit" class="btn btn-default">
   </form>
   {{inform}}
@@ -75,4 +87,22 @@
 {% endblock tabcontent %}
 
 {% block jsfiles %}
+<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js'%}"></script>
+<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('#date1').datepicker({format: "yyyy-mm-dd"});
+      $('#date2').datepicker({format: "yyyy-mm-dd"});
+      });
+  </script>
+<script type="text/javascript">
+	$('#allSelect').click(function(event){
+		if(this.checked){
+			$(':checkbox').each(function(){this.checked = true;});
+			}
+		else{
+			$(':checkbox').each(function(){this.checked = false;});
+			}	
+			});
+	</script>
 {% endblock jsfiles %}
