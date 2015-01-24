@@ -88,10 +88,8 @@ def volunteerSubmit(request):
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
-    query_results = Activity.objects.filter(user=user)
-    total_credits = 0
-    for log in query_results:
-        total_credits += log.credits
+    query_results = user.activity_set.all()
+    total_credits = user.profile.totalCredit()
     type_choices = ActivityType.objects.values_list('name', flat=True)
     # jq = ActivityType.objects.exclude(id__in=activities)
     # type_choices = jq.values_list('name', flat=True)
@@ -125,13 +123,7 @@ def volunteerStaffLog(request):
     if request.method == "POST" and not 'activityType' in request.POST.keys():
         for idNum in request.POST.keys(): 
             try:
-                activity = Activity.objects.get(id=int(idNum))
-                user = activity.user
-                totalCredit = user.profile.credit
-                totalCredit -= activity.credits
-                user.profile.credit = totalCredit
-                user.profile.save()
-                activity.delete()
+                Activity.objects.get(id=int(idNum)).delete()
             except:
                 idNum = idNum
         Logs = Activity.objects.all().order_by('-dateEntered')
@@ -242,10 +234,8 @@ def volunteerStaffUserSearchResult(request):
                     if user.username in request.POST.keys():
                         if request.POST[user.username]:
                             addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
-                            if int(request.POST['credits']) + user.profile.credit >= 0:
+                            if int(request.POST['credits']) + user.profile.totalCredit() >= 0:
                                 addLog.save();
-                                user.profile.credit += int(request.POST['credits'])
-                                user.profile.save()
                             else:
                                 inform += user.username + ', '
             except:
@@ -259,6 +249,8 @@ def volunteerStaffUserSearchResult(request):
     context['type_choices'] = type_choices
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
+# Sam: There is external links pointing to this page, obsolete? Also, I need more documentation to correct the code.
+# TLDR: This code does not run before refactoring, and it won't run until we have fixed it
 @login_required
 def volunteerStaffUser(request):
     inform = ""

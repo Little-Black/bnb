@@ -21,7 +21,7 @@ class ActivityType(models.Model):
         return self.name
 
 class Activity(models.Model):
-    user = models.ForeignKey(User, default='', related_name='user')
+    user = models.ForeignKey(User)
     dateDone = models.DateField(default=date.today)
     dateEntered = models.DateTimeField(auto_now_add=True, blank=True)
     activityType = models.ForeignKey(ActivityType, null=True, default='')
@@ -104,7 +104,9 @@ class UserProfile(models.Model):
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
     newEmail = models.EmailField(blank=True) # holds unverified email address
-    credit = models.PositiveSmallIntegerField(default=0)
+    
+    def totalCredit(self):
+        return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()))
     
     def get(self, attr):
         if hasattr(self, attr):
