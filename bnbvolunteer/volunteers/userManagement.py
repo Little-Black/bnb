@@ -7,8 +7,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 
 from captcha.fields import CaptchaField
-from volunteers.models import *
-from volunteers.emailTemplates import *
+from volunteers.models import VerificationRequest
+from volunteers.emailTemplates import sendRegVerificationEmail, sendResetPasswordEmail, sendEmailUpdateEmail, sendDeleteAccEmail
 
 from random import randint
 
@@ -98,8 +98,8 @@ class RegistrationForm(forms.Form):
                 user.is_active = False
                 user.save()
                 user.profile.save()
-                VerificationRequest.createVerificationRequest(user, actionType="register")
-                sendRegVerificationEmail(user)
+                vr = VerificationRequest.createVerificationRequest(user, actionType="register")
+                sendRegVerificationEmail(user, vr)
                 messages.success(request, "Registration successful. You should receive a verification mail in the inbox.")
         else:
             registrationSuccessful = False
@@ -116,6 +116,13 @@ class EditProfileForm(forms.Form):
     address = forms.CharField(max_length=100)
     phone = forms.CharField(max_length=30)
     
+    @staticmethod
+    def createUserContext(user):
+        data = {}
+        for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
+            data[attr] = user.profile.get(attr)
+        return data
+    
     """
     Attempt to edit the account information of an user.
     @param request: HTTPRequest
@@ -129,8 +136,8 @@ class EditProfileForm(forms.Form):
                     messages.info(request, "A confirmation mail is sent to your new email address.")
                     request.user.profile.newEmail = self.cleaned_data["email"]
                     request.user.profile.save()
-                    VerificationRequest.createVerificationRequest(request.user, actionType="updateEmail")
-                    sendEmailUpdateEmail(request.user)
+                    vr = VerificationRequest.createVerificationRequest(request.user, actionType="updateEmail")
+                    sendEmailUpdateEmail(request.user, vr)
             for attr in {"first_name", "last_name", "address", "phone"}:
                 request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
@@ -139,12 +146,6 @@ class EditProfileForm(forms.Form):
         else:
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
-
-def createUserContext(user):
-    data = {}
-    for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
-        data[attr] = user.profile.get(attr)
-    return data
 
 class PasswordChangeForm(forms.Form):
     
@@ -188,8 +189,8 @@ class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField()
     username = forms.CharField(max_length=30)
     
-    @classmethod
-    def _generatePassword(cls):
+    @staticmethod
+    def _generatePassword():
         def generateRandomChar():
             randNumber = randint(0,61)
             if randNumber < 10:
@@ -205,8 +206,8 @@ class RequestPasswordResetForm(forms.Form):
         if self.is_valid():
             try:
                 user = User.objects.get(email=self.cleaned_data["email"], username=self.cleaned_data["username"])
-                VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
-                sendResetPasswordEmail(user)
+                vr = VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
+                sendResetPasswordEmail(user, vr)
                 messages.success(request, "A confirmation email is sent to your inbox.")
             except User.DoesNotExist:
                 messages.error(request, "Cannot find an user with given email and username.")
@@ -214,7 +215,7 @@ class RequestPasswordResetForm(forms.Form):
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
 
-def deleteAccount(request):
+def userDeleteAccount(request):
     messages.info(request, "A confirmation email is sent to your account.")
-    VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
-    sendDeleteAccEmail(request.user)
+    vr = VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
+    sendDeleteAccEmail(request.user, vr)

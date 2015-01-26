@@ -9,7 +9,8 @@
 
 {% block tabcontent %}
 <div class="add-logs">
-<form method="post" action="">{% csrf_token %}
+<form method="post" action="">
+{% csrf_token %}
   <p class="add-label">Filters: </p>
   <p class="credits-label">Activity done between </p>
         <input name="dateDoneDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>

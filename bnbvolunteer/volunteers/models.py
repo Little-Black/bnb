@@ -1,7 +1,9 @@
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
-from datetime import datetime
+
+from bnbvolunteer.settings import SITE_URL
+
 from datetime import date
 from random import random
 from threading import Timer
@@ -37,7 +39,7 @@ class Voucher(models.Model):
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User)
-    code = models.CharField(max_length=20)
+    code = models.CharField(max_length=20, unique=True)
     actionType = models.CharField(max_length=100)
     isValid = models.BooleanField(default=True)
     creationTime = models.DateTimeField(auto_now_add=True)
@@ -63,6 +65,9 @@ class VerificationRequest(models.Model):
             message = "Invalid action type."
         self._selfDestruct()
         return message
+    
+    def getURL(self):
+        return SITE_URL + "/verify/" + self.code
     
     def _selfDestruct(self, hasExpired=False):
         if self.isValid:
@@ -106,7 +111,14 @@ class UserProfile(models.Model):
     newEmail = models.EmailField(blank=True) # holds unverified email address
     
     def totalCredit(self):
-        return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()))
+        return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()), 0)
+    
+    def dateLastVolunteered(self):
+        activities = self.user.activity_set.all()
+        if activities:
+            return max(map(lambda a: a.dateDone, activities))
+        else:
+            return None
     
     def get(self, attr):
         if hasattr(self, attr):

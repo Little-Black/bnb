@@ -4,13 +4,13 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.utils.safestring import mark_safe
 
 from bnbvolunteer import settings
-from volunteers import userManagement
-from volunteers.models import *
-from volunteers.userManagement import *
+from volunteers.decorators import redirect_to_https, staff_only
+from volunteers.models import ActivityType, Activity, Voucher, VerificationRequest, UserProfile
+from volunteers.userManagement import LoginForm, RegistrationForm, EditProfileForm, PasswordChangeForm, RequestPasswordResetForm, userDeleteAccount
 
 from random import randint
 from datetime import date
@@ -98,7 +98,7 @@ def getVolunteerPageContext(request,user):
     context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
     return context
 
-@user_passes_test(lambda user: user.is_staff)
+@staff_only
 def volunteerStaffHome(request):
     Logs = Activity.objects.all()
     try:
@@ -116,7 +116,7 @@ def volunteerStaffHome(request):
     #     context = {'query_results': [],'total_credits':0,'type_choices':[]}
     # return render(request,'volunteers/volunteerHome.html',context)
 
-@user_passes_test(lambda user: user.is_staff)
+@staff_only
 def volunteerStaffLog(request):
     type_choices = ActivityType.objects.all()
     Logs = Activity.objects.all().order_by('-dateEntered')
@@ -173,8 +173,7 @@ def volunteerStaffLog(request):
     context['allPage'] = max((num-1)/30 + 1, 1)
     return render(request, 'volunteers/volunteerStaffLog.html', context)
 
-
-@login_required
+@staff_only
 def volunteerStaffActivity(request):
     if request.method == "POST":
         if not request.POST['activityName'] == "":
@@ -187,105 +186,65 @@ def volunteerStaffActivity(request):
     context = {'query_results': query_results}
     return render(request, 'volunteers/volunteerStaffActivity.html', context)
 
-@login_required
-def volunteerStaffUserSearchResult(request):
-    inform = ""
-    type_choices = ActivityType.objects.all()
-    if request.method == "GET":
-        search_results = User.objects.all() 
+@staff_only
+def volunteerStaffUserSearchResult(request):   
+    context = dict()
+    if request.method == "POST":
+        lastname = request.POST['lastname'] if 'lastname'in request.POST else ""
+        phone = request.POST['phone'] if 'phone' in request.POST else ""
+        email = request.POST['email'] if 'email' in request.POST else ""
+        try:
+            creditLowerBound = int(request.POST['creditsDown']) if 'creditsDown' in request.POST else 0
+        except ValueError:
+            creditLowerBound = 0
+        try:
+            creditUpperBound = int(request.POST['creditsUp']) if 'creditsUp' in request.POST else 999999
+        except ValueError:
+            creditUpperBound = 999999
+        search_results_raw = User.objects.filter(last_name__icontains=lastname, profile__phone__contains=phone, email__contains=email)
+        search_results_raw = filter(lambda user: creditLowerBound <= user.profile.totalCredit() <= creditUpperBound, search_results_raw)
+        context.update({'lastname': lastname,
+                        'phone': phone,
+                        'email': email,
+                        'creditsDown': creditLowerBound,
+                        'creditsUp': creditUpperBound
+                        })
     else:
-        if 'lastname' in request.POST.keys():
-            if request.POST['lastname'] != "":    
-                search_results = User.objects.filter(last_name__icontains=request.POST['lastname'])
-            else:
-                search_results = User.objects.all()
-            try:
-                search_results = search_results.filter(profile__credit__gte = request.POST['creditsDown'])
-            except:
-                search_results = search_results
-            try:
-                search_results = search_results.exclude(profile__credit__gt = request.POST['creditsUp'])
-            except:
-                search_results = search_results
-            try:
-                b = int(request.POST['phone']) + 1
-                phone = request.POST['phone']
-                search_results = search_results.filter(profile__phone = request.POST['phone'])
-            except:
-                search_results = search_results
-                phone = ""
-            try:
-                if not request.POST['email'] == "":
-                    search_results = search_results.filter(email = request.POST['email'])
-            except:
-                    search_results = search_results
-            try:
-                context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
-                context['type_choices'] = type_choices
-            except:
-                context = {'search_results': search_results}
-            return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
-        else:
-            search_results = User.objects.all()
-            try:  
-                s = 1 + int(request.POST['credits'])
-                activityType = ActivityType.objects.get(name = request.POST['activityType'])
-                for user in search_results:
-                    if user.username in request.POST.keys():
-                        if request.POST[user.username]:
-                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
-                            if int(request.POST['credits']) + user.profile.totalCredit() >= 0:
-                                addLog.save();
-                            else:
-                                inform += user.username + ', '
-            except:
-                inform = "Invalid credits or Done Date."
-                context = {'search_results': search_results,  'inform': inform}
-                context['type_choices'] = type_choices
-                return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
-    if not inform == "":
-        inform = "No enough credits for " + inform[:-2] +"!" 
-    context = {'search_results': search_results,  'inform': inform}
-    context['type_choices'] = type_choices
+        search_results_raw = User.objects.all()
+    search_results = map(lambda user: (user, user.profile.totalCredit()), search_results_raw)
+    context.update({'search_results': search_results, 'type_choices': ActivityType.objects.all()})
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
-# Sam: There is external links pointing to this page, obsolete? Also, I need more documentation to correct the code.
-# TLDR: This code does not run before refactoring, and it won't run until we have fixed it
-@login_required
+@staff_only
 def volunteerStaffUser(request):
     inform = ""
     type_choices = ActivityType.objects.all()
-    userSearch_result = User.objects.get(username=request.GET['getuser'])
-    search_results = Activity.objects.filter(user=userSearch_result)
-    if request.method == "POST" and not 'activityType' in request.POST.keys():
-        for idNum in request.POST.keys(): 
+    try:
+        user = User.objects.get(username=request.GET['getuser'])
+    except User.DoesNotExist:
+        return render(request, 'volunteers/volunteerStaffUser.html', {'inform': "User does not exist."})
+    if request.method == "POST":
+        if 'activityType' in request.POST:
+            activityType = ActivityType.objects.get(name = request.POST['activityType'])
             try:
-                activity = Activity.objects.get(id=int(idNum))
-                activity.delete()
+                addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
+                if user.profile.totalCredit() + int(addLog.credits) < 0:
+                    inform = "Do not have enough credits."
+                else:
+                    addLog.save()
             except:
-                idNum = idNum
-        search_results = Activity.objects.filter(user=userSearch_result)
-    creditSum = 0
-    for result in search_results:
-        creditSum += result.credits
-    if request.method == "POST" and 'activityType' in request.POST.keys():
-        activityType = ActivityType.objects.get(name = request.POST['activityType'])
-        try:
-            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
-            if creditSum + int(addLog.credits) < 0:
-                inform = "Do not have enough credits"
-            else:
-                addLog.save()
-                search_results = Activity.objects.filter(user=userSearch_result)
-                creditSum += int(addLog.credits)
-        except:
-            inform = "Invalid credits or Date Done."
-    userSearch_result.profile.credit = creditSum
-    userSearch_result.profile.save()
-    context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
-    context['type_choices'] = type_choices
+                inform = "Invalid credits or Date Done."
+        else:
+            for idNum in request.POST: 
+                try:
+                    activity = Activity.objects.get(id=int(idNum))
+                    activity.delete()
+                except:
+                    pass
+    context = {'search_results':user.activity_set.all(), 'getuser':user, 'inform':inform, 'type_choices':type_choices}
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
+@redirect_to_https
 def userLogin(request):
     def redirect():
         if "next" in request.GET:
@@ -340,7 +299,7 @@ def editProfile(request):
         if pwForm.isFilled(request):
             pwForm.process(request)
     else:
-        infoForm = EditProfileForm(createUserContext(request.user))
+        infoForm = EditProfileForm(EditProfileForm.createUserContext(request.user))
         pwForm = PasswordChangeForm()
     returnPage = "volunteerHome"
     if request.user.has_perm("staff_status"):
@@ -358,11 +317,11 @@ def verify(request, code):
         except VerificationRequest.DoesNotExist:
             cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
             message = "Invalid code."
-    return render(request, "volunteers/verify.html", {"message": message})
+    return render(request, "volunteers/verify.html", {"message": message, "redirect_time": 3})
 
 @login_required
 def deleteAccount(request):
-    userManagement.deleteAccount(request)
+    userDeleteAccount(request)
     return HttpResponseRedirect(reverse("editProfile"))
 
 @login_required
@@ -375,7 +334,7 @@ def updateProfile(request):
     context = {}
     return render(request,'volunteers/updateProfile.html',context)
 
-@user_passes_test(lambda user: user.is_staff)
+@staff_only
 def codeGenerator(request):
     query_results = Voucher.objects.all()
     if request.method == 'POST':
@@ -494,7 +453,7 @@ def codeCheck(code):
 
     return True
 
-@user_passes_test(lambda user: user.is_staff)
+@staff_only
 def generateCodes(request):
     generatedVouchers = []
     for counter in range(1,16):
@@ -523,12 +482,13 @@ def generateCodes(request):
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
-@user_passes_test(lambda user: user.is_staff)
+@staff_only
 def viewGeneratedCodes(request):
     generatedVouchers = request.generatedVouchers
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
+@staff_only
 def exportCodes(request):
     generatedVouchers = Voucher.objects.all()
     now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
@@ -547,13 +507,3 @@ def exportCodes(request):
         writer.writerow([str(voucher.code), str(voucher.credits)])
 
     return response
-
-# decorators
-def redirect_to_https(viewFunction):
-    def _redirect_to_https(request, *args, **kwargs):
-        if not request.is_secure():
-            if getattr(settings, "HTTPS_REDIRECT", False):
-                redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
-                return HttpResponseRedirect(redirect)
-        return viewFunction(request, *args, **kwargs)
-    return _redirect_to_https
