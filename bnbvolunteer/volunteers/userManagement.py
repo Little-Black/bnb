@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 
 from captcha.fields import CaptchaField
-from volunteers.models import *
+from volunteers.models import VerificationRequest
 from volunteers.emailTemplates import *
 
 from random import randint
@@ -116,6 +116,13 @@ class EditProfileForm(forms.Form):
     address = forms.CharField(max_length=100)
     phone = forms.CharField(max_length=30)
     
+    @staticmethod
+    def createUserContext(user):
+        data = {}
+        for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
+            data[attr] = user.profile.get(attr)
+        return data
+    
     """
     Attempt to edit the account information of an user.
     @param request: HTTPRequest
@@ -139,12 +146,6 @@ class EditProfileForm(forms.Form):
         else:
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
-
-def createUserContext(user):
-    data = {}
-    for attr in {"username", "email", "first_name", "last_name", "address", "phone"}:
-        data[attr] = user.profile.get(attr)
-    return data
 
 class PasswordChangeForm(forms.Form):
     
@@ -214,7 +215,7 @@ class RequestPasswordResetForm(forms.Form):
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
 
-def deleteAccount(request):
+def userDeleteAccount(request):
     messages.info(request, "A confirmation email is sent to your account.")
     vr = VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
     sendDeleteAccEmail(request.user, vr)

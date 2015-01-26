@@ -1,10 +1,11 @@
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
-from datetime import datetime
+
+from bnbvolunteer.settings import SITE_URL
+
 from datetime import date
 from random import random
-from bnbvolunteer.settings import SITE_URL
 from threading import Timer
 
 #Userlog is now Activity!!! Userlog just here for reference.
@@ -110,7 +111,7 @@ class UserProfile(models.Model):
     newEmail = models.EmailField(blank=True) # holds unverified email address
     
     def totalCredit(self):
-        return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()))
+        return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()), 0)
     
     def get(self, attr):
         if hasattr(self, attr):
