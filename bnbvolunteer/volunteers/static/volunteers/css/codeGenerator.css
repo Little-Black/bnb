@@ -8,3 +8,18 @@
 .nav{
 	margin-bottom: 20px;
 }
+.generator-title, .find-title{
+	font-size: 50px;
+	font-weight: bold;
+	border-bottom: 1px solid black;
+	text-align: center;
+	width: 50%;
+	margin: 20px auto 20px auto;
+}
+.generator{
+	margin: auto;
+	text-align: center;
+}
+.delete-btn{
+	background-color: red;
+}

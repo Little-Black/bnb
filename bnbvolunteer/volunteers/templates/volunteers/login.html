@@ -1,9 +1,13 @@
-<html>
-<head>
-    <title> Login </title>
-<head>
-<body>
-    <h2> Login to the Volunteer Credit System </h2>
+{% extends "volunteers/base.html" %}
+{% load staticfiles %}
+
+{% block cssfiles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/login.css' %}" />
+{% endblock cssfiles %}
+
+{% block tabcontent %}
+<div class="centered">
+  <h2 class="title"> BNB Volunteer Credit System </h2>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -11,16 +15,26 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form method="post">
+    <form method="post" class="login-form">
         {% csrf_token %}
-        <p> Username: {{ form.username }} </p>
-        <p> Password: {{ form.password }} </p>
+        <div class="username">
+          <div class="input-label">Username:</div>
+          {{ form.username }}
+        </div>
+        <div class="password">
+          <div class="input-label">Password:</div>
+          {{ form.password }}
+        </div>
         {% if form.captcha.field.required %}
             <p> {{ form.captcha }} </p>
         {% endif %}
-   	    <input type="submit" value="Login">
+        <input class="login-btn btn-default btn" type="submit" value="Login">
     </form>
-    <a href="{% url "forgetPassword" %}"> Forget password </a> <br>
+
+    <a href="{% url "forgetPassword" %}"> Forgot password </a> <br>
     <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
-</body>
-</html>
+</div>
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+{% endblock jsfiles %}
