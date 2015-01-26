@@ -113,6 +113,13 @@ class UserProfile(models.Model):
     def totalCredit(self):
         return reduce(int.__add__, map(lambda a: a.credits, self.user.activity_set.all()), 0)
     
+    def dateLastVolunteered(self):
+        activities = self.user.activity_set.all()
+        if activities:
+            return max(map(lambda a: a.dateDone, activities))
+        else:
+            return None
+    
     def get(self, attr):
         if hasattr(self, attr):
             return getattr(self, attr)

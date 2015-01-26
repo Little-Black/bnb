@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from captcha.fields import CaptchaField
 from volunteers.models import VerificationRequest
-from volunteers.emailTemplates import *
+from volunteers.emailTemplates import sendRegVerificationEmail, sendResetPasswordEmail, sendEmailUpdateEmail, sendDeleteAccEmail
 
 from random import randint
 
@@ -189,8 +189,8 @@ class RequestPasswordResetForm(forms.Form):
     email = forms.EmailField()
     username = forms.CharField(max_length=30)
     
-    @classmethod
-    def _generatePassword(cls):
+    @staticmethod
+    def _generatePassword():
         def generateRandomChar():
             randNumber = randint(0,61)
             if randNumber < 10:

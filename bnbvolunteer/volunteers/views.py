@@ -187,7 +187,7 @@ def volunteerStaffActivity(request):
     return render(request, 'volunteers/volunteerStaffActivity.html', context)
 
 @staff_only
-def volunteerStaffUserSearchResult(request):
+def volunteerStaffUserSearchResult(request):   
     context = dict()
     if request.method == "POST":
         lastname = request.POST['lastname'] if 'lastname'in request.POST else ""

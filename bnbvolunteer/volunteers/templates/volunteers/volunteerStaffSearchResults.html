@@ -7,12 +7,8 @@
 {% endblock specificCss %}
 
 {% block tabcontent %}
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-<div class="input-group search">
-
-</div>
-
+<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">
+{% csrf_token %}
 <div class="add-logs">
   <p class="add-label">Filters:</p>
   <p class="credits-label">Last name:</p>

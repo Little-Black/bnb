@@ -3,7 +3,7 @@
 from django.core.mail import send_mail
 from bnbvolunteer import settings
 
-def addHeaderAndSig(user, content):
+def _addHeaderAndSig(user, content):
     return "Hi %s,\n\n" % user.first_name + content + "\n\n%s" % settings.ORG_NAME
 
 def sendRegVerificationEmail(user, vr):
@@ -12,7 +12,7 @@ def sendRegVerificationEmail(user, vr):
                 "You can activate your account at\n" + vr.getURL() +"\n" +\
                 "The account may be deleted if it is not verified within 48 hours.\n" +\
                 "If you did not create the account, ignore this email."
-    message = addHeaderAndSig(user, content)
+    message = _addHeaderAndSig(user, content)
     send_mail("%s Volunteering Registration" % settings.ORG_NAME_SHORT, message, settings.ORG_NAME, [user.email,])
 
 def sendResetPasswordEmail(user, vr):
@@ -21,7 +21,7 @@ def sendResetPasswordEmail(user, vr):
                 vr.getURL() + "\n" +\
                 "This link is only guaranteed to work for 48 hours.\n" +\
                 "If you did not request a password change, ignore this email."
-    message = addHeaderAndSig(user, content)
+    message = _addHeaderAndSig(user, content)
     send_mail("%s Volunteering Password Reset" % settings.ORG_NAME_SHORT, message, settings.ORG_NAME, [user.email,])
 
 def sendEmailUpdateEmail(user, vr):
@@ -30,7 +30,7 @@ def sendEmailUpdateEmail(user, vr):
                 vr.getURL() + "\n" +\
                 "This link is only guaranteed to work for 48 hours.\n" +\
                 "If you do not own this account, ignore this email."
-    message = addHeaderAndSig(user, content)
+    message = _addHeaderAndSig(user, content)
     send_mail("%s Volunteering Email Update" % settings.ORG_NAME_SHORT, message, settings.ORG_NAME, [user.profile.newEmail,])
 
 def sendDeleteAccEmail(user, vr):
@@ -39,5 +39,5 @@ def sendDeleteAccEmail(user, vr):
                 vr.getURL() + "\n" +\
                 "This link is only guaranteed to work for 48 hours.\n" +\
                 "If you did not request to delete this account, ignore this email and change your password."
-    message = addHeaderAndSig(user, content)
+    message = _addHeaderAndSig(user, content)
     send_mail("%s Volunteering Account Deletion" % settings.ORG_NAME_SHORT, message, settings.ORG_NAME, [user.email,])
