@@ -1,142 +1,101 @@
+{% extends "volunteers/staff_templates/base_staff_generateVoucher.html" %}
 {% load staticfiles %}
-<html>
-	<!-- Bootstrap -->
-<head>
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
-</head>
-<body>
 
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-<br>
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
+{% endblock specificCss %}
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+{% block tabcontent %}
+<div class="find-title">Find Vouchers</div>
 
-<ul class="nav nav-tabs">
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'editProfile' %}">Edit Profile</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffUserSearchResult' %}">Users</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffLog' %}">Activities</a>
-  </li>
-  <li role="presentation" class="active">
-    <a href="{% url 'codeGenerator' %}">Generate Voucher</a>
-  </li>
-  <li role="presentation">
-    <a href="{% url 'volunteerStaffActivity' %}">Activity Types</a>
-  </li>
-</ul>
-
-<form action="{% url 'generateCodes' %}" method="post">{% csrf_token %}
-
-<div id="dynamicInput">
-    <p class="voucher-points">Voucher Points:</p><input type="text" name="myInputs1">
-    <p class="how-many">How many?:</p><input type="text" name="myInputs1">
-</div>
-<input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');">
-
-<input class="btn btn-default submit-btn" type="submit" value="Submit" />
-</form>
-
-<div class="add-logs">
 <form method="post" action="">{% csrf_token %}
-	<p class="add-label">Filters: </p>
-	<p class="credits-label">Generated between </p>
-       	<input name="dateDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDown}}>
-	<p class="credits-label">and </p>
-	<input name="dateUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateUp}}>
-	<br>
-	<p class="credits-label">Redemed or not: </p>
-	<select name="isRedemed">
-		<option {% if isRedemed == "All" %}selected{% endif %}value="All">All</option>
-		<option {% if isRedemed == "Yes" %}selected{% endif %} value="Yes">Yes</option>
-		<option {% if isRedemed == "No" %}selected{% endif %} value="No">No</option>
-	</select>
-	<br>
-	<p class="credits-label">Credits between</p>
-	<input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
-	<p class="credits-label">and </p>
-	<input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
-	<br>
-	<input type="submit"  formaction="?page=0" Value="Search" class="btn btn-default">
-</div>
+  <p class="add-label">Filters: </p>
+  <p class="credits-label">Generated between </p>
+        <input name="dateDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDown}}>
+  <p class="credits-label">and </p>
+  <input name="dateUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateUp}}>
+  <br>
+  <p class="credits-label">Redemed or not: </p>
+  <select name="isRedemed">
+    <option {% if isRedemed == "All" %}selected{% endif %}value="All">All</option>
+    <option {% if isRedemed == "Yes" %}selected{% endif %} value="Yes">Yes</option>
+    <option {% if isRedemed == "No" %}selected{% endif %} value="No">No</option>
+  </select>
+  <br>
+  <p class="credits-label">Credits between</p>
+  <input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
+  <p class="credits-label">and </p>
+  <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
+  <br>
+  <input type="submit"  formaction="?page=0" Value="Search" class="btn btn-default">
 
-<div class="add-logs">
-	<p class="credits-label">{{ num }} vouchers found. </p>
-	<p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
-	<br>
-	<input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">	
-	<input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
-	<br>
-	<p class="credits-label">Go to page </p>
-	<input name="toPage" type="text" >
-	<input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
+  <p class="credits-label">{{ num }} vouchers found. </p>
+  <p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
+  <br>
+  <input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">  
+  <input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
+  <br>
+  <p class="credits-label">Go to page </p>
+  <input name="toPage" type="text" >
+  <input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
 </form>
-</div>
 
-
-	<form action="" method="post">{% csrf_token %}
-<div class="input-group search">
-	</div>
+<form action="" method="post">{% csrf_token %}
 <div class="panel panel-default results">
     <div class="panel-heading">All Vouchers</div>
     <table class="table">
-	    <tr>
-		    <th>Id</th>
-		    <th>Code</th>
-		    <th>Credits</th>
-		    <th>Is Redemed</th>
-		    <th>Generate Date</th>
-		    <th>Selected
-		<input type="checkbox" name="allSelect" id="allSelect"></input>
-		    </th>
+      <tr>
+        <th>Id</th>
+        <th>Code</th>
+        <th>Credits</th>
+        <th>Is Redemed</th>
+        <th>Generate Date</th>
+        <th>Selected
+    <input type="checkbox" name="allSelect" id="allSelect"></input>
+        </th>
     </tr>
     {% for item in query_results %}
     <tr> 
-	    <td>{{ item.id }}</td>
-	    <td>{{ item.code }}</td>
-	    <td>{{ item.credits }}</td>
-	    <td>{% if item.redemptionActivity != null %}Yes{% endif %}{% if item.redemptionActivity == null %}No{% endif %}</td>
-	    <td>{{ item.generateDate }}</td>
-	    <td><input id="checkbox-{{item.id}}"  name="{{ item.code }}" type="checkbox"></td>
+      <td>{{ item.id }}</td>
+      <td>{{ item.code }}</td>
+      <td>{{ item.credits }}</td>
+      <td>{% if item.redemptionActivity != null %}Yes{% endif %}{% if item.redemptionActivity == null %}No{% endif %}</td>
+      <td>{{ item.generateDate }}</td>
+      <td><input id="checkbox-{{item.id}}"  name="{{ item.code }}" type="checkbox"></td>
     </tr>
     {% endfor %}
 </table>
 </div>
-
-<div class="add-logs">
-  <input type="submit" value="Delete Selected Vouchers" class="btn btn-default">
+  <input type="submit" value="Delete Selected Vouchers" class="delete-btn btn btn-default">
   </form>
-</div>
-
 </form>
-<!-- JQuery -->
 
+
+<div class="generator-title"> Generate Vouchers</div>
+
+<form class="generator" action="{% url 'generateCodes' %}" method="post">{% csrf_token %}
+<div id="dynamicInput">
+    <p class="voucher-points">Voucher Points:</p><input type="text" name="myInputs1">
+    <p class="how-many">Quantity of vouchers?:</p><input type="text" name="myInputs1">
+</div>
+<!-- <input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');"> -->
+<input class="btn btn-default submit-btn" type="submit" value="Generate" />
+</form>
+{% endblock tabcontent %}
+
+{% block jsfiles %}
 <script type="text/javascript">
-	$('#allSelect').click(function(event){
-		if(this.checked){
-			$(':checkbox').each(function(){this.checked = true;});
-			}
-		else{
-			$(':checkbox').each(function(){this.checked = false;});
-			}	
-			});
-	</script>
-<!-- Bootstrap -->
-<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
+  $('#allSelect').click(function(event){
+    if(this.checked){
+      $(':checkbox').each(function(){this.checked = true;});
+      }
+    else{
+      $(':checkbox').each(function(){this.checked = false;});
+      } 
+      });
+  </script>
 <script src="{% static 'volunteers/js/codeGenerator.js' %}"></script>
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
 <script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -144,5 +103,4 @@
 			$('#date2').datepicker({format: "yyyy-mm-dd"});
 			});
 	</script>
-</body>
-</html>
+{% endblock jsfiles %}
