@@ -1,10 +1,13 @@
-import sys, os
+import os, sys
 from getpass import getpass
 from random import randint
 from re import match
 from string import ascii_lowercase
 
 configs = dict()
+BASE_PATH = os.path.dirname(__file__)
+CONFIG_FILE_PATH = os.path.join(BASE_PATH, "bnbvolunteer/vcsConfig.txt")
+MANAGE_PY_PATH = os.path.join(BASE_PATH, "manage.py")
 
 class InvalidArgumentException(Exception):
     @classmethod
@@ -63,11 +66,53 @@ def stringToBool(s):
     else:
         raise InvalidArgumentException()
 
+
+"""
+Read existing configuration values and reset fields if needed.
+"""
+def promptUserFirstTime():
+    global configs, CONFIG_FILE_PATH, MANAGE_PY_PATH
+    print
+    print "Welcome to the installer for volunteer credit system. This script will ask you for some information to customize the site."
+    firstTime = True
+    if os.path.exists(CONFIG_FILE_PATH):
+        print
+        print "A configuration file is detected. Is this the first time this script is run?"
+        print "(Selecting yes will generate a new secret key and flush existing database.)"
+        firstTime = stringToBool(raw_input("Enter (Y)es/(N)o: "))
+        if not firstTime:
+            print
+            print "For the rest of the setup, you can keep an old setting by leaving the field blank."
+            try:
+                with open(CONFIG_FILE_PATH) as f:
+                    configRegex = r'(?P<name>[a-zA-Z_]\w*)\s*=\s*(?P<value>.+)\n'
+                    while True:
+                        line = f.readline()
+                        if not line:
+                            break
+                        else:
+                            mo = match(configRegex, line)
+                            if mo:
+                                configs[mo.group("name")] = mo.group("value")
+            except IOError:
+                print "Cannot read configuration file."
+    if firstTime:
+        # generate secret key
+        charList = list(ascii_lowercase + "1234567890_=!@#$%^&*()_+")
+        generateChar = lambda : charList[randint(0,len(charList)-1)]
+        gString = ""
+        for i in xrange(50):
+            gString += generateChar()
+        configs["SECRET_KEY"] = "\"%s\"" % gString
+        # flush database
+        os.system("python %(path)s sqlflush | python %(path)s dbshell" % {"path": MANAGE_PY_PATH})
+
+
 """
 Ask user for configuration values.
 """
-def promptUser():
-    global configs
+def promptUserGeneral():
+    global configs, MANAGE_PY_PATH
     print
     addConfigVariable("ORG_NAME",
                       "Enter organization name: ")
@@ -78,7 +123,8 @@ def promptUser():
                       valueProcessor=lambda x: x[:-1] if x[-1] == '/' else x)
     print
     # setting up connection to email server
-    print "Next we will set up a way to connect with your email server. If you use gmail, choose \"TLS\", \"587\", and \"smtp.gmail.com\" in the next 3 options."
+    print "Setting up connection to an email server..."
+    print "If you use gmail, choose \"TLS\", \"587\", and \"smtp.gmail.com\" in the next 3 options."
     print
     processConfig("Email server encryption (TLS, SSL, None): ",
                   lambda s: configs.update({"EMAIL_USE_TLS": True, "EMAIL_USE_SSL": False}) if s.upper() == "TLS" \
@@ -95,48 +141,31 @@ def promptUser():
     addConfigVariable("EMAIL_HOST_USER",
                       "User (email): ")
     addConfigPasswordVariable("EMAIL_HOST_PASSWORD")
+    print
+    print "Creating a superuser..."
+    print
+    csuExitCode = os.system("python %s createsuperuser" % MANAGE_PY_PATH)
+    if not csuExitCode:
+        print "\nInstallation cancelled.\n"
+        sys.exit()
+
+
+def saveConfigs():
+    global configs, CONFIG_FILE_PATH
+    with open(CONFIG_FILE_PATH, 'w') as f:
+        for name in configs:
+            value = configs[name]
+            f.write('%s = %s\n' % (name, value))
+    print
+    print "Installation complete."
+    print
 
 
 if __name__ == "__main__":
-    configFilePath = os.path.join(os.path.dirname(__file__), 'bnbvolunteer/vcsConfig.txt')
-    # read current config
     try:
-        print "\nWelcome to the installer for volunteer credit system. This script will ask you for some information to customize the site."
-        firstTime = True
-        if os.path.exists(configFilePath):
-            print "\nA configuration file is detected. Is this the first time this script is run? (Selecting yes will generate a new secret key and invalidate existing database.)"
-            firstTime = stringToBool(raw_input("Enter (Y)es/(N)o: "))
-            if not firstTime:
-                print "\nFor the rest of the setup, you can keep the an old setting by leaving the field blank."
-                try:
-                    with open(configFilePath) as f:
-                        configRegex = r'(?P<name>[a-zA-Z_]\w*)\s*=\s*(?P<value>.+)\n'
-                        while True:
-                            line = f.readline()
-                            if not line:
-                                break
-                            else:
-                                mo = match(configRegex, line)
-                                if mo:
-                                    configs[mo.group("name")] = mo.group("value")
-                except IOError:
-                    print "Cannot read configuration file."
-        if firstTime:
-            # generate secret key
-            charList = list(ascii_lowercase + "1234567890_=!@#$%^&*()_+")
-            generateChar = lambda : charList[randint(0,len(charList)-1)]
-            gString = ""
-            for i in xrange(50):
-                gString += generateChar()
-            configs["SECRET_KEY"] = "\"%s\"" % gString
-        # ask user for config values
-        promptUser()
-        # write user-specified config to file
-        with open(configFilePath, 'w') as f:
-            for name in configs:
-                value = configs[name]
-                f.write('%s = %s\n' % (name, value))
-        print "\nInstallation complete.\n"
+        promptUserFirstTime()
+        promptUserGeneral()
+        saveConfigs()
     except InvalidArgumentException:
         print "\nYou provided an invalid argument.\n"
         sys.exit()
