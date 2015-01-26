@@ -79,22 +79,23 @@ Welcome, {{user.first_name}}!
 <option value="value2">Option 2</option>
 </select> -->
 <script type="text/javascript">
-	function check(a)
-	{
-		var des = document.getElementById('des');
+	function check(a){
 	if(document.getElementById('activityType').value=='Other'){
-		des.disabled=false;
+		var newdiv = document.createElement('div');
+		newdiv.id = 'newdiv';
+          	newdiv.innerHTML = "Task Description: " + " <input type='text' name='description'>";
+          	document.getElementById('des').appendChild(newdiv);
 	}
 	else
 	{
-		des.disabled=true;
-		des.value="";
+			var adiv = document.getElementById('des');
+			adiv.innerHTML = "";
 	}
 	}
 </script>
+	<div id='des'>
+	</div>	
 	<br>
-	Task Description:
-	<input type="text" name="description" id="des"  disabled='true'>
 	<br>
 	Voucher code(s):
 	<br>
