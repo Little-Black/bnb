@@ -13,5 +13,23 @@ function addInput(divName){
 }
 function doImmediately() {
     $('#tohide').hide();
+        console.log(invalid_boolean);
+        var invalid_boolean = {{invalid_boolean}};
+        if (invalid_boolean){
+        document.getElementById('invalid').style.display = 'none';
 }
 window.onload = doImmediately;
+
+
+    $(document).ready(function() {  
+        var invalid_boolean = "{{invalid_boolean}}";
+        if (invalid_boolean === "False"){
+        $("#invalid").hide();
+    } 
+
+
+});
+
+  $(function() {
+    $( "#datepicker" ).datepicker();
+  });
