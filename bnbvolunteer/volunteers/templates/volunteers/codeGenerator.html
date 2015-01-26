@@ -4,23 +4,11 @@
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
-  <!-- <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" /> -->
-  <!-- <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" /> -->
 {% endblock specificCss %}
 
 {% block tabcontent %}
-<form action="{% url 'generateCodes' %}" method="post">{% csrf_token %}
+<div class="find-title">Find Vouchers</div>
 
-<div id="dynamicInput">
-    <p class="voucher-points">Voucher Points:</p><input type="text" name="myInputs1">
-    <p class="how-many">How many?:</p><input type="text" name="myInputs1">
-</div>
-<input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');">
-
-<input class="btn btn-default submit-btn" type="submit" value="Submit" />
-</form>
-
-<div class="add-logs">
 <form method="post" action="">{% csrf_token %}
   <p class="add-label">Filters: </p>
   <p class="credits-label">Generated between </p>
@@ -41,9 +29,7 @@
   <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
   <br>
   <input type="submit"  formaction="?page=0" Value="Search" class="btn btn-default">
-</div>
 
-<div class="add-logs">
   <p class="credits-label">{{ num }} vouchers found. </p>
   <p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
   <br>
@@ -54,14 +40,8 @@
   <input name="toPage" type="text" >
   <input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
 </form>
-</div>
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
-<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
 
-
-  <form action="" method="post">{% csrf_token %}
-<div class="input-group search">
-  </div>
+<form action="" method="post">{% csrf_token %}
 <div class="panel panel-default results">
     <div class="panel-heading">All Vouchers</div>
     <table class="table">
@@ -87,12 +67,20 @@
     {% endfor %}
 </table>
 </div>
-
-<div class="add-logs">
-  <input type="submit" value="Delete Selected Vouchers" class="btn btn-default">
+  <input type="submit" value="Delete Selected Vouchers" class="delete-btn btn btn-default">
   </form>
-</div>
+</form>
 
+
+<div class="generator-title"> Generate Vouchers</div>
+
+<form class="generator" action="{% url 'generateCodes' %}" method="post">{% csrf_token %}
+<div id="dynamicInput">
+    <p class="voucher-points">Voucher Points:</p><input type="text" name="myInputs1">
+    <p class="how-many">Quantity of vouchers?:</p><input type="text" name="myInputs1">
+</div>
+<!-- <input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');"> -->
+<input class="btn btn-default submit-btn" type="submit" value="Generate" />
 </form>
 {% endblock tabcontent %}
 
@@ -108,4 +96,11 @@
       });
   </script>
 <script src="{% static 'volunteers/js/codeGenerator.js' %}"></script>
+<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+			$('#date1').datepicker({format: "yyyy-mm-dd"});
+			$('#date2').datepicker({format: "yyyy-mm-dd"});
+			});
+	</script>
 {% endblock jsfiles %}

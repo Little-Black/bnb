@@ -83,13 +83,21 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Custom fields
+# Custom constants that apply to all sites
 
-SITE_URL = 'http://frozen-beyond-2591.herokuapp.com'
 LOGIN_URL = '/login/'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'bnbvolunteers.testing@gmail.com'
-EMAIL_HOST_PASSWORD = 'codeforgood2015'
-EMAIL_PORT = 587
+# Site-specific constants
+# vcsConfig.txt should be created and modified by setup.py
+
+import sys
+
+try:
+    with open(os.path.join(BASE_DIR, 'bnbvolunteer/vcsConfig.txt')) as f:
+        line = f.readline()
+        while line:
+            exec(line)
+            line = f.readline()
+except IOError:
+    print "Cannot find or open configuration file vcsConfig.txt, please run setup.py first"
+    sys.exit()

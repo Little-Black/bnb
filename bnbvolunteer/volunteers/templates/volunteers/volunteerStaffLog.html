@@ -30,13 +30,27 @@
   <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
   <br>
   <input type="submit" Value="Search" class="btn btn-default">
+</div>
+
+<div class="add-logs">
+	<p class="credits-label">{{ num }} activities found. </p>
+	<p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
+	<br>
+	<input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">	
+	<input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
+	<br>
+	<p class="credits-label">Go to page </p>
+	<input name="toPage" type="text" >
+	<input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
 </form>
 </div>
 
+	<form action="" method="post">{% csrf_token %}
 <div class="panel panel-default results">
     <div class="panel-heading">Timesheet</div>
 <table class="table">
-    <tr>
+	<tr>
+	<th>Id</th>
         <th>User</th>
         <th>DateDone</th>
         <th>DateEntered</th>
@@ -44,9 +58,13 @@
         <th>Description</th>
   <th>Credits</th>
   <th>Staff</th>
+		    <th>Selected
+		<input type="checkbox" name="allSelect" id="allSelect"></input>
+		    </th>
     </tr>
     {% for item in Logs %}
     <tr> 
+	    <td>{{ item.id }}</td>    
       <td><a href="../user/?getuser={{item.user}}">{{ item.user }}</a></td>
         <td>{{ item.dateDone }}</td>
         <td>{{ item.dateEntered }}</td>
@@ -54,9 +72,14 @@
         <td>{{ item.description }}</td>
   <td>{{ item.credits }}</td>
   <td>{{ item.staff }}</td>
+	    <td><input id="checkbox-{{item.id}}"  name="{{ item.id }}" type="checkbox"></td>
     </tr>
     {% endfor %}
 </table>
+</div>
+<div class="add-logs">
+  <input type="submit" value="Delete Selected Logs" class="btn btn-default">
+  </form>
 </div>
 {% endblock tabcontent %}
 
@@ -69,4 +92,14 @@
       $('#date2').datepicker({format: "yyyy-mm-dd"});
       });
   </script>
+<script type="text/javascript">
+	$('#allSelect').click(function(event){
+		if(this.checked){
+			$(':checkbox').each(function(){this.checked = true;});
+			}
+		else{
+			$(':checkbox').each(function(){this.checked = false;});
+			}	
+			});
+	</script>
 {% endblock jsfiles %}

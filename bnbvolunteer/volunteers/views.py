@@ -88,10 +88,8 @@ def volunteerSubmit(request):
     return render(request,'volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
-    query_results = Activity.objects.filter(user=user)
-    total_credits = 0
-    for log in query_results:
-        total_credits += log.credits
+    query_results = user.activity_set.all()
+    total_credits = user.profile.totalCredit()
     type_choices = ActivityType.objects.values_list('name', flat=True)
     # jq = ActivityType.objects.exclude(id__in=activities)
     # type_choices = jq.values_list('name', flat=True)
@@ -122,7 +120,14 @@ def volunteerStaffHome(request):
 def volunteerStaffLog(request):
     type_choices = ActivityType.objects.all()
     Logs = Activity.objects.all().order_by('-dateEntered')
-    if request.method == "POST":
+    if request.method == "POST" and not 'activityType' in request.POST.keys():
+        for idNum in request.POST.keys(): 
+            try:
+                Activity.objects.get(id=int(idNum)).delete()
+            except:
+                idNum = idNum
+        Logs = Activity.objects.all().order_by('-dateEntered')
+    if request.method == "POST" and 'activityType' in request.POST.keys():
         try:
             Logs = Logs.exclude(dateDone__gt = request.POST['dateDoneUp'])
         except:
@@ -185,12 +190,13 @@ def volunteerStaffActivity(request):
 @login_required
 def volunteerStaffUserSearchResult(request):
     inform = ""
+    type_choices = ActivityType.objects.all()
     if request.method == "GET":
         search_results = User.objects.all() 
     else:
         if 'lastname' in request.POST.keys():
             if request.POST['lastname'] != "":    
-                search_results = User.objects.filter(last_name=request.POST['lastname'])
+                search_results = User.objects.filter(last_name__icontains=request.POST['lastname'])
             else:
                 search_results = User.objects.all()
             try:
@@ -213,42 +219,59 @@ def volunteerStaffUserSearchResult(request):
                     search_results = search_results.filter(email = request.POST['email'])
             except:
                     search_results = search_results
-            context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
+            try:
+                context = {'search_results': search_results, 'creditsDown': request.POST['creditsDown'], 'creditsUp': request.POST['creditsUp'], 'phone': phone, 'email': request.POST['email']}
+                context['type_choices'] = type_choices
+            except:
+                context = {'search_results': search_results}
             return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
         else:
             search_results = User.objects.all()
             try:  
                 s = 1 + int(request.POST['credits'])
+                activityType = ActivityType.objects.get(name = request.POST['activityType'])
                 for user in search_results:
                     if user.username in request.POST.keys():
                         if request.POST[user.username]:
-                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
-                            if int(request.POST['credits']) + user.profile.credit >= 0:
+                            addLog = Activity(user=user,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
+                            if int(request.POST['credits']) + user.profile.totalCredit() >= 0:
                                 addLog.save();
-                                user.profile.credit += int(request.POST['credits'])
-                                user.profile.save()
                             else:
                                 inform += user.username + ', '
             except:
-                inform = "Please type an integer in credits."
+                inform = "Invalid credits or Done Date."
                 context = {'search_results': search_results,  'inform': inform}
+                context['type_choices'] = type_choices
                 return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
     if not inform == "":
         inform = "No enough credits for " + inform[:-2] +"!" 
     context = {'search_results': search_results,  'inform': inform}
+    context['type_choices'] = type_choices
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
+# Sam: There is external links pointing to this page, obsolete? Also, I need more documentation to correct the code.
+# TLDR: This code does not run before refactoring, and it won't run until we have fixed it
 @login_required
 def volunteerStaffUser(request):
     inform = ""
+    type_choices = ActivityType.objects.all()
     userSearch_result = User.objects.get(username=request.GET['getuser'])
     search_results = Activity.objects.filter(user=userSearch_result)
+    if request.method == "POST" and not 'activityType' in request.POST.keys():
+        for idNum in request.POST.keys(): 
+            try:
+                activity = Activity.objects.get(id=int(idNum))
+                activity.delete()
+            except:
+                idNum = idNum
+        search_results = Activity.objects.filter(user=userSearch_result)
     creditSum = 0
     for result in search_results:
         creditSum += result.credits
-    if request.method == "POST":
+    if request.method == "POST" and 'activityType' in request.POST.keys():
+        activityType = ActivityType.objects.get(name = request.POST['activityType'])
         try:
-            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user)
+            addLog = Activity(user=userSearch_result,  description=request.POST['description'], credits=request.POST['credits'], staff=request.user, dateDone = request.POST['dateDone'], activityType = activityType)
             if creditSum + int(addLog.credits) < 0:
                 inform = "Do not have enough credits"
             else:
@@ -256,10 +279,11 @@ def volunteerStaffUser(request):
                 search_results = Activity.objects.filter(user=userSearch_result)
                 creditSum += int(addLog.credits)
         except:
-            inform = "Please type an integer in credits."
+            inform = "Invalid credits or Date Done."
     userSearch_result.profile.credit = creditSum
     userSearch_result.profile.save()
     context = {'search_results': search_results, 'getuser':userSearch_result, 'inform': inform}
+    context['type_choices'] = type_choices
     return render(request, 'volunteers/volunteerStaffUser.html', context)
 
 def userLogin(request):
@@ -326,15 +350,15 @@ def editProfile(request):
 def verify(request, code):
     cacheKey = (request.META["REMOTE_ADDR"], "verify")
     if cache.get(cacheKey, 0) >= 5:
-        return HttpResponse("You have entered too many invalid codes. Try again later.")
+        message = "You are temporarily blocked from this page because you have entered too many invalid codes."
     else:
         try:
             verificationRequests = VerificationRequest.objects.get(code=code)
             message = verificationRequests.verify()
-            return HttpResponse(message)
         except VerificationRequest.DoesNotExist:
             cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
-            return HttpResponse("Invalid code.")
+            message = "Invalid code."
+    return render(request, "volunteers/verify.html", {"message": message})
 
 @login_required
 def deleteAccount(request):
@@ -528,7 +552,7 @@ def exportCodes(request):
 def redirect_to_https(viewFunction):
     def _redirect_to_https(request, *args, **kwargs):
         if not request.is_secure():
-            if not getattr(settings, "HTTPS_REDIRECT", True):
+            if getattr(settings, "HTTPS_REDIRECT", False):
                 redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
                 return HttpResponseRedirect(redirect)
         return viewFunction(request, *args, **kwargs)
