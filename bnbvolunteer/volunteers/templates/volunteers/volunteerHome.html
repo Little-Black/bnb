@@ -9,19 +9,19 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-  <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
 
   <script type="text/javascript">
     window.onload = function(){
         // var invalid = {{invalid_vouchers}};
-        
-        var invalid_boolean = {{invalid_boolean}};
-        console.log(invalid_boolean);
+	    console.log(invalid_boolean);
+	    var invalid_boolean = true;
+        invalid_boolean = {{invalid_boolean}};
         if (invalid_boolean){
         document.getElementById('invalid').style.display = 'none';
     }
     };
 </script>
+
 
 </head>
 <body>
@@ -52,7 +52,7 @@ Welcome, {{user.first_name}}!
 <p> Sorry, the following vouchers are invalid:</p>
 <p> {{invalid_vouchers}} </p>
 </span>
-
+{{message}}
 <div "add-entry-and-edit-profile-btns">
 	<button class="add-entry-btn btn btn-default" onclick="$('#tohide').toggle();">
 		<span class="glyphicon glyphicon-plus"></span>
@@ -68,14 +68,15 @@ Welcome, {{user.first_name}}!
 
 	<form name = "newLogForm" onsubmit="return validateForm()" action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
 
-	Date:
-	<input type="text" name="date" id="datepicker">
+	Date of Volunteering:
+	<input type="text" value={{ today }} class="DateInput" name="date" id="datepicker" format="y-m-d">
 	<br>
 	Activity Type:
 	<!-- <input type="text" name="activityType"> -->
 
 
-	<select name="activityType" id="activityType">
+
+    <select name="activityType" id="activityType" onchange="check(this)">
     <option selected disabled hidden value=''></option>
     <option value="Other">Other</option> 
 	  {% for type in type_choices %}
@@ -86,11 +87,23 @@ Welcome, {{user.first_name}}!
 <option value="value1">Option 1</option>
 <option value="value2">Option 2</option>
 </select> -->
-
-
+<script type="text/javascript">
+	function check(a)
+	{
+		var des = document.getElementById('des');
+	if(document.getElementById('activityType').value=='Other'){
+		des.disabled=false;
+	}
+	else
+	{
+		des.disabled=true;
+		des.value="";
+	}
+	}
+</script>
 	<br>
 	Task Description:
-	<input type="text" name="description">
+	<input type="text" name="description" id="des"  disabled='true'>
 	<br>
 	Voucher code(s):
 	<br>
@@ -115,7 +128,6 @@ Welcome, {{user.first_name}}!
 	<div class="panel-heading">Timesheet Entries</div>
 	<table class="table">
 	    <tr>
-	        <th>User</th>
 	        <th>Date Done</th>
 	        <th>Activity Type</th>
 	        <th>Description</th>
@@ -123,7 +135,6 @@ Welcome, {{user.first_name}}!
 	    </tr>
 	    {% for item in query_results %}
 	    <tr> 
-	        <td>{{ item.user }}</td>
 	        <td>{{ item.dateDone }}</td>
 	        <td>{{ item.activityType}}</td>
 	        <td>{{ item.description }}</td>
