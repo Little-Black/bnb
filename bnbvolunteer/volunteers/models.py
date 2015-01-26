@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from datetime import date
 from random import random
+from bnbvolunteer.settings import SITE_URL
 from threading import Timer
 
 #Userlog is now Activity!!! Userlog just here for reference.
@@ -37,7 +38,7 @@ class Voucher(models.Model):
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User)
-    code = models.CharField(max_length=20)
+    code = models.CharField(max_length=20, unique=True)
     actionType = models.CharField(max_length=100)
     isValid = models.BooleanField(default=True)
     creationTime = models.DateTimeField(auto_now_add=True)
@@ -63,6 +64,9 @@ class VerificationRequest(models.Model):
             message = "Invalid action type."
         self._selfDestruct()
         return message
+    
+    def getURL(self):
+        return SITE_URL + "/verify/" + self.code
     
     def _selfDestruct(self, hasExpired=False):
         if self.isValid:

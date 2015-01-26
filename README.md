@@ -4,7 +4,9 @@ Volunteer credit system is a Django application that allow non-profits to effici
 
 # Usage
 For development server:
+
 1. run setup.py
+
 2. type in "python manage.py runserver" in command line
 
 To change the info provided in setup.py, run the script again and restart the server.

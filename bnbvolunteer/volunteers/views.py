@@ -358,7 +358,7 @@ def verify(request, code):
         except VerificationRequest.DoesNotExist:
             cache.set(cacheKey, cache.get(cacheKey, 0)+1, 300)
             message = "Invalid code."
-    return render(request, "volunteers/verify.html", {"message": message})
+    return render(request, "volunteers/verify.html", {"message": message, "redirect_time": 3})
 
 @login_required
 def deleteAccount(request):

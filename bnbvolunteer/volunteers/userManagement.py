@@ -98,8 +98,8 @@ class RegistrationForm(forms.Form):
                 user.is_active = False
                 user.save()
                 user.profile.save()
-                VerificationRequest.createVerificationRequest(user, actionType="register")
-                sendRegVerificationEmail(user)
+                vr = VerificationRequest.createVerificationRequest(user, actionType="register")
+                sendRegVerificationEmail(user, vr)
                 messages.success(request, "Registration successful. You should receive a verification mail in the inbox.")
         else:
             registrationSuccessful = False
@@ -129,8 +129,8 @@ class EditProfileForm(forms.Form):
                     messages.info(request, "A confirmation mail is sent to your new email address.")
                     request.user.profile.newEmail = self.cleaned_data["email"]
                     request.user.profile.save()
-                    VerificationRequest.createVerificationRequest(request.user, actionType="updateEmail")
-                    sendEmailUpdateEmail(request.user)
+                    vr = VerificationRequest.createVerificationRequest(request.user, actionType="updateEmail")
+                    sendEmailUpdateEmail(request.user, vr)
             for attr in {"first_name", "last_name", "address", "phone"}:
                 request.user.profile.set(attr, self.cleaned_data[attr])
             request.user.save()
@@ -205,8 +205,8 @@ class RequestPasswordResetForm(forms.Form):
         if self.is_valid():
             try:
                 user = User.objects.get(email=self.cleaned_data["email"], username=self.cleaned_data["username"])
-                VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
-                sendResetPasswordEmail(user)
+                vr = VerificationRequest.createVerificationRequest(user, actionType="resetPassword", data=RequestPasswordResetForm._generatePassword())
+                sendResetPasswordEmail(user, vr)
                 messages.success(request, "A confirmation email is sent to your inbox.")
             except User.DoesNotExist:
                 messages.error(request, "Cannot find an user with given email and username.")
@@ -216,5 +216,5 @@ class RequestPasswordResetForm(forms.Form):
 
 def deleteAccount(request):
     messages.info(request, "A confirmation email is sent to your account.")
-    VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
-    sendDeleteAccEmail(request.user)
+    vr = VerificationRequest.createVerificationRequest(request.user, actionType="deleteAcc")
+    sendDeleteAccEmail(request.user, vr)
