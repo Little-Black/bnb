@@ -9,12 +9,34 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-  <link rel="stylesheet" href="/resources/demos/style.css">
+  <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
 
-
+  <script type="text/javascript">
+    window.onload = function(){
+        // var invalid = {{invalid_vouchers}};
+        
+        var invalid_boolean = {{invalid_boolean}};
+        console.log(invalid_boolean);
+        if (invalid_boolean){
+        document.getElementById('invalid').style.display = 'none';
+    }
+    };
+</script>
 
 </head>
 <body>
+
+    <script>
+    $(document).ready(function() {  
+        var invalid_boolean = "{{invalid_boolean}}";
+        if (invalid_boolean === "False"){
+        $("#invalid").hide();
+    } 
+
+
+});
+
+    </script>
 
 <h1 style="margin-left:10px;">
 Welcome, {{user.first_name}}!
@@ -44,7 +66,7 @@ Welcome, {{user.first_name}}!
 	<div id="tohide" style="margin-left:30px;margin-top:10px">
 
 
-	<form action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
+	<form name = "newLogForm" onsubmit="return validateForm()" action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
 
 	Date:
 	<input type="text" name="date" id="datepicker">
@@ -54,8 +76,10 @@ Welcome, {{user.first_name}}!
 
 
 	<select name="activityType" id="activityType">
+    <option selected disabled hidden value=''></option>
+    <option value="Other">Other</option> 
 	  {% for type in type_choices %}
-	  <option value="{{type}}">{{type}}</option>
+	  <option value="{{type}}">{{type}}</option> 
 	  {% endfor %}
 	</select>
 <!-- 	<select name="dropdown" id="dropdown">

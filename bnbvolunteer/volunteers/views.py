@@ -20,6 +20,7 @@ import csv
 
 @login_required
 def volunteerHome(request):
+    print "Homepage no submit"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
         context = getVolunteerPageContext(request,user)
@@ -30,6 +31,7 @@ def volunteerHome(request):
 
 @login_required
 def volunteerSubmit(request):
+    print "GOT SUBMISSION!!"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
     except:
@@ -79,13 +81,13 @@ def volunteerSubmit(request):
     for voucher in vouchers_used:
         voucher.redemptionActivity = activity
         voucher.save()
-
     context = getVolunteerPageContext(request,user)
     # return HttpResponse("Hi there!")
     context['invalid_vouchers']=mark_safe(invalid)
     context['invalid_boolean']=invalid_boolean
     print invalid_boolean
     return render(request,'volunteers/volunteerHome.html',context)
+    # return HttpResponseRedirect('/volunteer/home/','volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
     query_results = user.activity_set.all()
@@ -95,7 +97,7 @@ def getVolunteerPageContext(request,user):
     # type_choices = jq.values_list('name', flat=True)
     if len(type_choices) == 0:
         type_choices = ["Edit me out later","Views.py somewhere"]
-    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
+    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices, 'invalid_boolean':False}
     return context
 
 @staff_only
