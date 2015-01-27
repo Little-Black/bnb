@@ -42,7 +42,7 @@
 </form>
 
 <form action="" method="post">{% csrf_token %}
-<div class="panel panel-default results">
+<div class="panel panel-default vouchers-panel">
     <div class="panel-heading">All Vouchers</div>
     <table class="table">
       <tr>
@@ -67,7 +67,7 @@
     {% endfor %}
 </table>
 </div>
-  <input type="submit" value="Delete Selected Vouchers" class="delete-btn btn btn-default">
+  <input type="submit" value="Delete Selected Vouchers" class="delete-btn btn btn-danger">
   </form>
 </form>
 
@@ -80,7 +80,7 @@
     <p class="how-many">Quantity of vouchers?:</p><input type="text" name="myInputs1">
 </div>
 <!-- <input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');"> -->
-<input class="btn btn-default submit-btn" type="submit" value="Generate" />
+<input class="btn btn-primary submit-btn" type="submit" value="Generate" />
 </form>
 {% endblock tabcontent %}
 
