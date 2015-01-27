@@ -18,6 +18,9 @@ from datetime import datetime
 
 import csv
 
+def siteInfoContextProcessor(request):
+    return {"org_name": settings.ORG_NAME, "org_name_short": settings.ORG_NAME_SHORT, "subheader": settings.SUBHEADER}
+
 @login_required
 def volunteerHome(request):
     try:

@@ -24,14 +24,17 @@ def processConfig(message, processFunc):
 """
 Add a configuration value.
 """
-def addConfigVariable(name, message=None, inQuotes=True, valueProcessor=lambda x:x):
+def addConfigVariable(name, message=None, inQuotes=True, valueProcessor=lambda x:x, default=None):
     global configs
     if not message:
         message = "Enter "+name+": "
     value = raw_input(message)
     if not value:
         if name not in configs:
-            raise InvalidArgumentException()
+            if default != None:
+                configs[name] = default
+            else:
+                raise InvalidArgumentException()
     else:
         quotingProcessor = lambda x: '\"%s\"' % x if inQuotes else x
         try:
@@ -81,6 +84,7 @@ def promptUserFirstTime():
         print "(Selecting yes will generate a new secret key and flush existing database.)"
         firstTime = stringToBool(raw_input("Enter (Y)es/(N)o: "))
         if not firstTime:
+            # read old config file and load constants
             print
             print "For the rest of the setup, you can keep an old setting by leaving the field blank."
             try:
@@ -105,7 +109,22 @@ def promptUserFirstTime():
             gString += generateChar()
         configs["SECRET_KEY"] = "\"%s\"" % gString
         # flush database
+        print
+        print "Flushing database..."
         os.system("python %(path)s sqlflush | python %(path)s dbshell" % {"path": MANAGE_PY_PATH})
+    # create superuser (optional if not running setup for first time)
+    if firstTime:
+        createSuperuser = True
+    else:
+        print
+        print "Do you want to create a superuser?"
+        createSuperuser = stringToBool(raw_input("Enter (Y)es/(N)o: "))
+    if createSuperuser:
+        print
+        csuExitCode = os.system("python %s createsuperuser" % MANAGE_PY_PATH)
+        if not csuExitCode:
+            print "\nInstallation cancelled.\n"
+            sys.exit()
 
 
 """
@@ -118,6 +137,9 @@ def promptUserGeneral():
                       "Enter organization name: ")
     addConfigVariable("ORG_NAME_SHORT",
                       "Enter organization acronym: ")
+    addConfigVariable("SUBHEADER",
+                      "Enter website subheader (optional): ",
+                      default="\"\"")
     addConfigVariable("SITE_URL",
                       "Enter URL where this app will be hosted: ",
                       valueProcessor=lambda x: x[:-1] if x[-1] == '/' else x)
@@ -141,13 +163,6 @@ def promptUserGeneral():
     addConfigVariable("EMAIL_HOST_USER",
                       "User (email): ")
     addConfigPasswordVariable("EMAIL_HOST_PASSWORD")
-    print
-    print "Creating a superuser..."
-    print
-    csuExitCode = os.system("python %s createsuperuser" % MANAGE_PY_PATH)
-    if not csuExitCode:
-        print "\nInstallation cancelled.\n"
-        sys.exit()
 
 
 def saveConfigs():
