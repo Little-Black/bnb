@@ -2,8 +2,8 @@
 	display: inline;
 	margin: 20px 5px 0 20px;
 }
-.create-more-btn, .submit-btn{
-	margin: 20px 10px 5px; 20px;
+.create-more-btn, .generate-btn, .search-btn{
+	margin: 20px 10px 5px 20px;
 }
 .nav{
 	margin-bottom: 20px;
@@ -14,17 +14,68 @@
 	border-bottom: 1px solid black;
 	text-align: center;
 	width: 50%;
-	margin: 20px auto 20px auto;
+	margin: 50px auto 20px auto;
 }
 .generator{
 	margin: auto;
 	text-align: center;
 }
 .delete-btn{
-	/*background-color: red;
-	color: white;*/
+	margin: 20px 100px 20px 20px;
+	float: right;
 }
 .vouchers-panel{
-	width: 70%;
+	width: 90%;
+	margin: 120px auto auto auto;
+}
+.credits-label, .redeemed, .generated-btn, .generated-btn1, .and,.generated-btn2 ,.credits-btn1, .credits-btn2{
+	display: inline-block;
+}
+.submit-btn{
 	margin: auto;
+	display: block;
+}
+.filters{
+	background-color: lightgray;
+	border: 1px solid black;
+	border-radius: 20px;
+	text-align: center;
+	margin:  auto auto 60px auto;
+	display: block;
+	padding: 20px;
+	width: 50%;
+}
+.dropdown{
+	position: relative;
+	margin-bottom: 60px;
+	overflow: visible;
+}
+.next-page{
+	float: right;
+}
+.last-page{
+	float: left;
+}
+.next-page, .last-page{
+	margin: 0 20px 0 20px;
+}
+.gotopage{
+	text-align: center;
+	display: inline-block;
+}
+.goto-label{
+	display: inline;
+}
+.toPage{
+	width: 50px;
+}
+.wrap {
+    float: left;
+    position: relative;
+    left: 50%;
+}
+.content {
+    float: left;
+    position: relative;
+    left: calc(-50% - 140px);
 }

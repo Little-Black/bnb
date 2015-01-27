@@ -1,4 +1,4 @@
-{% extends "volunteers/staff_templates/base_staff_generateVoucher.html" %}
+ {% extends "volunteers/staff_templates/base_staff_generateVoucher.html" %}
 {% load staticfiles %}
 
 {% block specificCss %}
@@ -10,35 +10,49 @@
 <div class="find-title">Find Vouchers</div>
 
 <form method="post" action="">{% csrf_token %}
-  <p class="add-label">Filters: </p>
-  <p class="credits-label">Generated between </p>
-        <input name="dateDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDown}}>
-  <p class="credits-label">and </p>
-  <input name="dateUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateUp}}>
-  <br>
-  <p class="credits-label">Redemed or not: </p>
-  <select name="isRedemed">
-    <option {% if isRedemed == "All" %}selected{% endif %}value="All">All</option>
-    <option {% if isRedemed == "Yes" %}selected{% endif %} value="Yes">Yes</option>
-    <option {% if isRedemed == "No" %}selected{% endif %} value="No">No</option>
-  </select>
-  <br>
-  <p class="credits-label">Credits between</p>
-  <input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
-  <p class="credits-label">and </p>
-  <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
-  <br>
-  <input type="submit"  formaction="?page=0" Value="Search" class="btn btn-default">
 
-  <p class="credits-label">{{ num }} vouchers found. </p>
-  <p class="credits-label">This is page {{ pageNum }} of {{ allPage }}. </p> 
-  <br>
-  <input type="submit"  formaction="?page={{ lastPage }}" Value="Last Page" class="btn btn-default">  
-  <input type="submit"  formaction="?page={{ nextPage }}" Value="Next Page" class="btn btn-default">
-  <br>
-  <p class="credits-label">Go to page </p>
-  <input name="toPage" type="text" >
-  <input type="submit"  formaction="?page=?" Value="Go" class="btn btn-default">
+<div class="filters">
+  <div class="filter1">
+    <p class="generated-btn">Generated between </p>
+      <input name="dateDown" class="generated-btn1 DateInput" id="date2" type="text" format="y-m-d" value={{dateDown}}>
+    <p class="and">and </p>
+      <input name="dateUp" class="generated-btn2 DateInput" id="date1" type="text" format="y-m-d" value={{dateUp}}>
+  </div>
+
+   <div class="filter2">
+  <p class="credits-label">Credits between</p>
+    <input name="creditsDown" class="credits-btn1 DateInput" type="number" value={{creditsDown}}>
+    <p class="and">and </p>
+    <input name="creditsUp" class="credits-btn2 DateInput" type="number" value={{creditsUp}}>
+  </div>
+
+  <div class="filter3">
+    <p class="redeemed">Redemed or not: </p>
+    <select class="btn btn-default dropdown-toggle" name="isRedemed">
+      <option {% if isRedemed == "All" %}selected{% endif %}value="All">All</option>
+      <option {% if isRedemed == "Yes" %}selected{% endif %} value="Yes">Yes</option>
+      <option {% if isRedemed == "No" %}selected{% endif %} value="No">No</option>
+    </select>
+  </div>
+
+  <input type="submit"  formaction="?page=0" Value="Search" class="search-btn btn btn-default">
+
+</div>  
+
+<div class="page-btns">
+  <input type="submit" formaction="?page={{ lastPage }}" Value="Last Page" class="last-page btn btn-default"> 
+  
+  <input type="submit" formaction="?page={{ nextPage }}" Value="Next Page" class="next-page btn btn-default">
+</div>
+
+  <div class="gotopage wrap">
+    <div class="content">
+      <p class="goto-label">{{ num }} vouchers found. This is page {{ pageNum }} of {{ allPage }}. Go to page </p>
+      <input name="toPage" class="toPage" type="text" >
+    <input type="submit"  formaction="?page=?" Value="Go" class="goto-btn btn btn-default">
+      </div>
+  </div>
+
 </form>
 
 <form action="" method="post">{% csrf_token %}
@@ -80,7 +94,7 @@
     <p class="how-many">Quantity of vouchers?:</p><input type="text" name="myInputs1">
 </div>
 <!-- <input type="button" class="btn btn-default create-more-btn" value="Create another type of voucher" onClick="addInput('dynamicInput');"> -->
-<input class="btn btn-primary submit-btn" type="submit" value="Generate" />
+<input class="btn btn-primary generate-btn" type="submit" value="Generate" />
 </form>
 {% endblock tabcontent %}
 
