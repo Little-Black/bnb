@@ -11,8 +11,10 @@
 <a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
 <br>
 
-<h1 class="bnb-header">Bikes Not Bombs</h1>
-<h4 class="subheader">Using the bicycle as a vehicle for social change</h4>
+<h1 class="bnb-header"> {{ org_name }} </h1>
+{% if subheader %}
+    <h4 class="subheader"> {{ subheader }} </h4>
+{% endif %}
 
 <ul class="nav nav-tabs">
   <li role="presentation" class="active">

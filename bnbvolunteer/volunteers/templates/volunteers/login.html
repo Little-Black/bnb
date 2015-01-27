@@ -7,7 +7,7 @@
 
 {% block tabcontent %}
 <div class="centered">
-  <h2 class="title"> BNB Volunteer Credit System </h2>
+  <h2 class="title"> {{ org_name_short }} Volunteer Credit System </h2>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -31,7 +31,7 @@
         <input class="login-btn btn-default btn" type="submit" value="Login">
     </form>
 
-    <a href="{% url "forgetPassword" %}"> Forgot password </a> <br>
+    <a href="{% url "forgetPassword" %}"> Forget password </a> <br>
     <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
 </div>
 {% endblock tabcontent %}

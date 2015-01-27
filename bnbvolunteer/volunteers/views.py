@@ -18,8 +18,12 @@ from datetime import datetime
 
 import csv
 
+def siteInfoContextProcessor(request):
+    return {"org_name": settings.ORG_NAME, "org_name_short": settings.ORG_NAME_SHORT, "subheader": settings.SUBHEADER}
+
 @login_required
 def volunteerHome(request):
+    print "Homepage no submit"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
         context = getVolunteerPageContext(request,user)
@@ -30,11 +34,17 @@ def volunteerHome(request):
 
 @login_required
 def volunteerSubmit(request):
+    print "GOT SUBMISSION!!"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
     except:
         print "ERROR UGHHH"
-    date = request.POST['date']
+    dateDone = request.POST['date']
+    print dateDone
+    if date.today() < datetime.strptime(dateDone, "%m/%d/%Y").date():
+        context = getVolunteerPageContext(request,user)
+        context['message']='Date late than today!'
+        return render(request,'volunteers/volunteerHome.html',context)
     print request.POST['activityType']
     try:
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
@@ -45,7 +55,10 @@ def volunteerSubmit(request):
         activityType2.save()
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
     # activityType.save()
-    description = request.POST['description']
+    if 'description' in request.POST.keys():
+        description = request.POST['description']
+    else:
+        description = ""
     earned = request.POST.getlist('myInputs')
     print earned
     totalearned = 0
@@ -58,18 +71,18 @@ def volunteerSubmit(request):
     for voucher_code in earned: #input
         voucher_set = valid_vouchers.filter(code = voucher_code.encode('utf8'))
         print voucher_code.encode('utf8')
-        if len(voucher_set)==1:
+        if len(voucher_set)==1 and not voucher_set[0] in vouchers_used:
             # print voucher
             voucher = voucher_set[0]
             totalearned+=voucher.credits
             vouchers_used.append(voucher)
             print "VALID!"
-        elif len(voucher_set)==0:
+        elif len(voucher_set)==0 or voucher_set[0] in vouchers_used:
             invalid.append((voucher_code.encode('utf8')))
             invalid_boolean = "True"
         else: 
             return HttpResponse("Error: Multiple vouchers exist for that code")
-    storedate = date[6:10]+'-'+date[0:2]+'-'+date[3:5] #reformat the date :/
+    storedate = dateDone[6:10]+'-'+dateDone[0:2]+'-'+dateDone[3:5] #reformat the date :/
     activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
     # try: 
     if len(invalid) == 0:
@@ -79,13 +92,13 @@ def volunteerSubmit(request):
     for voucher in vouchers_used:
         voucher.redemptionActivity = activity
         voucher.save()
-
     context = getVolunteerPageContext(request,user)
     # return HttpResponse("Hi there!")
     context['invalid_vouchers']=mark_safe(invalid)
     context['invalid_boolean']=invalid_boolean
     print invalid_boolean
     return render(request,'volunteers/volunteerHome.html',context)
+    # return HttpResponseRedirect('/volunteer/home/','volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
     query_results = user.activity_set.all()
@@ -95,7 +108,8 @@ def getVolunteerPageContext(request,user):
     # type_choices = jq.values_list('name', flat=True)
     if len(type_choices) == 0:
         type_choices = ["Edit me out later","Views.py somewhere"]
-    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices}
+    context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices, 'invalid_boolean':False}
+    context['today'] = date.today().strftime('%m/%d/%Y')
     return context
 
 @staff_only

@@ -1,6 +1,7 @@
 ORG_NAME = "Bikes Not Bombs"
-ORG_NAME_SHORT = "BNB"
 EMAIL_HOST_PASSWORD = "codeforgood2015"
+SUBHEADER = "Using the bicycle as a vehicle for social change"
+ORG_NAME_SHORT = "BNB"
 SITE_URL = "http://frozen-beyond-2591.herokuapp.com"
 EMAIL_HOST_USER = "bnbvolunteers.testing@gmail.com"
 EMAIL_USE_TLS = True

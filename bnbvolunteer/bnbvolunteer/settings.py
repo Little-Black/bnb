@@ -49,6 +49,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 )
 
 ROOT_URLCONF = 'bnbvolunteer.urls'
@@ -87,6 +88,17 @@ STATIC_URL = '/static/'
 # Custom constants that apply to all sites
 
 LOGIN_URL = '/login/'
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "volunteers.views.siteInfoContextProcessor"
+)
 
 # Site-specific constants
 # vcsConfig.txt should be created and modified by setup.py

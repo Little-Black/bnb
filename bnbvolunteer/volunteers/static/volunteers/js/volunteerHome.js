@@ -13,23 +13,45 @@ function addInput(divName){
 }
 function doImmediately() {
     $('#tohide').hide();
-        console.log(invalid_boolean);
-        var invalid_boolean = {{invalid_boolean}};
+        
+        // var invalid_boolean = {{invalid_boolean}};
         if (invalid_boolean){
-        document.getElementById('invalid').style.display = 'none';
+          document.getElementById('invalid').style.display = 'none';
+   }
+     var invalid_boolean = "{{invalid_boolean}}";
+     if (invalid_boolean === "False"){
+        $("#invalid").hide();
+   }
 }
 window.onload = doImmediately;
 
 
-    $(document).ready(function() {  
-        var invalid_boolean = "{{invalid_boolean}}";
-        if (invalid_boolean === "False"){
-        $("#invalid").hide();
-    } 
+//     $(document).ready(function() {  
+
+//     } 
 
 
-});
+// });
 
   $(function() {
     $( "#datepicker" ).datepicker();
   });
+
+  function validateForm() {
+     var y = document.forms["newLogForm"]["date"].value;
+    if (y == null || y == "") {
+        alert("Please enter a date.");
+        return false;
+    }
+    var x = document.forms["newLogForm"]["activityType"].value;
+    if (x == null || x == "") {
+        alert("Please select an activity type.");
+        return false;
+    }
+
+}
+
+
+
+
+
