@@ -4,13 +4,14 @@
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
 {% endblock specificCss %}
 
 {% block tabcontent %}
 <form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">
 {% csrf_token %}
-<div class="add-logs">
-  <p class="add-label">Filters:</p>
+<div class="filters">
   <p class="credits-label">Last name:</p>
   <input name="lastname" class="DateInput" type="text" value={{lastname}}>
   <br>
@@ -40,9 +41,6 @@
             <th>First Name</th>
             <th>Email</th>
             <th>Credits Avaliable</th>
-            <th>Selected
-		        <input type="checkbox" name="allSelect" id="allSelect"></input> 
-            </th>
         </tr>
         {% for user, userCredit in search_results %}
         <tr> 
@@ -50,7 +48,6 @@
           <td><a href="../user/?getuser={{ user }}" >{{ user.first_name }}</a></td>
           <td>{{ user.email }}</td>
           <td>{{ userCredit }}</td>
-          <td><input name="{{ user.username }}"type="checkbox" id="checkbox-{{ user.id }}"></td>
         </tr>
         {% endfor %}
     </table>
@@ -66,14 +63,4 @@
       $('#date2').datepicker({format: "yyyy-mm-dd"});
       });
   </script>
-<script type="text/javascript">
-	$('#allSelect').click(function(event){
-		if(this.checked){
-			$(':checkbox').each(function(){this.checked = true;});
-			}
-		else{
-			$(':checkbox').each(function(){this.checked = false;});
-			}	
-			});
-	</script>
 {% endblock jsfiles %}

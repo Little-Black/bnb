@@ -1,0 +1,25 @@
+{% extends "volunteers/base.html" %}
+{% load staticfiles %}
+
+{% block cssfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+	{% block specificCss %}
+	{% endblock specificCss %}
+{% endblock cssfiles %}
+
+{% block tabs %}
+<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
+<a href="{% url 'editProfile' %}"><button class="profile-btn btn btn-default">Edit Profile</button></a>
+<br>
+
+<h1 class="bnb-header"> {{ org_name }} </h1>
+{% if subheader %}
+    <h4 class="subheader"> {{ subheader }} </h4>
+{% endif %}
+{% endblock tabs %}
+
+{% block tabcontent %}
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+{% endblock jsfiles %}

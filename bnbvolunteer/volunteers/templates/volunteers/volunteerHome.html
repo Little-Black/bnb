@@ -1,75 +1,26 @@
+{% extends "volunteers/base_volunteer_home.html" %}
 {% load staticfiles %}
-<html>
-<head>
-<!-- Bootstrap -->
+
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
-
-
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+{% endblock specificCss %}
 
-  <script type="text/javascript">
-    window.onload = function(){
-        // var invalid = {{invalid_vouchers}};
-	    console.log(invalid_boolean);
-	    var invalid_boolean = true;
-        invalid_boolean = {{invalid_boolean}};
-        if (invalid_boolean){
-        document.getElementById('invalid').style.display = 'none';
-    }
-    };
-</script>
+{% block tabcontent %}
 
 
-</head>
-<body>
-
-    <script>
-    $(document).ready(function() {  
-        var invalid_boolean = "{{invalid_boolean}}";
-        if (invalid_boolean === "False"){
-        $("#invalid").hide();
-    } 
-
-
-});
-
-    </script>
-
-<h1 style="margin-left:10px;">
-Welcome, {{user.first_name}}!
-
-</h1>
-<a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
-
-<p class="total-credit"> Total Credits: {{total_credits}} </p>
+<p class="total-credit">Welcome, {{user.first_name}}! You have {{total_credits}} credits. </p>
 
 
 
-<span id="invalid">
-<p> Sorry, the following vouchers are invalid:</p>
-<p> {{invalid_vouchers}} </p>
-</span>
-{{message}}
-<div "add-entry-and-edit-profile-btns">
-	<button class="add-entry-btn btn btn-default" onclick="$('#tohide').toggle();">
-		<span class="glyphicon glyphicon-plus"></span>
-		Add Timesheet Entry
-	</button>
-
-	<button class="edit-profile-btn btn btn-default" onclick="location.href='{% url 'editProfile' %}'">
-		Edit Profile Info
-	</button>
-	
-	<div id="tohide" style="margin-left:30px;margin-top:10px">
-
-
+	<div id="tohide" class="addLog">
 	<form name = "newLogForm" onsubmit="return validateForm()" action="{% url 'submitNewLog' %}" method="post" id="newLogForm">{% csrf_token %}
-
+<div class="vouchercode-title">Add An Activity</div>
+<br>
 	Date of Volunteering:
-	<input type="text" value={{ today }} class="DateInput" name="date" id="datepicker" format="y-m-d">
+	<input type="text" value={{ today }} class="DateInput" name="date" id="date1" format="y-m-d">
 	<br>
 	Activity Type:
 	<!-- <input type="text" name="activityType"> -->
@@ -103,27 +54,34 @@ Welcome, {{user.first_name}}!
 	}
 </script>
 	<div id='des'>
-	</div>	
+	</div>
+	<br>	
+<div class="vouchercode-title">Voucher Codes</div>
 	<br>
-	<br>
-	Voucher code(s):
-	<br>
-	<div id="dynamicInput" style="margin-left:20px;">
+	<div id="dynamicInput">
 	        Entry 1 <input type="text" name="myInputs">
 	</div>
-	<input type="button" value="Add another voucher code" style="margin-left:20px;" onClick="addInput('dynamicInput');">
-
 	<br>
+	<div>
+	<input type="submit" class="submit-btn btn btn-primary" value="Submit" />
+	<input class="submit-btn btn btn-primary" type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
 	<br>
-
-	<input type="submit" value="Submit" />
 	</form>
-
-
-
 	</div>
-
+	</div>
+<span id="invalid">
+<div class="errormessage">
+<p> Sorry, the following vouchers are invalid:</p>
+<p> {{invalid_vouchers}} </p>
+{{message}}
 </div>
+</span>
+<span id="message">
+<div class="errormessage">
+{{message}}
+</div>
+</span>
+
 
 <div class="timesheet panel panel-default">
 	<div class="panel-heading">Timesheet Entries</div>
@@ -159,14 +117,44 @@ Welcome, {{user.first_name}}!
             </div>
         </div>
     </footer>
-
+{% endblock tabcontent %}
 <!-- JQuery -->
 <!-- <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script> -->
 <!-- Bootstrap -->
+{% block jsfiles %}
 <script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
 <!-- Custom JS -->
 <script src="{% static 'volunteers/js/volunteerHome.js' %}"></script>
-</body>
+<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('#date1').datepicker({format: "yyyy-mm-dd"});
+      });
+  </script>
 
+  <script type="text/javascript">
+    window.onload = function(){
+        // var invalid = {{invalid_vouchers}};
+	    console.log(invalid_boolean);
+	    var invalid_boolean = true;
+        invalid_boolean = {{invalid_boolean}};
+        if (invalid_boolean){
+        document.getElementById('invalid').style.display = 'none';
+    }
+    };
+</script>
+    <script>
+    $(document).ready(function() {  
+        var invalid_boolean = "{{invalid_boolean}}";
+        if (invalid_boolean === "False"){
+        $("#invalid").hide();
+} 
+	var message = "{{message}}";
+	if (message == "")
+	{
+		$("#message").hide();
+	}
 
-</html>
+});
+    </script>
+{% endblock jsfiles %}
