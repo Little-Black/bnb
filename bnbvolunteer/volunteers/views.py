@@ -371,12 +371,25 @@ def codeGenerator(request):
             if request.POST['isRedemed'] == "No":
                 query_results = query_results.filter(redemptionActivity__isnull = True)
         else:
+            vouchersToExport = []
             for idNum in request.POST.keys(): 
-                try:
-                    voucher = Voucher.objects.get(code=idNum)
-                    voucher.delete()
-                except:
-                    idNum = idNum
+                ## If the user selected an export button, get the vouchers the user wants to export
+                ## If not, the user meant to delete those vouchers
+                    try:
+                        voucher = Voucher.objects.get(code=idNum)
+                        if request.POST.get('export', 'No'):
+                            print "ahhhh you got hereee"
+                            vouchersToExport.append(voucher)
+                        else:
+                            voucher.delete()
+                    except:
+                        idNum = idNum
+
+            #Now that you've built the list of vouchers to export, send the lsit to exportCodes()
+            if request.POST.get('export', 'No'):
+                responseToExport = exportCodes(request, vouchersToExport)
+                return responseToExport
+
             query_results = Voucher.objects.all()        
     query_results = query_results.order_by('-id')
     num = len(query_results)
@@ -498,15 +511,21 @@ def viewGeneratedCodes(request):
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
 
+#Exports the vouchers the current user has created in the last X minutes, which can be adjusted by changing 'minutes = X' below.
 @staff_only
-def exportCodes(request):
+def exportCodes(request, specifiedVouchers = []):
     user = request.user
     minutes = 60
     days = (minutes/60.0)/24.0
     start_datetime = datetime.now()-timedelta(days=days)
     end_datetime = datetime.now()
 
-    generatedVouchers = Voucher.objects.filter(generateDate__range=(start_datetime, end_datetime), creator=request.user)
+    #If vouchers aren't specified in the arguments, look up this user's created vouchers in the past X mins and export those.
+    if specifiedVouchers == []:
+        generatedVouchers = Voucher.objects.filter(generateDate__range=(start_datetime, end_datetime), creator=request.user)
+    else:
+        generatedVouchers = specifiedVouchers
+
     now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
 
     if len(generatedVouchers) == 0:

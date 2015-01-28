@@ -20,9 +20,12 @@
 	margin: auto;
 	text-align: center;
 }
-.delete-btn{
+.export-btn{
 	margin: 20px 100px 20px 20px;
 	float: right;
+}
+.delete-btn{
+	margin: 20px 20px 20px 100px;
 }
 .generate-btn{
 	margin-bottom: 100px;
@@ -81,4 +84,7 @@
     float: left;
     position: relative;
     left: calc(-50% - 140px);
+}
+.export-btn{
+	margin: ;
 }
