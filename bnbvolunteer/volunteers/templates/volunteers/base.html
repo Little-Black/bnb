@@ -1,8 +1,15 @@
 {% load staticfiles %}
 <html>
+<head>
+<title>
+{% block pageTitle %}
+{{ org_name }}
+{% endblock pageTitle %}
+</title>
 <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
 {% block cssfiles %}
 {% endblock cssfiles %}
+</head>
 <body>
 
 {% block tabs %}
