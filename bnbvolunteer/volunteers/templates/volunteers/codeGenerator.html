@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block specificCss %}
-  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap-datetimepicker.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
 {% endblock specificCss %}
 
@@ -13,10 +13,10 @@
 
 <div class="filters">
   <div class="filter1">
-    <p class="generated-btn">Generated between </p>
-      <input name="dateDown" class="generated-btn1 DateInput" id="date2" type="text" format="y-m-d" value={{dateDown}}>
+	  <p class="generated-btn">Generated between</p>
+      <input name="dateDown" class="DateTimeInput" id="date2" type="text"  value="{{dateDown}}">
     <p class="and">and </p>
-      <input name="dateUp" class="generated-btn2 DateInput" id="date1" type="text" format="y-m-d" value={{dateUp}}>
+      <input name="dateUp" class="DateTimeInput" id="date1" type="text"  value="{{dateUp}}">
   </div>
 
    <div class="filter2">
@@ -33,10 +33,10 @@
       <option {% if isRedemed == "Yes" %}selected{% endif %} value="Yes">Yes</option>
       <option {% if isRedemed == "No" %}selected{% endif %} value="No">No</option>
     </select>
-  </div>
-
-  <input type="submit"  formaction="?page=0" Value="Search" class="search-btn btn btn-default">
-
+    <br>
+  <input type="submit"  formaction="?page=0" Value="Search" class="search-btn btn btn-primary">
+  <br>
+</div>
 </div>  
 
 <div class="page-btns">
@@ -64,7 +64,8 @@
         <th>Code</th>
         <th>Credits</th>
         <th>Is Redemed</th>
-        <th>Generate Date</th>
+	<th>Generate Time</th>
+	<th>Creator</th>
         <th>Selected
     <input type="checkbox" name="allSelect" id="allSelect"></input>
         </th>
@@ -76,6 +77,7 @@
       <td>{{ item.credits }}</td>
       <td>{% if item.redemptionActivity != null %}Yes{% endif %}{% if item.redemptionActivity == null %}No{% endif %}</td>
       <td>{{ item.generateDate }}</td>
+      <td>{{ item.creator }}</td>
       <td><input id="checkbox-{{item.id}}"  name="{{ item.code }}" type="checkbox"></td>
     </tr>
     {% endfor %}
@@ -110,11 +112,11 @@
       });
   </script>
 <script src="{% static 'volunteers/js/codeGenerator.js' %}"></script>
-<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
+<script src="{% static 'volunteers/js/JQuery/bootstrap-datetimepicker.js'%}"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
-			$('#date1').datepicker({format: "yyyy-mm-dd"});
-			$('#date2').datepicker({format: "yyyy-mm-dd"});
+			$('#date1').datetimepicker({format: "yyyy-mm-dd hh:ii"});
+			$('#date2').datetimepicker({format: "yyyy-mm-dd hh:ii"});
 			});
 	</script>
 {% endblock jsfiles %}

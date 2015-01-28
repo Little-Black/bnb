@@ -402,11 +402,11 @@ def codeGenerator(request):
     query_results=query_results[:30]
     context = {'query_results': query_results }
     context['isRedemed'] = "All"
-    try:
-        for item in request.POST.keys():
+    for item in request.POST.keys():
+        try:
             context[item] = request.POST[item]
-    except:
-        context = context
+        except:
+            context = context
     context['num'] = num
     context['lastPage'] = max(pageNum-2, 0)
     context['nextPage'] = min(pageNum, (num-1)/30)
