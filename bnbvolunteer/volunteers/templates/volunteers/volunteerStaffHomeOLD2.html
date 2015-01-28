@@ -1,0 +1,48 @@
+{% extends "volunteers/staff_templates/base_staff_profile.html" %}
+{% load staticfiles %}
+
+{% block specificCss %}
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerHome.css' %}" />
+{% endblock specificCss %}
+
+{% block tabcontent %}
+  <div class="timesheet panel panel-default">
+    <div class="panel-heading">Timesheet Entries</div>
+    <table class="table">
+        <tr>
+            <th>User</th>
+            <th>Date Done</th>
+            <th>Activity Type</th>
+            <th>Description</th>
+            <th>Credits Earned</th>
+        </tr>
+        {% for item in query_results %}
+        <tr> 
+            <td>{{ item.user }}</td>
+            <td>{{ item.dateDone }}</td>
+            <td>{{ item.activityType}}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.credits }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+  </div>
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+<script>
+var counter = 1;
+var limit = 15;
+function addInput(divName){
+     if (counter == limit)  {
+          alert("You have reached the limit of adding " + counter + " inputs");
+     }
+     else {
+          var newdiv = document.createElement('div');
+          newdiv.innerHTML = "Entry " + (counter + 1) + " <input type='text' name='myInputs'>";
+          document.getElementById(divName).appendChild(newdiv);
+          counter++;
+     }
+}
+</script>
+{% endblock jsfiles %}

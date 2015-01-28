@@ -23,6 +23,9 @@ def siteInfoContextProcessor(request):
 
 @login_required
 def volunteerHome(request):
+    returnpage = 'volunteers/volunteerHome.html'
+    if request.user.has_perm('staff_status'):
+        returnpage = 'volunteers/volunteerStaffHome.html'
     print "Homepage no submit"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -30,10 +33,13 @@ def volunteerHome(request):
     except:
         print "Not logged in"
         context = {'query_results': [],'total_credits':0,'type_choices':[]}
-    return render(request,'volunteers/volunteerHome.html',context)
+    return render(request, returnpage,context)
 
 @login_required
 def volunteerSubmit(request):
+    returnpage = 'volunteers/volunteerHome.html'
+    if request.user.has_perm('staff_status'):
+        returnpage = 'volunteers/volunteerStaffHome.html'
     print "GOT SUBMISSION!!"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -44,7 +50,7 @@ def volunteerSubmit(request):
     if date.today() < datetime.strptime(dateDone, "%m/%d/%Y").date():
         context = getVolunteerPageContext(request,user)
         context['message']='Date late than today!'
-        return render(request,'volunteers/volunteerHome.html',context)
+        return render(request,returnpage,context)
     print request.POST['activityType']
     try:
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
@@ -93,7 +99,7 @@ def volunteerSubmit(request):
     context['invalid_vouchers']=mark_safe(invalid)
     context['invalid_boolean']=invalid_boolean
     print invalid_boolean
-    return render(request,'volunteers/volunteerHome.html',context)
+    return render(request, returnpage, context)
     # return HttpResponseRedirect('/volunteer/home/','volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -110,13 +116,14 @@ def getVolunteerPageContext(request,user):
 
 @staff_only
 def volunteerStaffHome(request):
-    Logs = Activity.objects.all()
-    try:
-        user = request.user #authenticate(username='admin', password='adMIN')
-    except:
-        print "Not logged in"
-    context = {'Logs': Logs}
-    return render(request,'volunteers/volunteerStaffHome.html',context)
+    return volunteerHome(request)
+    #Logs = Activity.objects.all()
+    #try:
+    #    user = request.user #authenticate(username='admin', password='adMIN')
+    #except:
+    #    print "Not logged in"
+    #context = {'Logs': Logs}
+    #return render(request,'volunteers/volunteerStaffHome.html',context)
 
     # try:
     #     user = request.user #authenticate(username='admin', password='adMIN')
@@ -409,7 +416,6 @@ def codeGenerator(request):
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
-    
     #Returns a string of a single random capitalized letter of the alphabet 
     def getRandomLetterInt():
         return 65+randint(0,25)
@@ -478,16 +484,17 @@ def generateCodes(request):
         quantity = voucherInfo[1]
         if (points == "" or quantity == ""):
             print "You left a field blank yo.."
-            #TODO: redirect them to the same page with an error message telling the user to try again TODO
+            #TODO: redirect them to the same page with an error message telling the user to try again. Field checking. TODO
         try:
             for i in range(int(quantity)):
                 newCode = generateCode()
                 while (Voucher.objects.filter(code=newCode).exists()):
                     newCode = generateCode()
-                voucher = Voucher(code=newCode, credits=int(points), creator=request.user)
+                voucher = Voucher(creator=request.user, code=newCode, credits=int(points))
                 voucher.save()
                 generatedVouchers.append(voucher)
         except: 
+            print "Vouchers are not properly saving for some reason."
             return render(request, 'volunteers/codeGenerator.html', {})
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
@@ -501,17 +508,16 @@ def viewGeneratedCodes(request):
 @staff_only
 def exportCodes(request):
     user = request.user
-    minutes = 30
+    minutes = 60
     days = (minutes/60.0)/24.0
-    start_datetime = datetime.datetime.now()-datetime.timedelta(days=days)
-    end_datetime = datetime.datetime.now()
+    start_datetime = datetime.now()-timedelta(days=days)
+    end_datetime = datetime.now()
 
-    generatedVouchers = Voucher.objects.filter(generateDate__range(start_datetime,end_datetime))
-    # generatedVouchers = Voucher.objects.all()
+    generatedVouchers = Voucher.objects.filter(generateDate__range=(start_datetime, end_datetime), creator=request.user)
     now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
 
     if len(generatedVouchers) == 0:
-        print "THERE ARE NO VOUCHERS TO EXPORT?!?"
+        print "THERE ARE NO VOUCHERS TO EXPORT"
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')

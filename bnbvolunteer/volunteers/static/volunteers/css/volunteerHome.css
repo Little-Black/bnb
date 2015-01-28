@@ -11,9 +11,19 @@
 	margin-left: 10px;
 	margin-top: 5px;
 }
+.addlog{
+	background-color: lightgray;
+	border: 1px solid black;
+	border-radius: 20px;
+	text-align: center;
+	margin:  auto auto 60px auto;
+	display: block;
+	padding: 20px;
+	width: 50%;
+}
 .total-credit{
 	font-weight: bold;
-	font-size: 30px;
+	font-size: 20px;
 	margin-left: 10px;
 	margin-top: 15px;
 }
@@ -21,4 +31,24 @@
 	width: 90%;
 	margin: 30px auto auto auto;
 	/*margin-top: 20px;*/
+}
+.vouchercode-title{
+	font-size: 20px;
+	font-weight: bold;
+	border-bottom: 1px solid black;
+	text-align: center;
+	width: 50%;
+	margin: auto auto auto auto;
+}
+.errormessage{
+	font-size: 20px;
+	color: red;
+	font-weight: bold;
+	text-align: center;
+	width: 50%;
+	margin: auto auto auto auto;
+}
+.submit-btn{
+	float: right;
+	margin-right: 10px;
 }
