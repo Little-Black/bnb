@@ -23,6 +23,9 @@ def siteInfoContextProcessor(request):
 
 @login_required
 def volunteerHome(request):
+    returnpage = 'volunteers/volunteerHome.html'
+    if request.user.has_perm('staff_status'):
+        returnpage = 'volunteers/volunteerStaffHome.html'
     print "Homepage no submit"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -30,10 +33,13 @@ def volunteerHome(request):
     except:
         print "Not logged in"
         context = {'query_results': [],'total_credits':0,'type_choices':[]}
-    return render(request,'volunteers/volunteerHome.html',context)
+    return render(request, returnpage,context)
 
 @login_required
 def volunteerSubmit(request):
+    returnpage = 'volunteers/volunteerHome.html'
+    if request.user.has_perm('staff_status'):
+        returnpage = 'volunteers/volunteerStaffHome.html'
     print "GOT SUBMISSION!!"
     try:
         user = request.user #authenticate(username='admin', password='adMIN')
@@ -44,7 +50,7 @@ def volunteerSubmit(request):
     if date.today() < datetime.strptime(dateDone, "%m/%d/%Y").date():
         context = getVolunteerPageContext(request,user)
         context['message']='Date late than today!'
-        return render(request,'volunteers/volunteerHome.html',context)
+        return render(request,returnpage,context)
     print request.POST['activityType']
     try:
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
@@ -93,7 +99,7 @@ def volunteerSubmit(request):
     context['invalid_vouchers']=mark_safe(invalid)
     context['invalid_boolean']=invalid_boolean
     print invalid_boolean
-    return render(request,'volunteers/volunteerHome.html',context)
+    return render(request, returnpage, context)
     # return HttpResponseRedirect('/volunteer/home/','volunteers/volunteerHome.html',context)
 
 def getVolunteerPageContext(request,user):
@@ -110,13 +116,14 @@ def getVolunteerPageContext(request,user):
 
 @staff_only
 def volunteerStaffHome(request):
-    Logs = Activity.objects.all()
-    try:
-        user = request.user #authenticate(username='admin', password='adMIN')
-    except:
-        print "Not logged in"
-    context = {'Logs': Logs}
-    return render(request,'volunteers/volunteerStaffHome.html',context)
+    return volunteerHome(request)
+    #Logs = Activity.objects.all()
+    #try:
+    #    user = request.user #authenticate(username='admin', password='adMIN')
+    #except:
+    #    print "Not logged in"
+    #context = {'Logs': Logs}
+    #return render(request,'volunteers/volunteerStaffHome.html',context)
 
     # try:
     #     user = request.user #authenticate(username='admin', password='adMIN')
@@ -408,11 +415,11 @@ def codeGenerator(request):
     query_results=query_results[:30]
     context = {'query_results': query_results }
     context['isRedemed'] = "All"
-    try:
-        for item in request.POST.keys():
+    for item in request.POST.keys():
+        try:
             context[item] = request.POST[item]
-    except:
-        context = context
+        except:
+            context = context
     context['num'] = num
     context['lastPage'] = max(pageNum-2, 0)
     context['nextPage'] = min(pageNum, (num-1)/30)

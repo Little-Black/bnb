@@ -1,22 +1,26 @@
 {% extends "volunteers/base.html" %}
 {% load staticfiles %}
 
+{% block pageTitle %}
+Login
+{% endblock pageTitle %}
+
 {% block cssfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/login.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/noLoginRequired.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/captcha.css" %}" />
 {% endblock cssfiles %}
 
 {% block tabcontent %}
 <div class="centered">
     <h2 class="title"> {{ org_name_short }} Volunteer Credit System </h2>
-    {% if messages %}
-        {% for message in messages %}
-            {{ message }} <br>
-        {% endfor %}
-        <br>
-    {% endif %}
-    <form method="post" class="login-form">
+    <form method="post" class="form">
         {% csrf_token %}
+        {% if messages %}
+            {% for message in messages %}
+                {{ message }} <br>
+            {% endfor %}
+            <br>
+        {% endif %}
         <div class="username">
           <div class="input-label">Username:</div>
           {{ form.username }}
@@ -25,14 +29,15 @@
           <div class="input-label">Password:</div>
           {{ form.password }}
         </div>
-        {% if form.captcha.field.required %}
-            <center><p> {{ form.captcha }} </p></center>
-        {% endif %}
-        <input class="login-btn btn-default btn" type="submit" value="Login">
+        <center>
+            {% if form.captcha.field.required %}
+                <p> {{ form.captcha }} </p>
+            {% endif %}
+            <input class="btn-default btn" type="submit" value="Login">
+            <a href="{% url "forgetPassword" %}"><input class="btn-default btn" type="button" value="Forget password"></a>
+            <a href="{% url "userRegistration" %}"><input class="btn-default btn" type="button" value="Register"></a>
+        </center>
     </form>
-
-    <a href="{% url "forgetPassword" %}"> Forget password </a> <br>
-    <a href="{% url "userRegistration" %}"> Don't have an account? Register here! </a>
 </div>
 {% endblock tabcontent %}
 

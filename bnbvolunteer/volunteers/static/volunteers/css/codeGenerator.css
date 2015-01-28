@@ -2,7 +2,11 @@
 	display: inline;
 	margin: 20px 5px 0 20px;
 }
-.create-more-btn, .generate-btn, .search-btn{
+.search-btn{
+	float: right;
+	margin-right: 10px;
+}
+.create-more-btn, .generate-btn{
 	margin: 20px 10px 5px 20px;
 }
 .nav{
@@ -84,7 +88,4 @@
     float: left;
     position: relative;
     left: calc(-50% - 140px);
-}
-.export-btn{
-	margin: ;
 }
