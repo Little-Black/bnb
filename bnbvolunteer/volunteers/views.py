@@ -14,7 +14,7 @@ from volunteers.userManagement import LoginForm, RegistrationForm, EditProfileFo
 
 from random import randint
 from datetime import date
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import csv
 
@@ -316,7 +316,8 @@ def editProfile(request):
         infoForm = EditProfileForm(EditProfileForm.createUserContext(request.user))
         pwForm = PasswordChangeForm()
     returnPage = "volunteerHome"
-    if request.user.has_perm("staff_status"):
+    if request.user.is_staff:
+    # if request.user.has_perm("staff_status"):
         returnPage = "volunteerStaffHome"
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
@@ -412,7 +413,7 @@ def codeGenerator(request):
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
-    
+    h
     #Returns a string of a single random capitalized letter of the alphabet 
     def getRandomLetterInt():
         return 65+randint(0,25)
@@ -488,7 +489,7 @@ def generateCodes(request):
                 while (Voucher.objects.filter(code=newCode).exists()):
                     newCode = generateCode()
 
-                voucher = Voucher(code=newCode, credits=int(points))
+                voucher = Voucher(user=request.user, code=newCode, credits=int(points))
                 voucher.save()
                 generatedVouchers.append(voucher)
         except: 
@@ -504,7 +505,14 @@ def viewGeneratedCodes(request):
 
 @staff_only
 def exportCodes(request):
-    generatedVouchers = Voucher.objects.all()
+    user = request.user
+    minutes = 30
+    days = (minutes/60.0)/24.0
+    start_datetime = datetime.datetime.now()-datetime.timedelta(days=days)
+    end_datetime = datetime.datetime.now()
+
+    generatedVouchers = Voucher.objects.filter(generateDate__range(start_datetime,end_datetime))
+    # generatedVouchers = Voucher.objects.all()
     now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
 
     if len(generatedVouchers) == 0:
