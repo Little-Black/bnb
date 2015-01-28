@@ -8,15 +8,6 @@ from datetime import date
 from random import random
 from threading import Timer
 
-#Userlog is now Activity!!! Userlog just here for reference.
-# class Userlog(models.Model):
-#     user = models.ForeignKey(User, default='')
-#     date = models.CharField(max_length=200)
-#     task = models.CharField(max_length=200)
-#     hours = models.PositiveSmallIntegerField(default=0)
-#     rate = models.PositiveSmallIntegerField(default=2)
-#     voucherearned = models.PositiveSmallIntegerField(default=0)
-
 class ActivityType(models.Model):
     name = models.CharField(max_length=200)
     def __str__(self):
@@ -35,7 +26,8 @@ class Voucher(models.Model):
     code = models.CharField(max_length=200)
     credits = models.PositiveSmallIntegerField(default=0)
     redemptionActivity = models.ForeignKey(Activity, null=True, blank=True)
-    generateDate = models.DateField(default=date.today)
+    generateDate = models.DateTimeField(auto_now_add=True)
+    creator = models.ForeignKey(User)
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User)
