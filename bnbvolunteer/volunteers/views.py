@@ -49,11 +49,7 @@ def volunteerSubmit(request):
     try:
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
     except:
-        activityType1 = ActivityType(name="Edit me out later")
-        activityType2 = ActivityType(name="Views.py somewhere")
-        activityType1.save()
-        activityType2.save()
-        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+        activityType = None
     # activityType.save()
     if 'description' in request.POST.keys():
         description = request.POST['description']
@@ -413,7 +409,7 @@ def codeGenerator(request):
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
-    h
+    
     #Returns a string of a single random capitalized letter of the alphabet 
     def getRandomLetterInt():
         return 65+randint(0,25)
@@ -488,8 +484,7 @@ def generateCodes(request):
                 newCode = generateCode()
                 while (Voucher.objects.filter(code=newCode).exists()):
                     newCode = generateCode()
-
-                voucher = Voucher(user=request.user, code=newCode, credits=int(points))
+                voucher = Voucher(code=newCode, credits=int(points), creator=request.user)
                 voucher.save()
                 generatedVouchers.append(voucher)
         except: 
