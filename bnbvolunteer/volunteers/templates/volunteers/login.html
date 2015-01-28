@@ -2,18 +2,17 @@
 {% load staticfiles %}
 
 {% block cssfiles %}
-  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/login.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/login.css' %}" />
 {% endblock cssfiles %}
 
 {% block tabcontent %}
 <div class="centered">
-  <h2 class="title"> {{ org_name_short }} Volunteer Credit System </h2>
+    <h2 class="title"> {{ org_name_short }} Volunteer Credit System </h2>
     {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li> {{ message }} </li>
-            {% endfor %}
-        </ul>
+        {% for message in messages %}
+            {{ message }} <br>
+        {% endfor %}
+        <br>
     {% endif %}
     <form method="post" class="login-form">
         {% csrf_token %}
@@ -26,7 +25,7 @@
           {{ form.password }}
         </div>
         {% if form.captcha.field.required %}
-            <p> {{ form.captcha }} </p>
+            <center><p> {{ form.captcha }} </p></center>
         {% endif %}
         <input class="login-btn btn-default btn" type="submit" value="Login">
     </form>

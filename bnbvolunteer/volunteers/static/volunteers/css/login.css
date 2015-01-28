@@ -24,3 +24,7 @@
 	margin: auto;
 	display: block;
 }
+input#id_captcha_1{
+    width: 80px;
+    text-align: center;
+}
