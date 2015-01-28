@@ -10,8 +10,8 @@ def _addHeaderAndSig(user, content):
 
 def sendRegVerificationEmail(user, vr):
     def _sendRegVerificationEmail(user, vr):
-        content = "Thank you for being interested in volunteering for %s." % settings.ORG_NAME +\
-                    "Your username is %s." % user.username +\
+        content = "Thank you for being interested in volunteering for %s. " % settings.ORG_NAME +\
+                    "Your username is %s. " % user.username +\
                     "You can activate your account at\n" + vr.getURL() +"\n" +\
                     "The account may be deleted if it is not verified within 48 hours.\n" +\
                     "If you did not create the account, ignore this email."

@@ -3,24 +3,20 @@
 	text-align: center;
 }
 .title{
-	margin-bottom: 40px;
+	margin-bottom: 30px;
 }
-.login-form{
+.form{
 	background-color: lightgray; 
 	border: 1px solid black;
 	border-radius: 10px;
-	width: 350px;
+	width: 365px;
 	margin: auto auto 20px auto;
 	text-align: left;
 	padding: 25px;
 }
 .input-label{
 	display: inline-block;
-	width: 120px;
+	width: 150px;
 	height: 35px;
 	position: relative;
-}
-.login-btn{
-	margin: auto;
-	display: block;
 }

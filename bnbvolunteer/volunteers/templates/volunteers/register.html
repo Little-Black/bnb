@@ -1,22 +1,30 @@
 {% extends "volunteers/base.html" %}
 {% load staticfiles %}
 
+{% block pageTitle %}
+Register
+{% endblock pageTitle %}
+
 {% block cssfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/register.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/noLoginRequired.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/captcha.css" %}" />
 {% endblock cssfiles %}
 
 {% block tabcontent %}
 <div class="centered">
     <h2 class="title"> Register </h2>
-    {% if messages %}
-        {% for message in messages %}
-            {{ message }} <br>
-        {% endfor %}
-        <br>
-    {% endif %}
-    <form method="post" class="register-form">
+    
+    <form method="post" class="form">
         {% csrf_token %}
+        {% if messages %}
+            Error(s) encountered:
+            <ul>
+            {% for message in messages %}
+                <li> {{ message }} </li>
+            {% endfor %}
+            </ul>
+            <br>
+        {% endif %}
         <div><div class="input-label"> *Username: </div> {{ form.username }}</div>
         <div><div class="input-label"> *Email: </div> {{ form.email }}</div>
         <div><div class="input-label"> *Password: </div> {{ form.password }}</div>

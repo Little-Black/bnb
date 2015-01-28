@@ -11,7 +11,7 @@ from volunteers.models import VerificationRequest
 from volunteers.emailTemplates import sendRegVerificationEmail, sendResetPasswordEmail, sendEmailUpdateEmail, sendDeleteAccEmail
 
 from random import randint
-from re import sub
+from re import search, sub
 
 def _isValidPassword(pwString):
     return len(pwString) >= 6
@@ -20,7 +20,7 @@ def _createErrorMessage(error):
     if error == "captcha":
         return "Invalid captcha response"
     else:
-        return "Missing required field: %s" % sub("-", " ", error)
+        return "Missing required field: %s" % sub("_", " ", error)
 
 class LoginForm(forms.Form):
     
@@ -50,7 +50,10 @@ class LoginForm(forms.Form):
             else:
                 messages.error(request, "Invalid username or password.")
         else:
-            messages.error(request, "Please enter username, password, and correct captcha (if applicable).")
+            if "username" in request.POST and request.POST["username"] and "password" in request.POST and request.POST["password"]:
+                messages.error(request, "Invalid captcha response.")
+            else:
+                messages.error(request, "Please enter both username and password.")
         if not loginSuccessful:
             pass
             cache.set(LoginForm._cacheKey(request), cache.get(LoginForm._cacheKey(request),0)+1, 300)
@@ -85,6 +88,9 @@ class RegistrationForm(forms.Form):
             if User.objects.filter(username=self.cleaned_data["username"]):
                 messages.error(request, "This username is already taken.")
                 registrationSuccessful = False
+            if search("[^A-Za-z0-9_]", self.cleaned_data["username"]):
+                messages.error(request, "Username can only contain alphanumeric characters and underscores.")
+                registrationSuccessful = False
             if User.objects.filter(email=self.cleaned_data["email"]):
                 messages.error(request, "This email is already connected to another account.")
                 registrationSuccessful = False
@@ -111,12 +117,7 @@ class RegistrationForm(forms.Form):
         else:
             registrationSuccessful = False
             for error in self.errors:
-                if error == "captcha":
-                    messages.error(request, "Invalid captcha")
-                else:
-                    nameConversion = {"confirm_password": "confirm password", "first_name": "first name", "last_name": "last name"}
-                    name = nameConversion[error] if error in nameConversion else error
-                    messages.error(request, "Required field: %s" % name)
+                messages.error(request, _createErrorMessage(error))
         return registrationSuccessful
 
 class EditProfileForm(forms.Form):
@@ -157,7 +158,7 @@ class EditProfileForm(forms.Form):
             messages.success(request, "Account info successfully saved!")
         else:
             for error in self.errors:
-                messages.error(request, error + " is a required field.")
+                messages.error(request, _createErrorMessage(error))
 
 class PasswordChangeForm(forms.Form):
     
@@ -194,7 +195,7 @@ class PasswordChangeForm(forms.Form):
                 messages.error(request, "The old password is incorrect.")
         else:
             for error in self.errors:
-                messages.error(request, error + " is a required field.")
+                messages.error(request, _createErrorMessage(error))
 
 class RequestPasswordResetForm(forms.Form):
     
@@ -222,7 +223,7 @@ class RequestPasswordResetForm(forms.Form):
                 sendResetPasswordEmail(user, vr)
                 messages.success(request, "A confirmation email is sent to your inbox.")
             except User.DoesNotExist:
-                messages.error(request, "Cannot find an user with given email and username.")
+                messages.error(request, "Cannot find an user with given information.")
         else:
             for error in self.errors:
                 messages.error(request, error + " is a required field.")
