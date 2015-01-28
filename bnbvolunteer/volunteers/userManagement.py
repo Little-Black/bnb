@@ -104,7 +104,12 @@ class RegistrationForm(forms.Form):
         else:
             registrationSuccessful = False
             for error in self.errors:
-                messages.error(request, error + " is a required field.")
+                if error == "captcha":
+                    messages.error(request, "Invalid captcha")
+                else:
+                    nameConversion = {"password_confirmation": "confirm password", "first_name": "first name", "last_name": "last name"}
+                    name = nameConversion[error] if error in nameConversion else error
+                    messages.error(request, "Required field: %s" % name)
         return registrationSuccessful
 
 class EditProfileForm(forms.Form):
