@@ -1,23 +1,39 @@
-<html>
-<head>
-    <title> Register </title>
-<head>
-<body>
-    <h2> Register </h2>
+{% extends "volunteers/base.html" %}
+{% load staticfiles %}
+
+{% block cssfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/register.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "volunteers/css/captcha.css" %}" />
+{% endblock cssfiles %}
+
+{% block tabcontent %}
+<div class="centered">
+    <h2 class="title"> Register </h2>
     {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li> {{ message }} </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <p> {{ field.label_tag }} {{ field }} </p>
+        {% for message in messages %}
+            {{ message }} <br>
         {% endfor %}
-        <input type="submit" value="Register">
-        <a href="{% url "userLogin" %}"><input type="button" value="Return to login"></a>
+        <br>
+    {% endif %}
+    <form method="post" class="register-form">
+        {% csrf_token %}
+        <div><div class="input-label"> *Username: </div> {{ form.username }}</div>
+        <div><div class="input-label"> *Email: </div> {{ form.email }}</div>
+        <div><div class="input-label"> *Password: </div> {{ form.password }}</div>
+        <div><div class="input-label"> *Confirm password: </div> {{ form.confirm_password }}</div>
+        <div><div class="input-label"> *First name: </div> {{ form.first_name }}</div>
+        <div><div class="input-label"> *Last name: </div> {{ form.last_name }}</div>
+        <div><div class="input-label"> *Address: </div> {{ form.address }}</div>
+        <div><div class="input-label"> *Phone: </div> {{ form.phone }}</div>
+        <center>
+            <p> {{ form.captcha }} </p>
+            <input class="btn-default btn" type="submit" value="Register">
+            <a href="{% url "userLogin" %}"><input class="btn-default btn" type="button" value="Return to login"></a>
+        </center>
     </form>
-</body>
-</html>
+</div>
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+    <script src="{% static "volunteers/js/captcha.js" %}"></script>
+{% endblock jsfiles %}

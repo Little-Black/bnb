@@ -11,9 +11,16 @@ from volunteers.models import VerificationRequest
 from volunteers.emailTemplates import sendRegVerificationEmail, sendResetPasswordEmail, sendEmailUpdateEmail, sendDeleteAccEmail
 
 from random import randint
+from re import sub
 
 def _isValidPassword(pwString):
     return len(pwString) >= 6
+
+def _createErrorMessage(error):
+    if error == "captcha":
+        return "Invalid captcha response"
+    else:
+        return "Missing required field: %s" % sub("-", " ", error)
 
 class LoginForm(forms.Form):
     
@@ -60,7 +67,7 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField()
     username = forms.CharField(max_length=30)
     password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
-    password_confirmation = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    confirm_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     address = forms.CharField(max_length=100)
@@ -81,7 +88,7 @@ class RegistrationForm(forms.Form):
             if User.objects.filter(email=self.cleaned_data["email"]):
                 messages.error(request, "This email is already connected to another account.")
                 registrationSuccessful = False
-            if self.cleaned_data["password"] != self.cleaned_data["password_confirmation"]:
+            if self.cleaned_data["password"] != self.cleaned_data["confirm_password"]:
                 messages.error(request, "The passwords do not match.")
                 registrationSuccessful = False
             if not _isValidPassword(self.cleaned_data["password"]):
@@ -104,7 +111,12 @@ class RegistrationForm(forms.Form):
         else:
             registrationSuccessful = False
             for error in self.errors:
-                messages.error(request, error + " is a required field.")
+                if error == "captcha":
+                    messages.error(request, "Invalid captcha")
+                else:
+                    nameConversion = {"confirm_password": "confirm password", "first_name": "first name", "last_name": "last name"}
+                    name = nameConversion[error] if error in nameConversion else error
+                    messages.error(request, "Required field: %s" % name)
         return registrationSuccessful
 
 class EditProfileForm(forms.Form):
@@ -151,7 +163,7 @@ class PasswordChangeForm(forms.Form):
     
     old_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
     new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
-    confirm_new_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
+    confirm_password = forms.CharField(widget=forms.PasswordInput(), max_length=30)
     
     def isFilled(self, request):
         fieldsFilled = dict()
@@ -160,19 +172,19 @@ class PasswordChangeForm(forms.Form):
                 fieldsFilled[field] = request.POST[field]
             except KeyError:
                 return False
-        return fieldsFilled["old_password"] or fieldsFilled["new_password"] or fieldsFilled["confirm_new_password"]
+        return fieldsFilled["old_password"] or fieldsFilled["new_password"] or fieldsFilled["confirm_password"]
     
     """
     Attempt to change the password of the current user.
     @param request: HTTPRequest
-    """    
+    """
     def process(self, request):
         if self.is_valid():
             if request.user.check_password(self.cleaned_data["old_password"]):
                 if not _isValidPassword(self.cleaned_data["new_password"]):
                     messages.error(request, "The new password must be at least 6 characters long.")
                 else:
-                    if self.cleaned_data["new_password"] == self.cleaned_data["confirm_new_password"]:
+                    if self.cleaned_data["new_password"] == self.cleaned_data["confirm_password"]:
                         messages.success(request, "Password successfully changed!")
                         request.user.set_password(self.cleaned_data["new_password"])
                         request.user.save()

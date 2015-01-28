@@ -49,11 +49,7 @@ def volunteerSubmit(request):
     try:
         activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
     except:
-        activityType1 = ActivityType(name="Edit me out later")
-        activityType2 = ActivityType(name="Views.py somewhere")
-        activityType1.save()
-        activityType2.save()
-        activityType = ActivityType.objects.filter(name=request.POST['activityType'])[0]
+        activityType = None
     # activityType.save()
     if 'description' in request.POST.keys():
         description = request.POST['description']
@@ -487,7 +483,6 @@ def generateCodes(request):
                 newCode = generateCode()
                 while (Voucher.objects.filter(code=newCode).exists()):
                     newCode = generateCode()
-
                 voucher = Voucher(creator=request.user, code=newCode, credits=int(points))
                 voucher.save()
                 generatedVouchers.append(voucher)
@@ -506,7 +501,7 @@ def viewGeneratedCodes(request):
 @staff_only
 def exportCodes(request):
     user = request.user
-    minutes = 2
+    minutes = 60
     days = (minutes/60.0)/24.0
     start_datetime = datetime.now()-timedelta(days=days)
     end_datetime = datetime.now()
