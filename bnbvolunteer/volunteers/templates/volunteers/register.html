@@ -11,13 +11,13 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form>
+    <form method="post">
         {% csrf_token %}
         {% for field in form %}
             <p> {{ field.label_tag }} {{ field }} </p>
         {% endfor %}
-        <input type="submit" method="post" value="Register">
-        <button type="cancel"><a href="{% url "userLogin" %}">Cancel</a></button>
+        <input type="submit" value="Register">
+        <a href="{% url "userLogin" %}"><input type="button" value="Return to login"></a>
     </form>
 </body>
 </html>

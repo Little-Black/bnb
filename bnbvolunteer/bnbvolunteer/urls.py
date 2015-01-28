@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     
     url(r'^$', lambda request: HttpResponseRedirect(reverse_lazy("userLogin"))),
-    url(r'^manage/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^captcha/', include('captcha.urls')),
     url(r'^volunteer/home/$', views.volunteerHome, name="volunteerHome"),
     url(r'^volunteerStaff/home/$', views.volunteerStaffHome, name="volunteerStaffHome"),
