@@ -24,6 +24,9 @@
 	margin: 20px 100px 20px 20px;
 	float: right;
 }
+.generate-btn{
+	margin-bottom: 100px;
+}
 .vouchers-panel, .results{
 	width: 90%;
 	margin: 120px auto auto auto;
