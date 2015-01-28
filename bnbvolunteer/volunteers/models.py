@@ -27,7 +27,7 @@ class Voucher(models.Model):
     credits = models.PositiveSmallIntegerField(default=0)
     redemptionActivity = models.ForeignKey(Activity, null=True, blank=True)
     generateDate = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User,null=True)
 
 class VerificationRequest(models.Model):
     user = models.ForeignKey(User)
