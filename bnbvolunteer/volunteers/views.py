@@ -416,7 +416,6 @@ def codeGenerator(request):
 
 #Generates an 8-digit-long random code that alternates between capital letters and numbers 1-9
 def generateCode():
-    
     #Returns a string of a single random capitalized letter of the alphabet 
     def getRandomLetterInt():
         return 65+randint(0,25)
@@ -485,16 +484,17 @@ def generateCodes(request):
         quantity = voucherInfo[1]
         if (points == "" or quantity == ""):
             print "You left a field blank yo.."
-            #TODO: redirect them to the same page with an error message telling the user to try again TODO
+            #TODO: redirect them to the same page with an error message telling the user to try again. Field checking. TODO
         try:
             for i in range(int(quantity)):
                 newCode = generateCode()
                 while (Voucher.objects.filter(code=newCode).exists()):
                     newCode = generateCode()
-                voucher = Voucher(code=newCode, credits=int(points), creator=request.user)
+                voucher = Voucher(creator=request.user, code=newCode, credits=int(points))
                 voucher.save()
                 generatedVouchers.append(voucher)
         except: 
+            print "Vouchers are not properly saving for some reason."
             return render(request, 'volunteers/codeGenerator.html', {})
     context = {'generatedVouchers': generatedVouchers}
     return render(request,'volunteers/viewGeneratedCodes.html',context)
@@ -508,17 +508,16 @@ def viewGeneratedCodes(request):
 @staff_only
 def exportCodes(request):
     user = request.user
-    minutes = 30
+    minutes = 60
     days = (minutes/60.0)/24.0
-    start_datetime = datetime.datetime.now()-datetime.timedelta(days=days)
-    end_datetime = datetime.datetime.now()
+    start_datetime = datetime.now()-timedelta(days=days)
+    end_datetime = datetime.now()
 
-    generatedVouchers = Voucher.objects.filter(generateDate__range(start_datetime,end_datetime))
-    # generatedVouchers = Voucher.objects.all()
+    generatedVouchers = Voucher.objects.filter(generateDate__range=(start_datetime, end_datetime), creator=request.user)
     now = datetime.now().strftime('%d-%b-%Y-%H-%M-%S')
 
     if len(generatedVouchers) == 0:
-        print "THERE ARE NO VOUCHERS TO EXPORT?!?"
+        print "THERE ARE NO VOUCHERS TO EXPORT"
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
