@@ -16,12 +16,12 @@
   <input name="lastname" class="DateInput" type="text" value={{lastname}}>
   <br>
   <p class="credits-label">Credits between</p>
-  <input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
+  <input name="creditsDown" class="DateInput onlyNumbersEntry" type="number" value={{creditsDown}}>
   <p class="credits-label">and </p>
-  <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
+  <input name="creditsUp" class="DateInput onlyNumbersEntry" type="number" value={{creditsUp}}>
   <br>
   <p class="credits-label">Phone</p>
-  <input name="phone" class="DateInput" type="text" value={{phone}}>
+  <input name="phone" class="DateInput phoneNumberEntry" type="text" value={{phone}}>
   <p class="credits-label">Email</p>
   <input name="email" class="DateInput" type="text" value={{email}}>
   <br>
@@ -37,7 +37,7 @@
 <div class="gotopage wrap">
     <div class="content">
         <p class="goto-label">{{ userCount }} users found. This is page {{ page }} of {{ pageCount }}. Go to page </p>
-        <input name="toPage" id='to-page' class="toPage" type="text" >
+        <input name="toPage" id='to-page' class="toPage onlyNumbersEntry" type="text" >
         <input type="submit" id="redirect-to-page" value="Go" class="goto-btn btn btn-default">
     </div>
 </div>

@@ -20,14 +20,14 @@
 <div class="vouchercode-title">Add An Activity</div>
 <br>
 	Date of Volunteering:
-	<input type="text" value={{ today }} class="DateInput" name="date" id="date1" format="y-m-d">
+	<input type="text" value={{ today }} class="DateInput datetimeEntry" name="date" id="date1" format="y-m-d">
 	<br>
 	Activity Type:
 	<!-- <input type="text" name="activityType"> -->
 
 
 
-    <select name="activityType" id="activityType" onchange="check(this)">
+    <select class="btn btn-default dropdown-toggle" name="activityType" id="activityType" onchange="check(this)">
     <option selected disabled hidden value=''></option>
     <option value="Other">Other</option> 
 	  {% for type in type_choices %}
@@ -59,12 +59,14 @@
 <div class="vouchercode-title">Voucher Codes</div>
 	<br>
 	<div id="dynamicInput">
-	        Entry 1 <input type="text" name="myInputs">
+	        Entry 1 <input type="text" class='codeEntry' name="myInputs">
 	</div>
 	<br>
 	<div>
+	
 	<input type="submit" class="submit-btn btn btn-primary" value="Submit" />
-	<input class="submit-btn btn btn-primary" type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
+	<input class="submit-btn btn btn-default" type="button" value="Add another voucher code" onClick="addInput('dynamicInput');">
+	
 	<br>
 	</form>
 	</div>
@@ -103,20 +105,6 @@
 	</table>
 </div>
 
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3 text-center">
-                    
-                    <div class="top-scroll">
-                        <a href="#top"><i class="fa fa-circle-arrow-up scroll fa-4x"></i></a>
-                    </div>
-                    <hr>
-                    <p>Bikes Not Bombs 2015</p>
-                </div>
-            </div>
-        </div>
-    </footer>
 {% endblock tabcontent %}
 <!-- JQuery -->
 <!-- <script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script> -->
@@ -124,7 +112,7 @@
 {% block jsfiles %}
 <script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
 <!-- Custom JS -->
-<script src="{% static 'volunteers/js/volunteerHome.js' %}"></script>
+<script type="text/javascript" src="{% static 'volunteers/js/volunteerHome.js' %}"></script>
 <script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
 <script type="text/javascript">
   $(document).ready(function(){

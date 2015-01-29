@@ -14,9 +14,9 @@
 <div class="filters">
   <div class="filter1">
     <p class="credits-label">Activity done between </p>
-      <input name="dateDoneDown" class="DateInput" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>
+      <input name="dateDoneDown" class="DateInput datetimeEntry" id="date2" type="text" format="y-m-d" value={{dateDoneDown}}>
     <p class="credits-label">and </p>
-    <input name="dateDoneUp" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDoneUp}}>
+    <input name="dateDoneUp" class="DateInput datetimeEntry" id="date1" type="text" format="y-m-d" value={{dateDoneUp}}>
   </div>
 
  <div class="filter2">
@@ -31,9 +31,9 @@
 
   <div class="filter3">
     <p class="credits-label">Credits between</p>
-    <input name="creditsDown" class="DateInput" type="number" value={{creditsDown}}>
+    <input name="creditsDown" class="DateInput onlyNumbersEntry" type="number" value={{creditsDown}}>
     <p class="credits-label">and </p>
-    <input name="creditsUp" class="DateInput" type="number" value={{creditsUp}}>
+    <input name="creditsUp" class="DateInput onlyNumbersEntry" type="number" value={{creditsUp}}>
   </div>
 
   <input type="submit" Value="Search" class="btn btn-default">
@@ -48,7 +48,7 @@
   <div class="gotopage wrap">
     <div class="content">
       <p class="goto-label">{{ num }} activities found. This is page {{ pageNum }} of {{ allPage }}. Go to page </p>
-      <input name="toPage" class="toPage" type="text" >
+      <input name="toPage" class="toPage onlyNumbersEntry" type="text" >
     <input type="submit"  formaction="?page=?" Value="Go" class="goto-btn btn btn-default">
       </div>
   </div>
