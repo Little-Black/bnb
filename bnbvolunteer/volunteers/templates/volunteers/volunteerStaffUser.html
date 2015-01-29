@@ -3,22 +3,12 @@
 
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffLog.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
 {% endblock specificCss %}
 
 {% block tabcontent %}
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-<div class="input-group search">
-
-
-<input type="text" class="form-control" Placeholder="Last Name"  name="lastname">
-<span class="input-group-btn">
-  <input type="submit"  class="btn btn-default" value="Go!">
-</span>
-</div>
-</form>
-
 <div class="panel panel-default results">
   <div class="panel-heading">{{ getuser }}</div>
 <table class="table">
@@ -38,8 +28,23 @@
     </tr>
 </table>
 </div>
-<br>
-	<form action="" method="post">{% csrf_token %}
+<form method="post" action="">
+{% csrf_token %}
+<div class="page-btns">
+  <input type="submit" formaction="?page={{ lastPage }}" Value="Last Page" class="last-page btn btn-default"> 
+  
+  <input type="submit" formaction="?page={{ nextPage }}" Value="Next Page" class="next-page btn btn-default">
+</div>
+
+  <div class="gotopage wrap">
+    <div class="content">
+      <p class="goto-label">{{ num }} activities found. This is page {{ pageNum }} of {{ allPage }}. Go to page </p>
+      <input name="toPage" class="toPage onlyNumbersEntry" type="text" >
+    <input type="submit"  formaction="?page=?" Value="Go" class="goto-btn btn btn-default">
+      </div>
+  </div>
+  </form>
+  <form action="" method="post">{% csrf_token %}
 <div class="panel panel-default results">
   <div class="panel-heading">Timesheet</div>
 <table class="table">
@@ -70,7 +75,7 @@
 </table>
 </div>
 <div class="add-logs">
-  <input type="submit" value="Delete Selected Logs" class="btn btn-default">
+  <input type="submit" value="Delete Selected Logs" class="btn btn-danger">
   </form>
 </div>
 
@@ -78,8 +83,9 @@
 <!-- JQuery -->
 
 
+<div class="generator-title">Add activity to {{ getuser.last_name }}</div>
 <div class="add-logs">
-  <form action="?getuser={{getuser}}" method="post">{% csrf_token %}
+  <form action="?getuser={{getuser}}" method="post" class="generator">{% csrf_token %}
 	  <p class="add-label">Add activities to {{ getuser.last_name }}</p>
   <p class="description-label">Description:</p><input type="text" name="description">
   <p class="credits-label">Credits:</p><input type="number" name="credits">
@@ -91,7 +97,8 @@
   </select>
   <p class="credits-label">Date Done:</p>
   <input name="dateDone" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDone}}>
-  <input type="submit" value="Submit" class="btn btn-default">
+  <br>
+  <input type="submit" value="Submit" class="btn btn-primary">
   </form>
   {{inform}}
 </div>

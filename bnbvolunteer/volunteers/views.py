@@ -44,7 +44,7 @@ def volunteerSubmit(request):
         print "ERROR UGHHH"
     dateDone = request.POST['date']
     print dateDone
-    if date.today() < datetime.strptime(dateDone, "%m/%d/%Y").date():
+    if date.today() < datetime.strptime(dateDone, "%Y-%m-%d").date():
         context = getVolunteerPageContext(request)
         context['message']='Date late than today!'
         return render(request,returnpage,context)
@@ -81,7 +81,7 @@ def volunteerSubmit(request):
             invalid_boolean = "True"
         else: 
             return HttpResponse("Error: Multiple vouchers exist for that code")
-    storedate = dateDone[6:10]+'-'+dateDone[0:2]+'-'+dateDone[3:5] #reformat the date :/
+    storedate = dateDone #reformat the date :/
     activity = Activity(user=user,dateDone=storedate,activityType = activityType, description=description,credits=totalearned) #request.user
     # try: 
     if len(invalid) == 0:
@@ -109,7 +109,7 @@ def getVolunteerPageContext(request):
     if len(type_choices) == 0:
         type_choices = ["Edit me out later","Views.py somewhere"]
     context = {'query_results': query_results,'total_credits':total_credits,'type_choices':type_choices, 'invalid_boolean':False}
-    context['today'] = date.today().strftime('%m/%d/%Y')
+    context['today'] = date.today().strftime('%Y-%m-%d')
     return context
 
 @staff_only
