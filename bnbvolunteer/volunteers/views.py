@@ -384,8 +384,7 @@ def codeGenerator(request):
                 ## If not, the user meant to delete those vouchers
                     try:
                         voucher = Voucher.objects.get(code=idNum)
-                        if request.POST.get('export', 'No'):
-                            print "ahhhh you got hereee"
+                        if request.POST.get('export', 'No') == "Yes":
                             vouchersToExport.append(voucher)
                         else:
                             voucher.delete()
@@ -393,7 +392,7 @@ def codeGenerator(request):
                         idNum = idNum
 
             #Now that you've built the list of vouchers to export, send the lsit to exportCodes()
-            if request.POST.get('export', 'No'):
+            if request.POST.get('export', 'No') == "Yes":
                 responseToExport = exportCodes(request, vouchersToExport)
                 return responseToExport
 
