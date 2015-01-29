@@ -1,8 +1,3 @@
-$(document).ready(function(){
-    $('#date1').datetimepicker({format: "yyyy-mm-dd"});
-    $('#date2').datetimepicker({format: "yyyy-mm-dd"});
-});
-
 var counter = 1;
 var limit = 15;
 function addInput(divName){

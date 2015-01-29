@@ -9,14 +9,14 @@
 	background-color: lightgray; 
 	border: 1px solid black;
 	border-radius: 10px;
-	width: 365px;
+	width: 380px;
 	margin: auto auto 20px auto;
 	text-align: left;
 	padding: 25px;
 }
 .input-label{
 	display: inline-block;
-	width: 150px;
+	width: 140px;
 	height: 35px;
 	position: relative;
 }
