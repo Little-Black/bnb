@@ -1,14 +1,14 @@
 from bnbvolunteer import settings
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http.response import HttpResponseRedirect
+from re import search
 
 """
 If HTTPS_REDIRECT is enabled, redirect an insecure page to its secure counterpart.
 """
 def redirect_to_https(viewFunction):
     def _redirect_to_https(request, *args, **kwargs):
-        if not request.is_secure():
+        if search("http://", request.build_absolute_uri(request.get_full_path())):
             if getattr(settings, "HTTPS_REDIRECT", False):
                 redirect = request.build_absolute_uri(request.get_full_path()).replace("http://", "https://")
                 return HttpResponseRedirect(redirect)

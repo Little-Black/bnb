@@ -30,13 +30,13 @@ Login
           {{ form.password }}
         </div>
         <center>
-            {% if form.captcha.field.required %}
-                <p> {{ form.captcha }} </p>
-            {% endif %}
-            <input class="bs-btn btn-default btn" type="submit" value="Login">
-            <a href="{% url "userRegistration" %}"><input class="bs-btn btn-default btn" type="button" value="Register"></a>
-            <br>
-            <a href="{% url "forgetPassword" %}">Forget password</a>
+        {% if form.captcha.field.required %}
+            <p> {{ form.captcha }} </p>
+        {% endif %}
+        <input class="bs-btn btn-default btn" type="submit" value="Login">
+        <a href="{% url "userRegistration" %}"><input class="bs-btn btn-default btn" type="button" value="Register"></a>
+        <br>
+        <a href="{% url "forgetPassword" %}">Forget password</a>
         </center>
     </form>
 </div>
