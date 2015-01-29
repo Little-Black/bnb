@@ -43,7 +43,7 @@
             <th>Credits Avaliable</th>
         </tr>
         {% for user, userCredit in search_results %}
-        <tr> 
+        <tr>
           <td><a href="../user/?getuser={{ user }}" >{{ user.last_name }}</a></td>
           <td><a href="../user/?getuser={{ user }}" >{{ user.first_name }}</a></td>
           <td>{{ user.email }}</td>
@@ -52,15 +52,6 @@
         {% endfor %}
     </table>
 </div>
+<br>
+<br>
 {% endblock tabcontent %}
-
-{% block jsfiles %}
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js'%}"></script>
-<script src="{% static 'volunteers/js/JQuery/bootstrap-datepicker.js'%}"></script>
-<script type="text/javascript">
-  $(document).ready(function(){
-      $('#date1').datepicker({format: "yyyy-mm-dd"});
-      $('#date2').datepicker({format: "yyyy-mm-dd"});
-      });
-  </script>
-{% endblock jsfiles %}
