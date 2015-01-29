@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import HttpResponseRedirect
 
-import settings 
 from volunteers import views
 
 

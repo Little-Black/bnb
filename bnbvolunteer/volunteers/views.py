@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from bnbvolunteer import settings
 from volunteers.decorators import redirect_to_https, staff_only
 from volunteers.models import ActivityType, Activity, Voucher, VerificationRequest, UserProfile
-from volunteers.userManagement import LoginForm, RegistrationForm, EditProfileForm, PasswordChangeForm, RequestPasswordResetForm, userDeleteAccount
+from volunteers.userManagement import LoginForm, RegistrationForm, EditProfileForm, PasswordChangeForm, RequestPasswordResetForm, getIP, userDeleteAccount
 
 from math import ceil
 from random import randint
@@ -344,7 +344,7 @@ def editProfile(request):
     return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
 
 def verify(request, code):
-    cacheKey = (request.META["REMOTE_ADDR"], "verify")
+    cacheKey = (getIP(request), "verify")
     if cache.get(cacheKey, 0) >= 5:
         message = "You are temporarily blocked from this page because you have entered too many invalid codes."
     else:

@@ -13,6 +13,16 @@ from volunteers.emailTemplates import sendRegVerificationEmail, sendResetPasswor
 from random import randint
 from re import search, sub
 
+"""
+Get IP of requests behind proxies.
+"""
+def getIP(request):
+    ips = request.META.get("HTTP_X_FORWARDED_FOR")
+    if ips:
+        return ips.split(", ")[0]
+    else:
+        return request.META["REMOTE_ADDR"]
+
 def _isValidPassword(pwString):
     return len(pwString) >= 6
 
@@ -30,7 +40,7 @@ class LoginForm(forms.Form):
     
     @staticmethod
     def _cacheKey(request):
-        return (request.META["REMOTE_ADDR"], "login")
+        return (getIP(request), "login")
     
     """
     Attempt to login an user who filled out the login form.
