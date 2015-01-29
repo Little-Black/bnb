@@ -25,17 +25,12 @@ def siteInfoContextProcessor(request):
 
 @login_required
 def volunteerHome(request):
-    returnpage = 'volunteers/volunteerHome.html'
-    if request.user.has_perm('staff_status'):
-        returnpage = 'volunteers/volunteerStaffHome.html'
-    print "Homepage no submit"
-    try:
-        user = request.user #authenticate(username='admin', password='adMIN')
-        context = getVolunteerPageContext(request,user)
-    except:
-        print "Not logged in"
-        context = {'query_results': [],'total_credits':0,'type_choices':[]}
-    return render(request, returnpage,context)
+    if request.method == "POST":
+        return volunteerSubmit(request)
+    else:
+        returnpage = 'volunteers/volunteerHome.html' if request.user.is_staff else 'volunteers/volunteerStaffHome.html'
+        context = getVolunteerPageContext(request)
+        return render(request, returnpage, context)
 
 @login_required
 def volunteerSubmit(request):
@@ -50,7 +45,7 @@ def volunteerSubmit(request):
     dateDone = request.POST['date']
     print dateDone
     if date.today() < datetime.strptime(dateDone, "%m/%d/%Y").date():
-        context = getVolunteerPageContext(request,user)
+        context = getVolunteerPageContext(request)
         context['message']='Date late than today!'
         return render(request,returnpage,context)
     print request.POST['activityType']
@@ -96,7 +91,7 @@ def volunteerSubmit(request):
     for voucher in vouchers_used:
         voucher.redemptionActivity = activity
         voucher.save()
-    context = getVolunteerPageContext(request,user)
+    context = getVolunteerPageContext(request)
     # return HttpResponse("Hi there!")
     context['invalid_vouchers']=mark_safe(invalid)
     context['invalid_boolean']=invalid_boolean
@@ -104,7 +99,8 @@ def volunteerSubmit(request):
     return render(request, returnpage, context)
     # return HttpResponseRedirect('/volunteer/home/','volunteers/volunteerHome.html',context)
 
-def getVolunteerPageContext(request,user):
+def getVolunteerPageContext(request):
+    user = request.user
     query_results = user.activity_set.all()
     total_credits = user.profile.totalCredit()
     type_choices = ActivityType.objects.values_list('name', flat=True)
