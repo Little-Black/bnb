@@ -1,6 +1,6 @@
 $(document).ready(function(){
-    $('#date1').datepicker({format: "yyyy-mm-dd"});
-    $('#date2').datepicker({format: "yyyy-mm-dd"});
+    $('#date1').datetimepicker({format: "yyyy-mm-dd"});
+    $('#date2').datetimepicker({format: "yyyy-mm-dd"});
 });
 
 var counter = 1;
