@@ -44,7 +44,7 @@ window.onload = doImmediately;
     // each additional entry field is added to the page 
     $( ".codeEntry" ).keydown(function(e){
       var key = e.keyCode;
-      if ((key >= 96 && key <= 105) || (key >= 48 && key <= 57) || (key >= 65 && key <= 90)) { //keyCode checks which character the user is entering
+      if (key == 8 || key == 9 || key == 13 || (key >= 96 && key <= 105) || (key >= 48 && key <= 57) || (key >= 65 && key <= 90)) { //keyCode checks which character the user is entering
         // Do nothing (for some reason, doing ![the statement in the 'if' statement] wasn't working...)
       }else{
         e.preventDefault(); //prevents anything other than a number or letter to be entered
