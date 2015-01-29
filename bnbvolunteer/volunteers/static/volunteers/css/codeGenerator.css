@@ -12,7 +12,7 @@
 .nav{
 	margin-bottom: 20px;
 }
-.generator-title, .find-title, .add-activity-title{
+.generator-title, .find-title, .add-activity-title, .add-log-title{
 	font-size: 40px;
 	font-weight: bold;
 	border-bottom: 1px solid black;
@@ -52,7 +52,7 @@
 	margin: auto;
 	display: block;
 }
-.filters, .add-new-act{
+.filters, .add-new-act, .add-log-to-user{
 	background-color: lightgray;
 	border: 1px solid black;
 	border-radius: 20px;

@@ -1,0 +1,7 @@
+.results{
+	width: 90%;
+	margin: 30px auto auto auto;
+}
+.description-label, .credits-label, .type-label, .done-label{
+	display: inline-block;
+}
