@@ -25,6 +25,8 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+HTTPS_REDIRECT = False # turn this on in production
+
 ALLOWED_HOSTS = []
 
 
