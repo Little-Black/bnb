@@ -1,13 +1,49 @@
+ {% extends "volunteers/base.html" %}
 {% load staticfiles%}
-<html>
-<head>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/bootstrap.min.css' %}" />
+
+{% block cssfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/updateProfile.css' %}" />
-</head>
-<body>
-    <a href="{% url returnPage %}"><button class="home btn btn-default"> Back </button></a>
-    <h3 class="title"> Edit profile information </h3>
+    <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/staffPages.css' %}" />
+{% endblock cssfiles %}
+
+{% block tabs %}
+    {% if isStaff %}
+        <a href="{% url 'logout' %}"><button class="logout-btn btn btn-default">Logout</button></a>
+        <br>
+
+        <h1 class="bnb-header"> {{ org_name }} </h1>
+        {% if subheader %}
+            <h4 class="subheader"> {{ subheader }} </h4>
+        {% endif %}
+
+        <ul class="nav nav-tabs">
+          <li role="presentation">
+            <a href="{% url 'volunteerStaffHome' %}">Volunteer Profile</a>
+          </li>
+          <li role="presentation" class="active">
+            <a href="{% url 'editProfile' %}">Edit Profile</a>
+          </li>
+          <li role="presentation">
+            <a href="{% url 'volunteerStaffUserSearchResult' %}">Users</a>
+          </li>
+          <li role="presentation">
+            <a href="{% url 'volunteerStaffLog' %}">Activities</a>
+          </li>
+          <li role="presentation">
+            <a href="{% url 'codeGenerator' %}">Vouchers</a>
+          </li>
+          <li role="presentation">
+            <a href="{% url 'volunteerStaffActivity' %}">Activity Types</a>
+          </li>
+        </ul>
+    {% endif %}
+{% endblock tabs %}
+
+{% block tabcontent %}
+    {% if not isStaff %}
+        <a href="{% url returnPage %}"><button class="home btn btn-default"> Back </button></a>
+    {% endif %}
+    <h3 class="title"> Edit profile information</h3>
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -32,19 +68,15 @@
                 </div>
             {% endfor %}
             <input type="submit" class="submit-btn btn btn-primary" name="submit" value="Submit">
-	    <input type="submit" class="btn btn-default" formaction="{% url returnPage %}" value="Cancel">
+	    <!-- <input type="submit" class="btn btn-default" formaction="{% url returnPage %}" value="Cancel"> -->
         </div>
     </form>
     <h3 class="delete-title"> Delete your account </h3>
     <p class="delete-note">Are you sure you want to delete your account? It will be gone forever! (a really long time)</p>
     <a href="{% url "deleteAccount" %}"><button class="delete-account-btn btn btn-danger">Delete Account</button></a>
     <!-- <a href="{% url "deleteAccount" %}"> Are you sure? Your points will be lost forever (a very long time). </a> -->
-    <br>
-    <br>
-<!-- JQuery -->
-<script src="{% static 'volunteers/js/JQuery/jquery-1.11.2.min.js' %}"></script>
-<!-- Bootstrap -->
-<script src="{% static 'volunteers/js/Bootstrap/bootstrap.min.js' %}"></script>
-<script src="{% static 'volunteers/js/updateProfile.js' %}"></script>
-</body>
-</html>
+{% endblock tabcontent %}
+
+{% block jsfiles %}
+  <script src="{% static 'volunteers/js/updateProfile.js' %}"></script>
+{% endblock jsfiles %}

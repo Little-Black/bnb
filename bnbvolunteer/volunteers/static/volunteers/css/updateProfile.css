@@ -20,6 +20,7 @@
 	background-color: lightgray;
 	padding: 10px;
 	margin-bottom: 20px;
+	overflow: auto;
 }
 .changing-password-fields{
 	display: none;

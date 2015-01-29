@@ -24,14 +24,15 @@ $( ".onlyNumbersEntry" ).keydown(function(e){
 });
 
 $( ".phoneNumberEntry" ).keydown(function(e){
-  phonekeyEntryFunction(e.keyCode);
+  phonekeyEntryFunction(e);
 });
 
 $( "#id_phone" ).keydown(function(e){
-  phonekeyEntryFunction(e.keyCode);
+  phonekeyEntryFunction(e);
 });
 
-function phonekeyEntryFunction(key){
+function phonekeyEntryFunction(event){
+  var key = event.keyCode;
   var isValidKeys = [16, 191, 189, 109];
   var keyIsValid = false;
   for (isValid in isValidKeys){
@@ -42,6 +43,6 @@ function phonekeyEntryFunction(key){
   if ((key >= 96 && key <= 105) || (key >= 48 && key <= 57) || keyIsValid) { //keyCode checks which character the user is entering
     // Do nothing (for some reason, doing ![the statement in the 'if' statement] wasn't working...)
   }else{
-    e.preventDefault(); //prevents anything other than a number or [/ or - or shift (for parentheses if they want)] to be entered
+    event.preventDefault(); //prevents anything other than a number or [/ or - or shift (for parentheses if they want)] to be entered
   }
 }

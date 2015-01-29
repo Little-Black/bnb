@@ -24,7 +24,6 @@ function addInput(divName){
      }
 }
 function doImmediately() {
-    $('#tohide').hide();
         
         // var invalid_boolean = {{invalid_boolean}};
         if (invalid_boolean){

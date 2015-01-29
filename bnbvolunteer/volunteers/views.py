@@ -28,7 +28,7 @@ def volunteerHome(request):
     if request.method == "POST":
         return volunteerSubmit(request)
     else:
-        returnpage = 'volunteers/volunteerHome.html' if request.user.is_staff else 'volunteers/volunteerStaffHome.html'
+        returnpage = 'volunteers/volunteerStaffHome.html' if request.user.is_staff else 'volunteers/volunteerHome.html'
         context = getVolunteerPageContext(request)
         return render(request, returnpage, context)
 
@@ -334,10 +334,12 @@ def editProfile(request):
         infoForm = EditProfileForm(EditProfileForm.createUserContext(request.user))
         pwForm = PasswordChangeForm()
     returnPage = "volunteerHome"
+    isStaff = False
     if request.user.is_staff:
     # if request.user.has_perm("staff_status"):
         returnPage = "volunteerStaffHome"
-    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage})
+        isStaff = True
+    return render(request, "volunteers/profile.html", {"infoForm": infoForm, "pwForm": pwForm, "returnPage": returnPage, "isStaff": isStaff})
 
 def verify(request, code):
     cacheKey = (getIP(request), "verify")
