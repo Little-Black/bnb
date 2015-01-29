@@ -12,7 +12,9 @@ from volunteers.decorators import redirect_to_https, staff_only
 from volunteers.models import ActivityType, Activity, Voucher, VerificationRequest, UserProfile
 from volunteers.userManagement import LoginForm, RegistrationForm, EditProfileForm, PasswordChangeForm, RequestPasswordResetForm, userDeleteAccount
 
+from math import ceil
 from random import randint
+from sys import maxint
 from datetime import date
 from datetime import datetime, timedelta
 
@@ -204,32 +206,47 @@ def volunteerStaffActivity(request):
     return render(request, 'volunteers/volunteerStaffActivity.html', context)
 
 @staff_only
-def volunteerStaffUserSearchResult(request):   
+def volunteerStaffUserSearchResult(request):
+    USERS_PER_PAGE = 30
     context = dict()
     if request.method == "POST":
         lastname = request.POST['lastname'] if 'lastname'in request.POST else ""
         phone = request.POST['phone'] if 'phone' in request.POST else ""
         email = request.POST['email'] if 'email' in request.POST else ""
         try:
-            creditLowerBound = int(request.POST['creditsDown']) if 'creditsDown' in request.POST else 0
-        except ValueError:
+            creditLowerBound = int(request.POST['creditsDown'])
+        except:
             creditLowerBound = 0
         try:
-            creditUpperBound = int(request.POST['creditsUp']) if 'creditsUp' in request.POST else 999999
-        except ValueError:
-            creditUpperBound = 999999
+            creditUpperBound = int(request.POST['creditsUp'])
+        except:
+            creditUpperBound = maxint
         search_results_raw = User.objects.filter(last_name__icontains=lastname, profile__phone__contains=phone, email__contains=email)
         search_results_raw = filter(lambda user: creditLowerBound <= user.profile.totalCredit() <= creditUpperBound, search_results_raw)
         context.update({'lastname': lastname,
                         'phone': phone,
                         'email': email,
-                        'creditsDown': creditLowerBound,
-                        'creditsUp': creditUpperBound
+                        'creditsDown': request.POST.get('creditsDown'),
+                        'creditsUp': request.POST.get('creditsUp')
                         })
     else:
         search_results_raw = User.objects.all()
-    search_results = map(lambda user: (user, user.profile.totalCredit()), search_results_raw)
-    context.update({'search_results': search_results, 'type_choices': ActivityType.objects.all()})
+    userCount = len(search_results_raw)
+    pageCount = int(ceil(float(userCount)/USERS_PER_PAGE))
+    try:
+        page = min(max(1,int(request.GET['page'])),pageCount)
+    except:
+        page = 1
+    if page != pageCount:
+        search_results = map(lambda user: (user, user.profile.totalCredit()), search_results_raw[USERS_PER_PAGE*(page-1):USERS_PER_PAGE*page])
+    else:
+        search_results = map(lambda user: (user, user.profile.totalCredit()), search_results_raw[USERS_PER_PAGE*(page-1):])
+    context['prevPage'] = max(1,page-1)
+    context['nextPage'] = min(page+1, pageCount)
+    context['search_results'] = search_results
+    context['userCount'] = userCount
+    context['pageCount'] = pageCount
+    context['page'] = page
     return render(request, 'volunteers/volunteerStaffSearchResults.html', context)
 
 @staff_only

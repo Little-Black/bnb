@@ -24,10 +24,23 @@
   <input name="phone" class="DateInput" type="text" value={{phone}}>
   <p class="credits-label">Email</p>
   <input name="email" class="DateInput" type="text" value={{email}}>
-  <input type="submit" value="Search" class="btn btn-default">
+  <br>
+  <input type="submit" value="Search" class="search-btn btn btn-primary">
+  <br>
 </div>
 
+<div class="page-btns">
+    <input type="submit" formaction="?page={{ prevPage }}" Value="Previous Page" class="last-page btn btn-default">
+    <input type="submit" formaction="?page={{ nextPage }}" Value="Next Page" class="next-page btn btn-default">
+</div>
 
+<div class="gotopage wrap">
+    <div class="content">
+        <p class="goto-label">{{ userCount }} users found. This is page {{ page }} of {{ pageCount }}. Go to page </p>
+        <input name="toPage" id='to-page' class="toPage" type="text" >
+        <input type="submit" id="redirect-to-page" value="Go" class="goto-btn btn btn-default">
+    </div>
+</div>
 
 </form>
 
@@ -55,3 +68,12 @@
 <br>
 <br>
 {% endblock tabcontent %}
+
+{% block jsfiles %}
+<script>
+    document.getElementById('redirect-to-page').onclick = function () {
+        var url = [location.protocol, '//', location.host, location.pathname].join('');
+        window.location.replace(url+'\?page='+document.getElementById('to-page').value);
+    };
+</script>
+{% endblock jsfiles %}
