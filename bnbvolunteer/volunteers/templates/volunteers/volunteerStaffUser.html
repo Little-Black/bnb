@@ -4,20 +4,11 @@
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/Bootstrap/datepicker.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/search.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffUser.css' %}" />
 {% endblock specificCss %}
 
 {% block tabcontent %}
-<form action="{% url 'volunteerStaffUserSearchResult' %}" method="post">{% csrf_token %}
-
-<div class="input-group search">
-
-
-<input type="text" class="form-control" Placeholder="Last Name"  name="lastname">
-<span class="input-group-btn">
-  <input type="submit"  class="btn btn-default" value="Go!">
-</span>
-</div>
-</form>
 
 <div class="panel panel-default results">
   <div class="panel-heading">{{ getuser }}</div>
@@ -70,7 +61,7 @@
 </table>
 </div>
 <div class="add-logs">
-  <input type="submit" value="Delete Selected Logs" class="btn btn-default">
+  <input type="submit" value="Delete Selected Logs" class="btn btn-danger">
   </form>
 </div>
 
@@ -78,23 +69,35 @@
 <!-- JQuery -->
 
 
-<div class="add-logs">
-  <form action="?getuser={{getuser}}" method="post">{% csrf_token %}
-	  <p class="add-label">Add activities to {{ getuser.last_name }}</p>
-  <p class="description-label">Description:</p><input type="text" name="description">
-  <p class="credits-label">Credits:</p><input type="number" name="credits">
-  <p class="credits-label">Activity Type:</p>
-  <select name="activityType">
-    {% for type in type_choices %}
-    <option {% if type.name == typeSelected %}selected{% endif %} value="{{type}}">{{type}}</option>
-    {% endfor %}  
-  </select>
-  <p class="credits-label">Date Done:</p>
-  <input name="dateDone" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDone}}>
-  <input type="submit" value="Submit" class="btn btn-default">
+<div class="add-log-title">Add a log to {{ getuser.first_name }}</div>
+  <form action="?getuser={{getuser}}" class="add-log-to-user" method="post">{% csrf_token %}
+	  <div class="field1">
+      <p class="description-label">Description:</p>
+        <input type="text" name="description">
+    </div>
+
+    <div class="field2">
+      <p class="credits-label">Credits:</p>
+        <input type="number" name="credits">
+    </div>
+
+    <div class="field3">
+      <p class="done-label">Date Done:</p>
+        <input name="dateDone" class="DateInput" id="date1" type="text" format="y-m-d" value={{dateDone}}>
+    </div>
+
+    <div class="field4">
+      <p class="type-label">Activity Type:</p>
+        <select name="activityType" class="btn btn-default dropdown-toggle">
+          {% for type in type_choices %}
+            <option {% if type.name == typeSelected %}selected{% endif %} value="{{type}}">{{type}}</option>
+          {% endfor %}  
+        </select>
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary">
   </form>
   {{inform}}
-</div>
 {% endblock tabcontent %}
 
 {% block jsfiles %}
