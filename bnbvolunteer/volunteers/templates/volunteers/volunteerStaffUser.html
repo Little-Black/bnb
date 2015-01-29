@@ -32,22 +32,6 @@
     </tr>
 </table>
 </div>
-<form method="post" action="">
-{% csrf_token %}
-<div class="page-btns">
-  <input type="submit" formaction="?page={{ lastPage }}" Value="Last Page" class="last-page btn btn-default"> 
-  
-  <input type="submit" formaction="?page={{ nextPage }}" Value="Next Page" class="next-page btn btn-default">
-</div>
-
-  <div class="gotopage wrap">
-    <div class="content">
-      <p class="goto-label">{{ num }} activities found. This is page {{ pageNum }} of {{ allPage }}. Go to page </p>
-      <input name="toPage" class="toPage onlyNumbersEntry" type="text" >
-    <input type="submit"  formaction="?page=?" Value="Go" class="goto-btn btn btn-default">
-      </div>
-  </div>
-  </form>
   <form action="" method="post">{% csrf_token %}
 <div class="panel panel-default results">
   <div class="panel-heading">Timesheet</div>
