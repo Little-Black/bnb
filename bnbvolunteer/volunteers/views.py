@@ -364,6 +364,7 @@ def codeGenerator(request):
     query_results = Voucher.objects.all()
     if request.method == 'POST':
         if "isRedemed" in request.POST.keys():
+            ## If the user wanted to filter vouchers
             try:
                 query_results = query_results.filter(generateDate__gte = request.POST['dateDown'])
             except:
@@ -391,7 +392,7 @@ def codeGenerator(request):
                 ## If not, the user meant to delete those vouchers
                     try:
                         voucher = Voucher.objects.get(code=idNum)
-                        if request.POST.get('export', 'No') == "Yes":
+                        if request.GET['export'] == "Yes":
                             vouchersToExport.append(voucher)
                         else:
                             voucher.delete()
@@ -399,7 +400,7 @@ def codeGenerator(request):
                         idNum = idNum
 
             #Now that you've built the list of vouchers to export, send the lsit to exportCodes()
-            if request.POST.get('export', 'No') == "Yes":
+            if request.GET['export'] == "Yes":
                 responseToExport = exportCodes(request, vouchersToExport)
                 return responseToExport
 
