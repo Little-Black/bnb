@@ -284,6 +284,7 @@ def userLogout(request):
     logout(request)
     return HttpResponseRedirect(reverse("userLogin"))
 
+@redirect_to_https
 def userRegistration(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
@@ -297,6 +298,7 @@ def userRegistration(request):
         else:
             return render(request, "volunteers/register.html", {"form": RegistrationForm()})
 
+@redirect_to_https
 def forgetPassword(request):
     if request.method == "POST":
         form = RequestPasswordResetForm(request.POST)
@@ -341,16 +343,6 @@ def verify(request, code):
 def deleteAccount(request):
     userDeleteAccount(request)
     return HttpResponseRedirect(reverse("editProfile"))
-
-@login_required
-def search(request):
-    context = {}
-    return render(request,'volunteers/search.html',context)
-
-@login_required
-def updateProfile(request):
-    context = {}
-    return render(request,'volunteers/updateProfile.html',context)
 
 @staff_only
 def codeGenerator(request):
