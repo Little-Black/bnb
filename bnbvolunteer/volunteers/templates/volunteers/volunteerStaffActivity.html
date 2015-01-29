@@ -3,12 +3,25 @@
 
 {% block specificCss %}
   <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/volunteerStaffActivity.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'volunteers/css/codeGenerator.css' %}" />
 {% endblock specificCss %}
 
 {% block tabcontent %}
+<div class="add-new-act">
+  <p class="add-activity-title">Create an Activity Type</p>
+
+  <form action="" class="create-new-act" method="post">{% csrf_token %}
+
+  <p class="act-name-label">Name:</p>
+  <input type="text" name="activityName">
+  <br>
+  <input class="submit-btn btn btn-primary" type="submit" value="Submit" />
+  </form>
+</div>
+
 <div class="input-group search">
   </div>
-<div class="panel panel-default results">
+<div class="panel panel-default results activities">
     <div class="panel-heading">Activities</div>
     <table class="table">
     <tr>
@@ -22,18 +35,6 @@
     </tr>
     {% endfor %}
 </table>
-</div>
-
-<div class="add-new-act">
-  <p class="add-label">Add a new activity type</p>
-
-  <form action="" method="post">{% csrf_token %}
-
-  <p class="name-label">Name:</p>
-  <input type="text" name="activityName">
-  <br>
-  <input class="submit-btn btn btn-default" type="submit" value="Submit" />
-  </form>
 </div>
 {% endblock tabcontent %}
 

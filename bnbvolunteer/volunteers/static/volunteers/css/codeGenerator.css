@@ -12,13 +12,17 @@
 .nav{
 	margin-bottom: 20px;
 }
-.generator-title, .find-title{
-	font-size: 50px;
+.generator-title, .find-title, .add-activity-title{
+	font-size: 40px;
 	font-weight: bold;
 	border-bottom: 1px solid black;
 	text-align: center;
 	width: 50%;
 	margin: 50px auto 20px auto;
+}
+.add-activity-title{
+	font-size: 20px;
+	margin: 10px auto 20px auto;
 }
 .generator{
 	margin: auto;
@@ -38,14 +42,17 @@
 	width: 90%;
 	margin: 120px auto auto auto;
 }
-.credits-label, .redeemed, .generated-btn, .generated-btn1, .and,.generated-btn2 ,.credits-btn1, .credits-btn2{
+.activities{
+	margin: 30px auto auto auto;
+}
+.act-name-label, .credits-label, .redeemed, .generated-btn, .generated-btn1, .and,.generated-btn2 ,.credits-btn1, .credits-btn2{
 	display: inline-block;
 }
 .submit-btn{
 	margin: auto;
 	display: block;
 }
-.filters{
+.filters, .add-new-act{
 	background-color: lightgray;
 	border: 1px solid black;
 	border-radius: 20px;
