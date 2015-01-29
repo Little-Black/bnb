@@ -40,7 +40,7 @@ function phonekeyEntryFunction(event){
   		keyIsValid = true;
   	}
   }
-  if ((key >= 96 && key <= 105) || (key >= 48 && key <= 57) || keyIsValid) { //keyCode checks which character the user is entering
+  if (key == 8 || key == 13 || (key >= 96 && key <= 105) || (key >= 48 && key <= 57) || keyIsValid) { //keyCode checks which character the user is entering
     // Do nothing (for some reason, doing ![the statement in the 'if' statement] wasn't working...)
   }else{
     event.preventDefault(); //prevents anything other than a number or [/ or - or shift (for parentheses if they want)] to be entered
